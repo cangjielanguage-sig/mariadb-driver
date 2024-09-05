@@ -1,0 +1,33 @@
+CREATE DATABASE driver_test
+USE driver_test
+CREATE TABLE `full_test`  (
+  `id` bigint NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `tinyint_col` tinyint NULL DEFAULT NULL,
+  `utinyint_col` tinyint UNSIGNED NULL DEFAULT NULL,
+  `smallint_col` smallint NULL DEFAULT NULL,
+  `usmallint_col` smallint UNSIGNED NULL DEFAULT NULL,
+  `mediumint_col` mediumint NULL DEFAULT NULL,
+  `umediumint_col` mediumint UNSIGNED NULL DEFAULT NULL,
+  `int_col` int NULL DEFAULT NULL,
+  `uint_col` int UNSIGNED NULL DEFAULT NULL,
+  `bigint_col` bigint NULL DEFAULT NULL,
+  `ubigint_col` bigint UNSIGNED NULL DEFAULT NULL,
+  `float_col` float NULL DEFAULT NULL,
+  `double_col` double NULL DEFAULT NULL,
+  `decimal_col` decimal(65, 30) NULL DEFAULT NULL,
+  `date_col` date NULL DEFAULT NULL,
+  `time_col` time NULL DEFAULT NULL,
+  `datetime_col` datetime NULL DEFAULT NULL,
+  `timestamp_col` timestamp NULL DEFAULT NULL,
+  `year_col` year NULL DEFAULT NULL,
+  `char_col` char(255) ,
+  `varchar_col` varchar(255) ,
+  `tinytext_col` tinytext ,
+  `text_col` text ,
+  `mediumtext_col` mediumtext ,
+  `longtext_col` longtext ,
+  `tinyblob_col` tinyblob ,
+  `blob_col` blob ,
+  `mediumblob_col` mediumblob ,
+  `longblob_col` longblob
+)
