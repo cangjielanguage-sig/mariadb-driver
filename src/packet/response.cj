@@ -14,11 +14,11 @@ protected open class Response <: CommonPacket {
 
     internal var _code: ResponseCode
 
-    internal prop code: ResponseCode {
-        get() {
-            return _code
-        }
-    }
+    // internal prop code: ResponseCode {
+    //     get() {
+    //         return _code
+    //     }
+    // }
 
     internal Response(stream: InputStream){
         super(stream)

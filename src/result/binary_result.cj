@@ -192,7 +192,6 @@ public class BinaryResult <: TabularResult {
         if(dataOp.isNone()){
             return None
         }
-        var data = dataOp.getOrThrow()
         match (columnType) {
             case Float => return Decimal(getFloat32(index).getOrThrow())
             case Double => return Decimal(getFloat64(index).getOrThrow())

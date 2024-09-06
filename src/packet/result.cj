@@ -216,7 +216,6 @@ protected class BinaryResultPacket <: Response {
         stream.read(nullMap)
         _nullMap = nullMap
         _binaryData = Array<?Array<Byte>>(columnCount, item: [])
-        var values = ArrayList<Any>()
         for(i in 0..columnCount){
             var isNull = (_nullMap[(i+2)/8] & (1u8 << ((i+2) % 8))) != 0
             if(isNull){

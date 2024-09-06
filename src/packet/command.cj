@@ -215,8 +215,8 @@ protected class ExecuteCommand <: Command {
                         case v: String => length += appendString(i, list, v)
                         case v: DateTime => length += appendDateTime(i, list, v)
                         case v: JsonObject => length += appendString(i, list, v.toString())
-                        case v: Array<Byte> => 0
-                        case v: InputStream => 0
+                        case v: Array<Byte> => nothingTodo(v)
+                        case v: InputStream => nothingTodo(v)
                         case v: ?Bool => length += appendBool(i, list, v)
                         case v: ?Int8 => length += appendInt8(i, list, v)
                         case v: ?UInt8 => length += appendUInt8(i, list, v)
@@ -232,9 +232,9 @@ protected class ExecuteCommand <: Command {
                         case v: ?String => length += appendString(i, list, v)
                         case v: ?DateTime => length += appendDateTime(i, list, v)
                         case v: ?JsonObject => length += appendString(i, list, v.toString())
-                        case v: ?Array<Byte> => 0
-                        case v: ?InputStream => 0
-                        case v: ?Any => 1
+                        case v: ?Array<Byte> => nothingTodo(v)
+                        case v: ?InputStream => nothingTodo(v)
+                        case v: ?Any => nothingTodo(v)
                         case _ => throw UnsupportedException("Unsupport type")
                     }
                 }

@@ -111,7 +111,7 @@ public class StatementTest{
         stream3.write([145,67,34,12,45,32,76,90,62,145,24,56,234,34,235,56,67,145,67,34,12,45,32,76,90,62,145,24,56,234,34,235,56,67,145,67,34,12,45,32,76,90,62,145,24,56,234,34,235,56,67,145,67,34,12,45,32,76,90,62,145,24,56,234,34,235,56,67])
         var p27 = SqlBlob(stream3)
         //longblob
-        var file = File("C:\\Users\\30247\\Desktop\\CangjieTPC\\mysqlclient4cj\\doc\\1.jpg",  OpenOption.Open(true, true))
+        var file = File("C:\\Users\\30247\\Desktop\\cjmd\\doc\\1.jpg",  OpenOption.Open(true, true))
         var array = file.readToEnd()
         var stream4 = ByteArrayStream()
         stream4.write(array)

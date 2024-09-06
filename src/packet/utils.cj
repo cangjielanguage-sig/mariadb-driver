@@ -395,8 +395,8 @@ protected func binaryTimeToDateTime(data: Array<Byte>): ?DateTime {
             stream.read(hourArray)
             stream.read(minuteArray)
             stream.read(secondArray)
-            var negative = littleEndianToUInt64(negativeArray)
-            var day = littleEndianToUInt64(dayArray)
+            //var negative = littleEndianToUInt64(negativeArray)
+            //var day = littleEndianToUInt64(dayArray)
             var hour = littleEndianToUInt64(hourArray)
             var minute = littleEndianToUInt64(minuteArray)
             var second = littleEndianToUInt64(secondArray)
@@ -416,8 +416,8 @@ protected func binaryTimeToDateTime(data: Array<Byte>): ?DateTime {
             stream.read(minuteArray)
             stream.read(secondArray)
             stream.read(micorSecondArray)
-            var negative = littleEndianToUInt64(negativeArray)
-            var day = littleEndianToUInt64(dayArray)
+            //var negative = littleEndianToUInt64(negativeArray)
+            //var day = littleEndianToUInt64(dayArray)
             var hour = littleEndianToUInt64(hourArray)
             var minute = littleEndianToUInt64(minuteArray)
             var second = littleEndianToUInt64(secondArray)
@@ -461,3 +461,10 @@ protected func arrayToHexString(array: Array<Byte>): String {
     builder.append(toHexString(array))
     return builder.toString()
 }
+
+/*
+ * 无事可做的函数，用于压制编译器报警
+ */
+ protected func nothingTodo(v: Any): Any {
+    return v
+ }

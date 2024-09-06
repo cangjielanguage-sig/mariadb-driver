@@ -118,7 +118,7 @@ public class MySqlConnection <: Resource {
                 case v:Array<Byte> => writeRequest(SendLongDataCommand(statementId,  UInt16(i), v))
                 case v:?InputStream => if(!v.isNone()){writeRequest(SendLongDataCommand(statementId, UInt16(i), inputStreamToArray(v.getOrThrow())))}
                 case v:?Array<Byte> => if(!v.isNone()){writeRequest(SendLongDataCommand(statementId, UInt16(i), v.getOrThrow()))}
-                case _ => 0
+                case _ => nothingTodo(0)
             }
         }
     }

@@ -62,7 +62,6 @@ public class ClientPrepareStatement <: Statement {
     public override func update(params: Array<SqlDbType>): UpdateResult {
         checkResourceAvailability()
         var executeableSql = getExecuteableSql(params)
-        println(executeableSql)
         var result = _connection.sendUpdate(executeableSql)
         var lastInsertId: Int64 = 0
         if (result.firstInsertId > 0) {
