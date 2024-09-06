@@ -70,6 +70,7 @@ public class ServerPrepareStatement <: Statement {
                 case v: SqlBigInt => parameters.append(v.value)
                 case v: SqlReal => parameters.append(v.value)
                 case v: SqlDouble => parameters.append(v.value)
+                case v: SqlDecimal => parameters.append(v.value)
                 case v: SqlChar => parameters.append(v.value)
                 case v: SqlVarchar => parameters.append(v.value)
                 case v: SqlClob => parameters.append(v.value)
@@ -114,6 +115,11 @@ public class ServerPrepareStatement <: Statement {
                 case v: SqlNullableDouble => if (v.value.isNone()) {
                     parameters.append(Option<Any>.None)
                 } else {
+                    parameters.append(v.value.getOrThrow())
+                }
+                case v: SqlNullableDecimal => if (v.value.isNone()) {
+                    parameters.append(Option<Any>.None)
+                }else {
                     parameters.append(v.value.getOrThrow())
                 }
                 case v: SqlNullableChar => if (v.value.isNone()) {

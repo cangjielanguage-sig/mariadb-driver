@@ -52,23 +52,23 @@ public class ConnectionImpl <: Connection{
     override public func prepareStatement(sql: String): Statement{
         checkResourceAvailability()
         checkEmptySql(sql)
-        return ClientPrepareStatement(this,sql)
+        //return ClientPrepareStatement(this,sql)
         //return ServerPrepareStatement(this, sql)
 
-        //var prepareMode: String = _options.get(ConnectionOption.PrepareMode).getOrDefault({=>"auto"})
-        // if(prepareMode == "auto"){
-        //     if(sql.size > 100 && sql.toAsciiLower().startsWith("select")){
-        //         return ServerPrepareStatement(this, sql)
-        //     }else{
-        //         return ClientPrepareStatement(this,sql)
-        //     }
-        // }else if(prepareMode == "server"){
-        //     return ServerPrepareStatement(this,sql)
-        // }else if(prepareMode == "client"){
-        //     return ClientPrepareStatement(this, sql)
-        // }else {
-        //     throw SqlException("Unknow prepare mode: ${prepareMode} option: auto, server or client")
-        // }
+        var prepareMode: String = _options.get(ConnectionOption.PrepareMode).getOrDefault({=>"auto"})
+        if(prepareMode == "auto"){
+            if(sql.size > 100 && sql.toAsciiLower().startsWith("select")){
+                return ServerPrepareStatement(this, sql)
+            }else{
+                return ClientPrepareStatement(this,sql)
+            }
+        }else if(prepareMode == "server"){
+            return ServerPrepareStatement(this,sql)
+        }else if(prepareMode == "client"){
+            return ClientPrepareStatement(this, sql)
+        }else {
+            throw SqlException("Unknow prepare mode: ${prepareMode} option: auto, server or client")
+        }
     }
 
     /*创建事务对象*/

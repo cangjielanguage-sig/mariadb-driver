@@ -9,6 +9,7 @@ import encoding.json.*
 import std.convert.*
 import encoding.hex.*
 import std.io.*
+import std.math.numeric.*
 
 /*
  * Command Phase
@@ -212,9 +213,10 @@ protected class ExecuteCommand <: Command {
                         case v: Float16 => length += appendFloat16(i, list, v)
                         case v: Float32 => length += appendFloat32(i, list, v)
                         case v: Float64 => length += appendFloat64(i, list, v)
+                        case v: Decimal => length += appendDecimal(i, list, v)
                         case v: String => length += appendString(i, list, v)
                         case v: DateTime => length += appendDateTime(i, list, v)
-                        case v: JsonObject => length += appendString(i, list, v.toString())
+                        case v: JsonObject => length += appendJsonObject(i, list, v)
                         case v: Array<Byte> => nothingTodo(v)
                         case v: InputStream => nothingTodo(v)
                         case v: ?Bool => length += appendBool(i, list, v)
@@ -229,9 +231,10 @@ protected class ExecuteCommand <: Command {
                         case v: ?Float16 => length += appendFloat16(i, list, v)
                         case v: ?Float32 => length += appendFloat32(i, list, v)
                         case v: ?Float64 => length += appendFloat64(i, list, v)
+                        case v: ?Decimal => length += appendDecimal(i, list, v)
                         case v: ?String => length += appendString(i, list, v)
                         case v: ?DateTime => length += appendDateTime(i, list, v)
-                        case v: ?JsonObject => length += appendString(i, list, v.toString())
+                        case v: ?JsonObject => length += appendJsonObject(i, list, v)
                         case v: ?Array<Byte> => nothingTodo(v)
                         case v: ?InputStream => nothingTodo(v)
                         case v: ?Any => nothingTodo(v)
@@ -276,11 +279,22 @@ protected class ExecuteCommand <: Command {
             var columnType = _paramDefinition[index].columnType
             var integer = value.getOrThrow()
             match (columnType) {
-                case Tiny => return appendUInt8(index, list, UInt8(integer))
-                case Short => return appendUInt16(index, list, UInt16(integer))
-                case Int24 | Long => return appendUInt32(index, list, UInt32(integer))
-                case LongLong => return appendUInt64(index, list, UInt64(integer))
-                case _ => throw Exception("The parameter of the Int8 type does not match the corresponding column type ${columnType}")
+                case Tiny => 
+                    return appendUInt8(index, list, UInt8(integer))
+                case Short => 
+                    return appendUInt16(index, list, UInt16(integer))
+                case Int24 | Long | Year=> 
+                    return appendUInt32(index, list, UInt32(integer))
+                case LongLong => 
+                    return appendUInt64(index, list, UInt64(integer))
+                case Float => 
+                    return appendFloat32(index, list, Float32(integer))
+                case Double => 
+                    return appendFloat64(index, list, Float64(integer))
+                case String | VarString | NewDecimal => 
+                    return appendString(index, list, integer.toString())
+                case _ => 
+                    throw Exception("The parameter of the Int8 type does not match the corresponding column type ${columnType}")
             }
         }
         return 0
@@ -300,6 +314,12 @@ protected class ExecuteCommand <: Command {
                     return appendUInt32(index, list, UInt32(integer))
                 case LongLong => 
                     return appendUInt64(index, list, UInt64(integer))
+                case Float => 
+                    return appendFloat32(index, list, Float32(integer))
+                case Double => 
+                    return appendFloat64(index, list, Float64(integer))
+                case String | VarString | NewDecimal => 
+                    return appendString(index, list, integer.toString())
                 case _ => 
                     throw Exception("The parameter of the UInt8 type does not match the corresponding column type ${columnType}")
             }
@@ -313,11 +333,21 @@ protected class ExecuteCommand <: Command {
             var columnType = _paramDefinition[index].columnType
             var integer = value.getOrThrow()
             match (columnType) {
-                case Tiny => return appendUInt8(index, list, UInt8(integer))
-                case Short => return appendUInt16(index, list, UInt16(integer))
-                case Int24 | Long => return appendUInt32(index, list, UInt32(integer))
-                case LongLong => return appendUInt64(index, list, UInt64(integer))
-                case _ => throw Exception("The parameter of the Int8 type does not match the corresponding column type ${columnType}")
+                case Tiny => 
+                    return appendUInt8(index, list, UInt8(integer))
+                case Short => 
+                    return appendUInt16(index, list, UInt16(integer))
+                case Int24 | Long | Year => 
+                    return appendUInt32(index, list, UInt32(integer))
+                case LongLong => 
+                    return appendUInt64(index, list, UInt64(integer))
+                case Float => 
+                    return appendFloat32(index, list, Float32(integer))
+                case Double => 
+                    return appendFloat64(index, list, Float64(integer))
+                case String | VarString | NewDecimal => 
+                    return appendString(index, list, integer.toString())
+                case _ => throw Exception("The parameter of the Int16 type does not match the corresponding column type ${columnType}")
             }
         }
         return 0
@@ -337,8 +367,14 @@ protected class ExecuteCommand <: Command {
                     return appendUInt32(index, list, UInt32(integer))
                 case LongLong => 
                     return appendUInt64(index, list, UInt64(integer))
+                case Float => 
+                    return appendFloat32(index, list, Float32(integer))
+                case Double => 
+                    return appendFloat64(index, list, Float64(integer))
+                case String | VarString | NewDecimal => 
+                    return appendString(index, list, integer.toString())
                 case _ => 
-                    throw Exception("The parameter of the UInt8 type does not match the corresponding column type ${columnType}")
+                    throw Exception("The parameter of the UInt16 type does not match the corresponding column type ${columnType}")
             }
         }
         return 0
@@ -350,11 +386,22 @@ protected class ExecuteCommand <: Command {
             var columnType = _paramDefinition[index].columnType
             var integer = value.getOrThrow()
             match (columnType) {
-                case Tiny => return appendUInt8(index, list, UInt8(integer))
-                case Short => return appendUInt16(index, list, UInt16(integer))
-                case Int24 | Long => return appendUInt32(index, list, UInt32(integer))
-                case LongLong => return appendUInt64(index, list, UInt64(integer))
-                case _ => throw Exception("The parameter of the Int8 type does not match the corresponding column type ${columnType}")
+                case Tiny => 
+                    return appendUInt8(index, list, UInt8(integer))
+                case Short => 
+                    return appendUInt16(index, list, UInt16(integer))
+                case Int24 | Long | Year => 
+                    return appendUInt32(index, list, UInt32(integer))
+                case LongLong => 
+                    return appendUInt64(index, list, UInt64(integer))
+                case Float => 
+                    return appendFloat32(index, list, Float32(integer))
+                case Double => 
+                    return appendFloat64(index, list, Float64(integer))
+                case String | VarString | NewDecimal => 
+                    return appendString(index, list, integer.toString())
+                case _ => 
+                    throw Exception("The parameter of the Int32 type does not match the corresponding column type ${columnType}")
             }
         }
         return 0
@@ -374,6 +421,12 @@ protected class ExecuteCommand <: Command {
                     return 4
                 case LongLong => 
                     return appendUInt64(index, list, UInt64(integer))
+                case Float => 
+                    return appendFloat32(index, list, Float32(integer))
+                case Double => 
+                    return appendFloat64(index, list, Float64(integer))
+                case String | VarString | NewDecimal => 
+                    return appendString(index, list, integer.toString())
                 case _ => 
                     throw Exception("The parameter of the UInt32 type does not match the corresponding column type ${columnType}")
             }
@@ -387,11 +440,22 @@ protected class ExecuteCommand <: Command {
             var columnType = _paramDefinition[index].columnType
             var integer = value.getOrThrow()
             match (columnType) {
-                case Tiny => return appendUInt8(index, list, UInt8(integer))
-                case Short => return appendUInt16(index, list, UInt16(integer))
-                case Int24 | Long => return appendUInt32(index, list, UInt32(integer))
-                case LongLong => return appendUInt64(index, list, UInt64(integer))
-                case _ => throw Exception("The parameter of the Int8 type does not match the corresponding column type ${columnType}")
+                case Tiny => 
+                    return appendUInt8(index, list, UInt8(integer))
+                case Short => 
+                    return appendUInt16(index, list, UInt16(integer))
+                case Int24 | Long => 
+                    return appendUInt32(index, list, UInt32(integer))
+                case LongLong => 
+                    return appendUInt64(index, list, UInt64(integer))
+                case Float => 
+                    return appendFloat32(index, list, Float32(integer))
+                case Double => 
+                    return appendFloat64(index, list, Float64(integer))
+                case String | VarString | NewDecimal => 
+                    return appendString(index, list, integer.toString())
+                case _ => 
+                    throw Exception("The parameter of the Int64 type does not match the corresponding column type ${columnType}")
             }
         }
         return 0
@@ -402,13 +466,23 @@ protected class ExecuteCommand <: Command {
             var integer = value.getOrThrow()
             var columnType = _paramDefinition[index].columnType
             match (columnType) {
-                case Tiny => return appendUInt8(index, list, UInt8(integer)) // possible overflow
-                case Short | Year => return appendUInt16(index, list, UInt16(integer)) // possible overflow
-                case Long | Int24 => return appendUInt32(index, list, UInt32(integer)) // possible overflow
+                case Tiny => 
+                    return appendUInt8(index, list, UInt8(integer)) // possible overflow
+                case Short => 
+                    return appendUInt16(index, list, UInt16(integer)) // possible overflow
+                case Int24 | Long | Year => 
+                    return appendUInt32(index, list, UInt32(integer)) // possible overflow
                 case LongLong => 
                     list.appendAll(uInt64ToLittleEndian(integer))
                     return 8
-                case _ => throw Exception("The parameter of the UInt32 type does not match the corresponding column type ${columnType}")
+                case Float => 
+                    return appendFloat32(index, list, Float32(integer))
+                case Double => 
+                    return appendFloat64(index, list, Float64(integer))
+                case String | VarString | NewDecimal => 
+                    return appendString(index, list, integer.toString())
+                case _ => 
+                    throw Exception("The parameter of the UInt64 type does not match the corresponding column type ${columnType}")
             }
         }
         return 0
@@ -416,7 +490,22 @@ protected class ExecuteCommand <: Command {
 
     private func appendFloat16(index: Int64, list: ArrayList<Byte>, value: ?Float16): Int64 {
         if (!value.isNone()) {
-            return appendFloat32(index, list, Float32(value.getOrThrow()))
+            var float = value.getOrThrow()
+            var columnType = _paramDefinition[index].columnType
+            match (columnType) {
+                case Float => return appendFloat32(index, list, Float32(float))
+                case Double => return appendFloat64(index, list, Float64(float))
+                case Short =>
+                    return appendInt16(index, list, Int16(float))
+                case Int24 | Long  => 
+                    return appendInt32(index, list, Int32(float))
+                case LongLong => 
+                    return appendInt64(index, list, Int64(float))
+                case String | VarString | NewDecimal  => 
+                    return appendString(index, list, float.toString())
+                case _ => 
+                    throw ParameterConvertException("The parameter of the Float32 type does not match the corresponding column type ${columnType}")
+            }
         }
         return 0
     }
@@ -431,6 +520,14 @@ protected class ExecuteCommand <: Command {
                      return 4
                 case Double => 
                     return appendFloat64(index, list, Float64(float))
+                case Short =>
+                    return appendInt16(index, list, Int16(float))
+                case Int24 | Long  => 
+                    return appendInt32(index, list, Int32(float))
+                case LongLong => 
+                    return appendInt64(index, list, Int64(float))
+                case String | VarString | NewDecimal  => 
+                    return appendString(index, list, float.toString())
                 case _ => 
                     throw ParameterConvertException("The parameter of the Float32 type does not match the corresponding column type ${columnType}")
             }
@@ -448,13 +545,26 @@ protected class ExecuteCommand <: Command {
                 case Double => 
                     list.appendAll(float64ToLittleEndian(float))
                     return 8
-                case Tiny | Short | Year | Int24 | Long | LongLong => 
+                case Tiny => 
+                    return appendInt8(index, list, Int8(float))
+                case Short =>
+                    return appendInt16(index, list, Int16(float))
+                case Int24 | Long  => 
+                    return appendInt32(index, list, Int32(float))
+                case LongLong => 
                     return appendInt64(index, list, Int64(float))
-                case NewDecimal | Json | VarString | TinyBlob | Blob | MediumBlob | LongBlob => 
+                case String | VarString | NewDecimal  => 
                     return appendString(index, list, float.toString())
                 case _ => 
                     throw ParameterConvertException("The parameter of the Float64 type does not match the corresponding column type ${columnType}")
             }
+        }
+        return 0
+    }
+
+    private func appendDecimal(index: Int64, list: ArrayList<Byte>, value: ?Decimal): Int64 {
+        if(!value.isNone()) {
+            return appendString(index, list, value.toString())
         }
         return 0
     }
@@ -464,7 +574,7 @@ protected class ExecuteCommand <: Command {
             var str = value.getOrThrow()
             var columnType = _paramDefinition[index].columnType
             match (columnType) {
-                case Json | String | VarString | NewDecimal | TinyBlob | Blob  | MediumBlob | LongBlob =>
+                case Json | String | VarString | NewDecimal | TinyBlob | Blob | MediumBlob | LongBlob =>
                     var array = stringToLengthEncoded(str)
                     list.appendAll(stringToLengthEncoded(str))
                     return array.size
@@ -531,44 +641,12 @@ protected class ExecuteCommand <: Command {
         return 0
     }
 
-    // private func appendArray(index: Int64, list: ArrayList<Byte>, value: ?Array<Byte>): Int64 {
-    //     if(!value.isNone()){
-    //         var array = value.getOrThrow()
-    //         var columnType = _paramDefinition[index].columnType
-    //         match (columnType) {
-    //             case TinyBlob | Blob | MediumBlob | LongBlob => 
-    //                 var encoded = stringToLengthEncoded(toHexString(array))
-    //                 list.appendAll(encoded)
-    //                 return encoded.size
-    //             case _ => throw Exception("The parameter of the DateTime type does not match the corresponding column type ${columnType}")
-    //         }
-    //     }
-    //     return 0
-    // }
-
-    // private func appendInputStream(index: Int64, list: ArrayList<Byte>, value: ?InputStream): Int64 {
-    //     if(!value.isNone()){
-    //         var stream = value.getOrThrow()
-    //         var columnType = _paramDefinition[index].columnType
-    //         var inputStream = value.getOrThrow()
-    //         match (columnType) {
-    //             case TinyBlob | Blob | MediumBlob | LongBlob => 
-    //                 var builder = StringBuilder()
-    //                 var buffer = Array<Byte>(1024, item: 0)
-    //                 builder.append("0x")
-    //                 var readLength = inputStream.read(buffer)
-    //                 do {
-    //                     builder.append(toHexString(buffer.slice(0, readLength)))
-    //                     readLength = inputStream.read(buffer)
-    //                 } while (readLength != 0)
-    //                 var encoded = stringToLengthEncoded(builder.toString())
-    //                 list.appendAll(encoded)
-    //                 return encoded.size
-    //             case _ => throw Exception("The parameter of the DateTime type does not match the corresponding column type ${columnType}")
-    //         }
-    //     }
-    //     return 0
-    // }   
+    private func appendJsonObject(index: Int64, list: ArrayList<Byte>, value: ?JsonObject): Int64 {
+        if(!value.isNone()) {
+            return appendString(index, list, value.toString())
+        }
+        return 0
+    }
 }
 
 /*

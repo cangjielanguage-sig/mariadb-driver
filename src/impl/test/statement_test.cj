@@ -38,20 +38,51 @@ public class StatementTest{
     */
     @TestCase
     public func insertTest(){
+        // var sql = ###"insert into full_test (
+        //                         tinyint_col,
+        //                         utinyint_col, 
+        //                         smallint_col, 
+        //                         usmallint_col, 
+        //                         mediumint_col, 
+        //                         umediumint_col, 
+        //                         int_col, 
+        //                         uint_col, 
+        //                         bigint_col, 
+        //                         ubigint_col, 
+        //                         float_col, 
+        //                         double_col, 
+        //                         decimal_col, 
+        //                         date_col, 
+        //                         time_col, 
+        //                         datetime_col,
+        //                         timestamp_col, 
+        //                         year_col,
+        //                         char_col,
+        //                         varchar_col,
+        //                         tinytext_col,
+        //                         text_col,
+        //                         mediumtext_col,
+        //                         longtext_col,
+        //                         tinyblob_col,
+        //                         blob_col,
+        //                         mediumblob_col,
+        //                         longblob_col) 
+        //                         values
+        //                         (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"###
         var sql = ###"insert into full_test (
                                 tinyint_col,
-                                utinyint_col, 
-                                smallint_col, 
-                                usmallint_col, 
-                                mediumint_col, 
-                                umediumint_col, 
-                                int_col, 
-                                uint_col, 
-                                bigint_col, 
-                                ubigint_col, 
-                                float_col, 
-                                double_col, 
-                                decimal_col, 
+                                utinyint_col,
+                                smallint_col,
+                                usmallint_col,
+                                mediumint_col,
+                                umediumint_col,
+                                int_col,
+                                uint_col,
+                                bigint_col,
+                                ubigint_col,
+                                float_col,
+                                double_col,
+                                decimal_col,
                                 date_col, 
                                 time_col, 
                                 datetime_col,
@@ -70,29 +101,47 @@ public class StatementTest{
                                 values
                                 (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"###
         var prepare = connection.prepareStatement(sql)
+        //tinyint
         var p1 = SqlByte(-128)
+        //utinyint
         var p2 = SqlSmallInt(0)
+        //smallint
         var p3 = SqlSmallInt(-32768)
+        //usmallint
         var p4 = SqlInteger(0)
+        //mediumint
         var p5 = SqlInteger(-8388608)
-        var p6 = SqlInteger(0)
-        var p7 = SqlInteger(-2147483648)
+        //umediumint
+        var p6 = SqlBigInt(0)
+        //int
+        var p7 = SqlBigInt(-2147483648)
+        //uint
         var p8 = SqlInteger(0)
+        //bigint
         var p9 = SqlBigInt(-9223372036854775808)
+        //ubigint
         var p10 = SqlBigInt(0)
+        //float
         var p11 = SqlReal(2355.785436875)
+        //double
         var p12 = SqlDouble(2465.089728343)
+        //decimal
         var p13 = SqlDecimal(Decimal("1234.56789"))
+        //date
         var p14 = SqlDate(DateTime.now())
+        //time
         var p15= SqlTime(DateTime.now())
+        //datetime
         var p16 = SqlTimestamp(DateTime.now())
+        //timestamp
         var p17 = SqlTimestamp(DateTime.now())
+        //year
         var p18 = SqlSmallInt(2077)
         //char
         var p19 = SqlChar("我冒了严寒，回到相隔二千余里，别了二十余年的故乡去。")
         //varchar
         var p20 = SqlVarchar("时候既然是深冬；渐近故乡时，天气又阴晦了，冷风吹进船舱中")
-        //tiny_tesxt
+        //tiny_text
         var p21 = SqlVarchar("于是我自己解释说：故乡本也如此，——虽然没有进步，也未必有如我所感的悲凉")
         //text
         var p22 = SqlVarchar("我所记得的故乡全不如此。我的故乡好得多了。但要我记起他的美丽，说出他的佳处来，却又没有影像，没有言辞了。仿佛也就如此。")
@@ -116,6 +165,7 @@ public class StatementTest{
         var stream4 = ByteArrayStream()
         stream4.write(array)
         var p28 = SqlBlob(stream4)
+        //var result = prepare.update([p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,p11,p12,p13,p14,p15,p16,p17,p18,p19,p20,p21,p22,p23,p24,p25,p26,p27,p28])
         var result = prepare.update([p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,p11,p12,p13,p14,p15,p16,p17,p18,p19,p20,p21,p22,p23,p24,p25,p26,p27,p28])
         println("effect rows: ${result.rowCount}")
         println("last insert id: ${result.lastInsertId}")
@@ -320,6 +370,76 @@ public class StatementTest{
             updateTest()
         }
         sleep(Duration.second * 5)
+    }
+
+    /*
+    * NULL值插入测试
+    */
+    @TestCase
+    public func insertNullTest() {
+        var sql = ###"insert into full_test (
+                                tinyint_col,
+                                utinyint_col, 
+                                smallint_col, 
+                                usmallint_col, 
+                                mediumint_col, 
+                                umediumint_col, 
+                                int_col, 
+                                uint_col, 
+                                bigint_col, 
+                                ubigint_col, 
+                                float_col, 
+                                double_col, 
+                                decimal_col, 
+                                date_col, 
+                                time_col, 
+                                datetime_col,
+                                timestamp_col, 
+                                year_col,
+                                char_col,
+                                varchar_col,
+                                tinytext_col,
+                                text_col,
+                                mediumtext_col,
+                                longtext_col,
+                                tinyblob_col,
+                                blob_col,
+                                mediumblob_col,
+                                longblob_col) 
+                                values
+                                (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"###
+        var prepare = connection.prepareStatement(sql)
+        var result = prepare.update([
+            SqlNullableChar(None),
+            SqlNullableChar(None),
+            SqlNullableChar(None),
+            SqlNullableChar(None),
+            SqlNullableChar(None),
+            SqlNullableChar(None),
+            SqlNullableChar(None),
+            SqlNullableChar(None),
+            SqlNullableChar(None),
+            SqlNullableChar(None),
+            SqlNullableChar(None),
+            SqlNullableChar(None),
+            SqlNullableChar(None),
+            SqlNullableChar(None),
+            SqlNullableChar(None),
+            SqlNullableChar(None),
+            SqlNullableChar(None),
+            SqlNullableChar(None),
+            SqlNullableChar(None),
+            SqlNullableChar(None),
+            SqlNullableChar(None),
+            SqlNullableChar(None),
+            SqlNullableChar(None),
+            SqlNullableChar(None),
+            SqlNullableChar(None),
+            SqlNullableChar(None),
+            SqlNullableChar(None),
+            SqlNullableChar(None)])
+        println("effect rows: ${result.rowCount}")
+        println("last insert id: ${result.lastInsertId}")
     }
 
 }
