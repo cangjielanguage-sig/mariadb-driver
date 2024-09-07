@@ -280,14 +280,15 @@ public class BinaryResult <: TabularResult {
             case NewDecimal =>
                 return String.fromUtf8(data)
             case String | Json | Enum | Set | TinyBlob | MediumBlob | LongBlob | Blob | VarString => 
-                match (charset) {
-                    case Binary => 
-                        throw Exception("Unsupported Charset: Binary")
-                    case Utf8mb3GeneralCi => 
-                        return String.fromUtf8(data)
-                    case Latin1SwedishCi => 
-                        throw Exception("Unsupported Charset: Latin1SwedishCi")
-                }
+                // match (charset) {
+                //     case Binary => 
+                //         throw Exception("Unsupported Charset: Binary")
+                //     case Utf8mb3GeneralCi => 
+                //         return String.fromUtf8(data)
+                //     case Latin1SwedishCi => 
+                //         throw Exception("Unsupported Charset: Latin1SwedishCi")
+                // }
+                return String.fromUtf8(data)
             case Date => 
                 return getDate(index).getOrThrow().toString(DB_DATE_FORMAT)
             case DateTime | Timestamp => 
@@ -306,18 +307,18 @@ public class BinaryResult <: TabularResult {
         }
         var data = dataOp.getOrThrow()
         match (columnType) {
-            case String | VarString | Json | Enum | Set | TinyBlob | MediumBlob | LongBlob =>
+            case String | VarString | Json | Enum | Set | TinyBlob | Blob | MediumBlob | LongBlob =>
                 return readLengthEncodedString(data)
             case _ => throw UnsupportedException("Unsupported database type ${columnType} convert to Array")
         }
     }
 
-    public override func getJsonObject(index: Int64): ?JsonObject {
+    public override func getJsonValue(index: Int64): ?JsonValue {
         var val = getString(index)
         if(val.isNone()){
             return None
         }else {
-            return JsonObject.fromStr(val.getOrThrow()).asObject()
+            return JsonValue.fromStr(val.getOrThrow())
         }
     }
 

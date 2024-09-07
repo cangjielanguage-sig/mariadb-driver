@@ -1,0 +1,16 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Cangjie (CJNative-unittest): cjmd.impl.test.StatementTest.insertTest",
+            "program": "c:\\Users\\30247\\Desktop\\cjmd\\target\\debug\\unittest_bin\\cjmd.impl.test.exe",
+            "request": "launch",
+            "type": "cangjieDebug",
+            "externalConsole": false,
+            "env": {},
+            "args": [
+                "--filter=StatementTest.insertTest"
+            ]
+        }
+    ]
+}

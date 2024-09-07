@@ -73,7 +73,7 @@ public class QueryResultImpl <: QueryResult {
                     case v: SqlTimestamp => v.value = _result.getTimestamp(i).getOrThrow()
                     case v: SqlBinary => v.value = _result.getArray(i).getOrThrow()
                     case v: SqlVarBinary => v.value = _result.getArray(i).getOrThrow()
-                    case v: SqlJson => v.value = _result.getJsonObject(i).getOrThrow()
+                    case v: SqlJson => v.value = _result.getJsonValue(i).getOrThrow()
                     
                     case v: SqlNullableBool => v.value = _result.getBool(i)
                     case v: SqlNullableByte => v.value = _result.getInt8(i)
@@ -93,7 +93,7 @@ public class QueryResultImpl <: QueryResult {
                     case v: SqlNullableTimestamp => v.value = _result.getTimestamp(i)
                     case v: SqlNullableBinary => v.value =_result.getArray(i)
                     case v: SqlNullableVarBinary => v.value =_result.getArray(i)
-                    case v: SqlNullableJson => v.value = _result.getJsonObject(i)
+                    case v: SqlNullableJson => v.value = _result.getJsonValue(i)
                     case _ => throw UnsupportedException("Unsupported SqlDbType")
                 }
             }

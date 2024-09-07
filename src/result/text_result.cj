@@ -307,12 +307,12 @@ public class PlainResult <: TabularResult {
         }
     }
 
-    public func getJsonObject(index: Int64): ?JsonObject {
+    public func getJsonValue(index: Int64): ?JsonValue {
         var val = getString(index)
         if(val.isNone()){
             return None
         }else {
-            return JsonObject.fromStr(val.getOrThrow()).asObject()
+            return JsonValue.fromStr(val.getOrThrow())
         }
     }
 

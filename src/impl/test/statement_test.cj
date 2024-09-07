@@ -14,6 +14,7 @@ import std.fs.*
 import std.io.*
 import std.math.numeric.*
 import cjmd.packet.*
+import encoding.json.*
 @Test
 public class StatementTest{
 
@@ -28,8 +29,8 @@ public class StatementTest{
         var property3 = ("database","driver_test")
         var property4 = ("ssl.mode","disabled")
         //var property5 = ("prepare.mode","server")
-        //var property5 = ("prepare.mode","client")
-        var dataSource = driver.open("mysql://localhost", [property1,property2,property3,property4])
+        var property5 = ("prepare.mode","client")
+        var dataSource = driver.open("mysql://localhost", [property1,property2,property3,property4,property5])
         connection =  dataSource.connect()
     } 
 
@@ -38,37 +39,6 @@ public class StatementTest{
     */
     @TestCase
     public func insertTest(){
-        // var sql = ###"insert into full_test (
-        //                         tinyint_col,
-        //                         utinyint_col, 
-        //                         smallint_col, 
-        //                         usmallint_col, 
-        //                         mediumint_col, 
-        //                         umediumint_col, 
-        //                         int_col, 
-        //                         uint_col, 
-        //                         bigint_col, 
-        //                         ubigint_col, 
-        //                         float_col, 
-        //                         double_col, 
-        //                         decimal_col, 
-        //                         date_col, 
-        //                         time_col, 
-        //                         datetime_col,
-        //                         timestamp_col, 
-        //                         year_col,
-        //                         char_col,
-        //                         varchar_col,
-        //                         tinytext_col,
-        //                         text_col,
-        //                         mediumtext_col,
-        //                         longtext_col,
-        //                         tinyblob_col,
-        //                         blob_col,
-        //                         mediumblob_col,
-        //                         longblob_col) 
-        //                         values
-        //                         (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"###
         var sql = ###"insert into full_test (
                                 tinyint_col,
                                 utinyint_col,
@@ -97,9 +67,12 @@ public class StatementTest{
                                 tinyblob_col,
                                 blob_col,
                                 mediumblob_col,
-                                longblob_col) 
+                                longblob_col,
+                                json_col,
+                                set_col,
+                                enum_col) 
                                 values
-                                (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"###
+                                (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"###
         var prepare = connection.prepareStatement(sql)
         //tinyint
         var p1 = SqlByte(-128)
@@ -165,8 +138,14 @@ public class StatementTest{
         var stream4 = ByteArrayStream()
         stream4.write(array)
         var p28 = SqlBlob(stream4)
-        //var result = prepare.update([p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,p11,p12,p13,p14,p15,p16,p17,p18,p19,p20,p21,p22,p23,p24,p25,p26,p27,p28])
-        var result = prepare.update([p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,p11,p12,p13,p14,p15,p16,p17,p18,p19,p20,p21,p22,p23,p24,p25,p26,p27,p28])
+        //json
+        var json = JsonObject.fromStr('{"name":"yesokim", "age": 22, "sex": 1}')
+        var p29 = SqlJson(json)
+        //set
+        var p30 = SqlNullableChar("value1,value2")
+        //enum
+        var p31 = SqlNullableChar("value1")
+        var result = prepare.update([p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,p11,p12,p13,p14,p15,p16,p17,p18,p19,p20,p21,p22,p23,p24,p25,p26,p27,p28,p29,p30,p31])
         println("effect rows: ${result.rowCount}")
         println("last insert id: ${result.lastInsertId}")
     }
@@ -204,7 +183,7 @@ public class StatementTest{
     public func queryTest(){
 
         var prepare = connection.prepareStatement("select * from full_test where id = ?")
-        var param = SqlInteger(37)
+        var param = SqlInteger(115)
         var id = SqlInteger(-1)
         //tinyint
         var col1 = SqlNullableByte(None)
@@ -262,9 +241,15 @@ public class StatementTest{
         var col27 = SqlNullableBlob(None)
         //long blob
         var col28 = SqlNullableBlob(None)
+        //json
+        var col29 = SqlNullableJson(None)
+        //set
+        var col30 = SqlNullableVarchar(None)
+        //enum
+        var col31 = SqlNullableVarchar(None)
         var result = prepare.query([param])
 
-        var row: Array<SqlDbType> = [id,col1,col2,col3,col4,col5,col6,col7,col8,col9,col10,col11,col12,col13,col14,col15,col16,col17,col18,col19,col20,col21,col22,col23,col24,col25,col26,col27,col28]
+        var row: Array<SqlDbType> = [id,col1,col2,col3,col4,col5,col6,col7,col8,col9,col10,col11,col12,col13,col14,col15,col16,col17,col18,col19,col20,col21,col22,col23,col24,col25,col26,col27,col28,col29,col30,col31]
         
         while (result.next(row)) {
            print(id.value)
@@ -324,6 +309,12 @@ public class StatementTest{
            print(inputStremToArray(col27.value.getOrThrow()).size)
            print(" ")
            print(inputStremToArray(col28.value.getOrThrow()).size)
+           print(" ")
+           print(col29.value)
+           print(" ")
+           print(col30.value)
+           print(" ")
+           print(col31.value)
            println()
         }
 

@@ -11,3 +11,9 @@
 ## Feature
 
 - 完成了对服务端Prepare的支持
+
+# [v0.2.1]
+
+## Feature
+
+- 完善了对json、set、enum类型的支持

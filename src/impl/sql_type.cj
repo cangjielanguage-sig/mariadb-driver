@@ -8,11 +8,11 @@ import encoding.json.*
 
 public class SqlJson <: SqlDbType{
 
-    private let _name: String = "SqlJSON"
+    private let _name: String = "SqlJson"
 
-    private var _value: JsonObject
+    private var _value: JsonValue
 
-    public SqlJson(value: JsonObject){
+    public SqlJson(value: JsonValue){
         _value = value
     }
     public prop name: String{
@@ -20,7 +20,7 @@ public class SqlJson <: SqlDbType{
             _name
         }
     }
-    public mut prop value: JsonObject{
+    public mut prop value: JsonValue{
         get() {
             _value
         }
@@ -32,11 +32,11 @@ public class SqlJson <: SqlDbType{
 
 public class SqlNullableJson <: SqlNullableDbType{
 
-    private let _name: String = "SqlNullableJSON"
+    private let _name: String = "SqlNullableJson"
     
-    private var _value: ?JsonObject
+    private var _value: ?JsonValue
 
-    public SqlNullableJson(value: ?JsonObject){
+    public SqlNullableJson(value: ?JsonValue){
         _value = value
     }
     public prop name: String{
@@ -44,7 +44,7 @@ public class SqlNullableJson <: SqlNullableDbType{
             _name
         }
     }
-    public mut prop value: ?JsonObject{
+    public mut prop value: ?JsonValue{
         get() {
             _value
         }

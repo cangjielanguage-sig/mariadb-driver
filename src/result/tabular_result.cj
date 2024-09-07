@@ -64,7 +64,7 @@ public interface TabularResult {
 
     func getArray(index: Int64): ?Array<Byte>
 
-    func getJsonObject(index: Int64): ?JsonObject
+    func getJsonValue(index: Int64): ?JsonValue
 
     func getFieldType(index: Int64): ColumnType
 

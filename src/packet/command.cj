@@ -216,7 +216,7 @@ protected class ExecuteCommand <: Command {
                         case v: Decimal => length += appendDecimal(i, list, v)
                         case v: String => length += appendString(i, list, v)
                         case v: DateTime => length += appendDateTime(i, list, v)
-                        case v: JsonObject => length += appendJsonObject(i, list, v)
+                        case v: JsonValue => length += appendJsonValue(i, list, v)
                         case v: Array<Byte> => nothingTodo(v)
                         case v: InputStream => nothingTodo(v)
                         case v: ?Bool => length += appendBool(i, list, v)
@@ -234,7 +234,7 @@ protected class ExecuteCommand <: Command {
                         case v: ?Decimal => length += appendDecimal(i, list, v)
                         case v: ?String => length += appendString(i, list, v)
                         case v: ?DateTime => length += appendDateTime(i, list, v)
-                        case v: ?JsonObject => length += appendJsonObject(i, list, v)
+                        case v: ?JsonValue => length += appendJsonValue(i, list, v)
                         case v: ?Array<Byte> => nothingTodo(v)
                         case v: ?InputStream => nothingTodo(v)
                         case v: ?Any => nothingTodo(v)
@@ -283,7 +283,7 @@ protected class ExecuteCommand <: Command {
                     return appendUInt8(index, list, UInt8(integer))
                 case Short => 
                     return appendUInt16(index, list, UInt16(integer))
-                case Int24 | Long | Year=> 
+                case Int24 | Long | Year => 
                     return appendUInt32(index, list, UInt32(integer))
                 case LongLong => 
                     return appendUInt64(index, list, UInt64(integer))
@@ -308,9 +308,9 @@ protected class ExecuteCommand <: Command {
                 case Tiny => 
                     list.append(value.getOrThrow())
                     return 1
-                case Short | Year => 
+                case Short => 
                     return appendUInt16(index, list, UInt16(integer))
-                case Long | Int24 => 
+                case Long | Int24 | Year => 
                     return appendUInt32(index, list, UInt32(integer))
                 case LongLong => 
                     return appendUInt64(index, list, UInt64(integer))
@@ -416,7 +416,7 @@ protected class ExecuteCommand <: Command {
                     return appendUInt8(index, list, UInt8(integer)) // possible overflow
                 case Short =>
                     return appendUInt16(index, list, UInt16(integer)) // possible overflow
-                case Long | Int24 | Year => 
+                case Int24 | Long | Year => 
                     list.appendAll(uInt32ToLittleEndian(integer))
                     return 4
                 case LongLong => 
@@ -444,7 +444,7 @@ protected class ExecuteCommand <: Command {
                     return appendUInt8(index, list, UInt8(integer))
                 case Short => 
                     return appendUInt16(index, list, UInt16(integer))
-                case Int24 | Long => 
+                case Int24 | Long | Year => 
                     return appendUInt32(index, list, UInt32(integer))
                 case LongLong => 
                     return appendUInt64(index, list, UInt64(integer))
@@ -574,7 +574,7 @@ protected class ExecuteCommand <: Command {
             var str = value.getOrThrow()
             var columnType = _paramDefinition[index].columnType
             match (columnType) {
-                case Json | String | VarString | NewDecimal | TinyBlob | Blob | MediumBlob | LongBlob =>
+                case String | VarString | NewDecimal | Json | TinyBlob | Blob | MediumBlob | LongBlob =>
                     var array = stringToLengthEncoded(str)
                     list.appendAll(stringToLengthEncoded(str))
                     return array.size
@@ -641,9 +641,9 @@ protected class ExecuteCommand <: Command {
         return 0
     }
 
-    private func appendJsonObject(index: Int64, list: ArrayList<Byte>, value: ?JsonObject): Int64 {
+    private func appendJsonValue(index: Int64, list: ArrayList<Byte>, value: ?JsonValue): Int64 {
         if(!value.isNone()) {
-            return appendString(index, list, value.toString())
+            return appendString(index, list, value.getOrThrow().toJsonString())
         }
         return 0
     }
