@@ -152,7 +152,6 @@ protected class ColumnDefinition <: CommonPacket {
     protected func hasFlag(flag: ColumnFlag): Bool {
         (_flags & flag.value()) != 0
     }
-
 }
 
 /*
@@ -189,12 +188,11 @@ protected class TextResult <: CommonPacket {
  * Binary Protocol Resultset
  * referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_binary_resultset.html
  */
-protected class BinaryResultPacket <: Response {
-
+protected class BinaryResult <: Response {
+    
     private var _nullMap: Array<Byte>
 
     private var _binaryData: Array<?Array<Byte>>
-
 
     protected prop nullMap: Array<Byte> {
         get() {
@@ -208,53 +206,51 @@ protected class BinaryResultPacket <: Response {
         }
     }
 
-
-    protected BinaryResultPacket(stream: InputStream, columnInfos: Array<ColumnDefinition>) {
+    protected BinaryResult(stream: InputStream, columnInfos: Array<ColumnDefinition>) {
         super(stream)
         var columnCount = columnInfos.size
         var nullMap = Array<Byte>((columnCount + 7 + 2) / 8, item: 0)
         stream.read(nullMap)
         _nullMap = nullMap
         _binaryData = Array<?Array<Byte>>(columnCount, item: [])
-        for(i in 0..columnCount){
-            var isNull = (_nullMap[(i+2)/8] & (1u8 << ((i+2) % 8))) != 0
-            if(isNull){
+        for (i in 0..columnCount) {
+            var isNull = (_nullMap[(i + 2) / 8] & (1u8 << ((i + 2) % 8))) != 0
+            if (isNull) {
                 _binaryData[i] = None
-            }else{
+            } else {
                 var columnInfo = columnInfos[i]
                 var columnType = columnInfo.columnType
                 match (columnType) {
-                case Tiny => 
-                    var array = Array<Byte>(1, item: 0)
-                    stream.read(array)
-                    _binaryData[i] = array
-                case Short | Year =>
-                    var array = Array<Byte>(2, item: 0)
-                    stream.read(array)
-                    _binaryData[i] = array
-                case Long | Int24 | Float => 
-                    var array = Array<Byte>(4, item: 0)
-                    stream.read(array)
-                    _binaryData[i] = array
-                case LongLong | Double =>
-                    var array = Array<Byte>(8, item: 0)
-                    stream.read(array)
-                    _binaryData[i] = array
-                case String | NewDecimal | Json | Enum | Set | TinyBlob | MediumBlob | LongBlob | Blob | VarString => 
-                    _binaryData[i] = readLengthEncodedString(stream)
-                case Date | DateTime | Timestamp | Time =>
-                    var single = Array<Byte>(1, item: 0)
-                    stream.read(single)
-                    var buffer = Array<Byte>(Int64(single[0]), item: 0)
-                    stream.read(buffer)
-                    var list = ArrayList<Byte>(Int64(1 + single[0]))
-                    list.appendAll(single)
-                    list.appendAll(buffer)
-                    _binaryData[i] = list.toArray()
-                case _ => throw Exception("Unsupport MySQL binary type")
+                    case Tiny =>
+                        var array = Array<Byte>(1, item: 0)
+                        stream.read(array)
+                        _binaryData[i] = array
+                    case Short | Year =>
+                        var array = Array<Byte>(2, item: 0)
+                        stream.read(array)
+                        _binaryData[i] = array
+                    case Long | Int24 | Float =>
+                        var array = Array<Byte>(4, item: 0)
+                        stream.read(array)
+                        _binaryData[i] = array
+                    case LongLong | Double =>
+                        var array = Array<Byte>(8, item: 0)
+                        stream.read(array)
+                        _binaryData[i] = array
+                    case String | NewDecimal | Json | Enum | Set | TinyBlob | MediumBlob | LongBlob | Blob | VarString => _binaryData[i] = readLengthEncodedString(
+                        stream)
+                    case Date | DateTime | Timestamp | Time =>
+                        var single = Array<Byte>(1, item: 0)
+                        stream.read(single)
+                        var buffer = Array<Byte>(Int64(single[0]), item: 0)
+                        stream.read(buffer)
+                        var list = ArrayList<Byte>(Int64(1 + single[0]))
+                        list.appendAll(single)
+                        list.appendAll(buffer)
+                        _binaryData[i] = list.toArray()
+                    case _ => throw Exception("Unsupport MySQL binary type")
+                }
             }
-            }
-
         }
     }
 }

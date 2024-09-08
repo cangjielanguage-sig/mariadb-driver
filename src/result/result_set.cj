@@ -16,7 +16,7 @@ protected const DB_DATE_FORMAT: String = "yyyy-MM-dd"
 protected const DB_TIME_FORMAT: String = "HH:mm:ss"
 public const DB_TIME_PREFIX: String = "1970-01-01 "
 
-public interface TabularResult {
+public interface ResultSet {
 
     prop rowSize: Int64
 

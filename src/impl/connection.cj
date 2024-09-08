@@ -94,7 +94,7 @@ public class ConnectionImpl <: Connection{
         }
     }
 
-    public func sendQuery(sql: String): TabularResult {
+    public func sendQuery(sql: String): ResultSet {
         try {
             return _connection.sendQuery(sql)
         }catch (e: ResponseErrorException) {
@@ -118,7 +118,7 @@ public class ConnectionImpl <: Connection{
         }
     }
 
-    public func executeQueryPrepare(prepare: PrepareResult, params: Array<Any>): TabularResult {
+    public func executeQueryPrepare(prepare: PrepareResult, params: Array<Any>): ResultSet {
         try {
             return _connection.executeQueryPrepare(prepare, params)
         }catch (e: ResponseErrorException | ParameterConvertException) {

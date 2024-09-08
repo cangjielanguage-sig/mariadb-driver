@@ -59,11 +59,11 @@ public class MySqlConnection <: Resource {
     public func sendCommand(sql: String) {
         synchronized(_connectionMutex) {
             sendQuerySql(sql)
-            readIfErrorResponseThrow()
+            readCommandResponse()
         }
     }
 
-    public func sendQuery(sql: String): TabularResult {
+    public func sendQuery(sql: String): ResultSet {
         synchronized(_connectionMutex) {
             sendQuerySql(sql)
             return readQueryResponse()
@@ -84,7 +84,7 @@ public class MySqlConnection <: Resource {
         }
     }
 
-    public func executeQueryPrepare(prepare: PrepareResult, params: Array<Any>): TabularResult {
+    public func executeQueryPrepare(prepare: PrepareResult, params: Array<Any>): ResultSet {
         synchronized(_connectionMutex) {
             handleLongData(prepare.id, params)
             writeRequest(ExecuteCommand.default(prepare.id, prepare.parameterDefinition, params))
@@ -123,25 +123,14 @@ public class MySqlConnection <: Resource {
         }
     }
 
-    private func inputStreamToArray(stream: InputStream): Array<Byte>{
-        var buffer = Array<Byte>(1024, item: 0)
-        var list = ArrayList<Byte>()
-        var len = stream.read(buffer)
-        while (len > 0) {
-            list.appendAll(buffer)
-            len = stream.read(buffer)
-        }
-        return list.toArray()
-    }
 
     /*
      * 读取预执行语句响应
      */
     private func readPrepareResponse(): PrepareResult {
-        var list = read()
-        var stream = ByteArrayStream()
-        stream.write(list)
-        if (list[4] == ResponseCode.Error.value()) {
+        var array = read()
+        var stream = arrayToInputStream(array)
+        if (array[4] == ResponseCode.Error.value()) {
             var error = ErrorResponse(stream)
             throw ResponseErrorException(error.message)
         }
@@ -149,9 +138,7 @@ public class MySqlConnection <: Resource {
         var parameters = ArrayList<ColumnDefinition>(Int64(prepareResponse.numParams))
         if(prepareResponse.numParams > 0){
             for (_ in 0..prepareResponse.numParams) {
-                stream = ByteArrayStream()
-                stream.write(read())
-                parameters.append(ColumnDefinition(stream))
+                parameters.append(ColumnDefinition(arrayToInputStream(read())))
             }
             read()
         }
@@ -159,9 +146,7 @@ public class MySqlConnection <: Resource {
         var columns = ArrayList<ColumnDefinition>(Int64(prepareResponse.numColumns))
         if(prepareResponse.numColumns > 0){
             for (_ in 0..prepareResponse.numColumns) {
-            stream = ByteArrayStream()
-            stream.write(read())
-            columns.append(ColumnDefinition(stream))
+            columns.append(ColumnDefinition(arrayToInputStream(read())))
             }
             read()
         }
@@ -171,34 +156,29 @@ public class MySqlConnection <: Resource {
     /*
     * 读取执行查询预执行语句响应
     */
-    private func readExecutePrepareResponse(): TabularResult {
-        var list = read()
-        var stream = ByteArrayStream()
-        stream.write(list)
-        if (list[4] == ResponseCode.Error.value()) {
+    private func readExecutePrepareResponse(): ResultSet {
+        var array = read()
+        var stream = arrayToInputStream(array)
+        if (array[4] == ResponseCode.Error.value()) {
             var error = ErrorResponse(stream)
             throw ResponseErrorException(error.message)
         }
         var filedsCount = ColumnCount(stream)
         var fields = ArrayList<ColumnDefinition>()
         for (_ in 0..filedsCount.count) {
-            stream = ByteArrayStream()
-            stream.write(read())
-            var field = ColumnDefinition(stream)
+            var field = ColumnDefinition(arrayToInputStream(read()))
             fields.append(field)
         }
         //丢弃Eof包
         read()
-        list = read()
-        var rowPackets = ArrayList<BinaryResultPacket>()
-        while (list[4] != ResponseCode.Eof.value() || list.size > 9) {
-            var stream = ByteArrayStream()
-            stream.write(list)
-            var row = BinaryResultPacket(stream, fields.toArray())
+        array = read()
+        var rowPackets = ArrayList<BinaryResult>()
+        while (array[4] != ResponseCode.Eof.value() || array.size > 9) {
+            var row = BinaryResult(arrayToInputStream(array), fields.toArray())
             rowPackets.append(row)
-            list = read()
+            array = read()
         }
-        return BinaryResult(fields.toArray(), rowPackets.toArray())
+        return BinaryResultSet(fields.toArray(), rowPackets.toArray())
     }
 
     /*
@@ -268,38 +248,31 @@ public class MySqlConnection <: Resource {
      * 读取一个mysql响应报文,可能是OkResponse、ErrorResponse、AbstructEof和AuthStateResponse 或者其子类
      */
     private func readResponse(): Response {
-        var list = read()
-        var code = ResponseCode.get(list[4])
+        var array = read()
+        var code = ResponseCode.get(array[4])
         match (code) {
             case ResponseCode.Ok =>
-                var stream = ByteArrayStream()
-                stream.write(list)
-                return OkResponse(stream)
+                return OkResponse(arrayToInputStream(array))
             case ResponseCode.Error =>
-                var stream = ByteArrayStream()
-                stream.write(list)
-                return ErrorResponse(stream)
-            case ResponseCode.Eof => return getEofResponse(list)
-            case ResponseCode.AuthMoreData => return getAuthMoreData(list)
+                return ErrorResponse(arrayToInputStream(array))
+            case ResponseCode.Eof => return getEofResponse(array)
+            case ResponseCode.AuthMoreData => return getAuthMoreData(array)
         }
     }
 
-    private func getEofResponse(list: Array<Byte>): AbstractEOF {
-        var stream = ByteArrayStream()
-        stream.write(list)
-        if (list.size > 9) {
+    private func getEofResponse(array: Array<Byte>): AbstractEOF {
+        var stream = arrayToInputStream(array)
+        if (array.size > 9) {
             return AuthSwitch(stream)
         } else {
             return EofResponse(stream)
         }
     }
 
-    private func getAuthMoreData(list: Array<Byte>): AuthMoreData {
-        var authCode = list[5]
-        var stream = ByteArrayStream()
-        stream.write(list)
-        if (list.size == 6 && (authCode == AuthState.FastAuthSuccess.value() || authCode ==
-            AuthState.PerformFullAuthentication.value())) {
+    private func getAuthMoreData(array: Array<Byte>): AuthMoreData {
+        var authCode = array[5]
+        var stream = arrayToInputStream(array)
+        if (array.size == 6 && (authCode == AuthState.FastAuthSuccess.value() || authCode == AuthState.PerformFullAuthentication.value())) {
             return AuthStatus(stream)
         } else {
             return PublicKeyResponse(stream)
@@ -315,7 +288,7 @@ public class MySqlConnection <: Resource {
     /*
     * 处理命令语句响应
     */
-    private func readIfErrorResponseThrow() {
+    private func readCommandResponse() {
         var response = readResponse()
         if (response is ErrorResponse) {
             var error = response as ErrorResponse
@@ -326,45 +299,39 @@ public class MySqlConnection <: Resource {
     /*
      * 处理查询语句的响应
      */
-    private func readQueryResponse(): TabularResult {
-        var list = read()
-        var stream = ByteArrayStream()
-        stream.write(list)
-        if (list[4] == ResponseCode.Error.value()) {
+    private func readQueryResponse(): ResultSet {
+        var array = read()
+        var stream = arrayToInputStream(array)
+        if (array[4] == ResponseCode.Error.value()) {
             var error = ErrorResponse(stream)
             throw ResponseErrorException(error.message)
         }
         var columnCount = ColumnCount(stream)
         var fields = ArrayList<ColumnDefinition>()
         for (_ in 0..columnCount.count) {
-            stream = ByteArrayStream()
-            stream.write(read())
-            var field = ColumnDefinition(stream)
+            var field = ColumnDefinition(arrayToInputStream(read()))
             fields.append(field)
         }
         //丢弃Eof包
         read()
-        list = read()
+        array = read()
         var rowPackets = ArrayList<TextResult>()
-        while (list[4] != ResponseCode.Eof.value() || list.size > 9) {
+        while (array[4] != ResponseCode.Eof.value() || array.size > 9) {
             var row: TextResult
-            var stream = ByteArrayStream()
-            stream.write(list)
-            row = TextResult(stream, Int64(columnCount.count))
+            row = TextResult(arrayToInputStream(array), Int64(columnCount.count))
             rowPackets.append(row)
-            list = read()
+            array = read()
         }
-        return PlainResult(fields.toArray(), rowPackets.toArray())
+        return TextResultSet(fields.toArray(), rowPackets.toArray())
     }
 
     /*
      * 处理更新语句的响应
      */
     private func readUpdateResponse(): ChangeResult {
-        var list = read()
-        var stream = ByteArrayStream()
-        stream.write(list)
-        if (list[4] == ResponseCode.Error.value()) {
+        var array = read()
+        var stream = arrayToInputStream(array)
+        if (array[4] == ResponseCode.Error.value()) {
             var error = ErrorResponse(stream)
             throw ResponseErrorException(error.message)
         }

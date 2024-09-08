@@ -2,7 +2,7 @@
 
 [package]
   cjc-version = "0.54.3"
-  compile-option = ""
+  compile-option = "--incremental-compile --diagnostic-format=noColor"
   description = "nothing here"
   link-option = ""
   name = "cjmd"
@@ -10,4 +10,4 @@
   src-dir = ""
   target-dir = ""
   version = "1.0.0"
-  package-configuration = {}
+  [package.package-configuration]

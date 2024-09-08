@@ -18,7 +18,7 @@ public class QueryResultImpl <: QueryResult {
     
     private var _columnInfos: Array<ColumnInfo>
 
-    private var _result: TabularResult
+    private var _result: ResultSet
 
     private var _resultSetMutext: ReentrantMutex = ReentrantMutex()
 
@@ -30,7 +30,7 @@ public class QueryResultImpl <: QueryResult {
         }
     }
 
-    public QueryResultImpl(result: TabularResult) {
+    public QueryResultImpl(result: ResultSet) {
         _result = result
         _columnInfos = []
         var arrayList = ArrayList<ColumnInfo>()

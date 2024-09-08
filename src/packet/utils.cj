@@ -439,7 +439,7 @@ protected func binaryTimeToDateTime(data: Array<Byte>): ?DateTime {
 /*
  * InputStream转Array
  */
-protected func inputStremToArray(inputStream: InputStream): Array<Byte> {
+protected func inputStreamToArray(inputStream: InputStream): Array<Byte> {
     var buffer = Array<Byte>(1024, item: 0)
     var len = inputStream.read(buffer)
     var list = ArrayList<Byte>()
@@ -448,7 +448,17 @@ protected func inputStremToArray(inputStream: InputStream): Array<Byte> {
         len = inputStream.read(buffer)
     } while (len != 0)
     return list.toArray()
-    }
+}
+
+/*
+ * Array转InputStream
+ */
+protected func arrayToInputStream(array: Array<Byte>): InputStream {
+    var stream = ByteArrayStream(array.size)
+    stream.write(array)
+    return stream
+}
+
 /*
  * Array转二进制字符串，以0x开头
  */

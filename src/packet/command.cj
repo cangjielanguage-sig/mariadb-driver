@@ -563,10 +563,10 @@ protected class ExecuteCommand <: Command {
     }
 
     private func appendDecimal(index: Int64, list: ArrayList<Byte>, value: ?Decimal): Int64 {
-        if(!value.isNone()) {
-            return appendString(index, list, value.toString())
+        match (value) {
+            case None => 0
+            case Some(s) => appendString(index, list, s.toString())
         }
-        return 0
     }
 
     private func appendString(index: Int64, list: ArrayList<Byte>, value: ?String): Int64 {

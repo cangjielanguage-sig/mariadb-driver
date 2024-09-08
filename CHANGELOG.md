@@ -17,3 +17,9 @@
 ## Feature
 
 - 完善了对json、set、enum类型的支持
+
+# [v0.2.2]
+
+## Feature
+
+- 修复了使用服务端prepare插入Decimal类型时出现错误的bug

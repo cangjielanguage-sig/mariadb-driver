@@ -92,8 +92,8 @@ public class ClientPrepareStatement <: Statement {
                 case v: SqlDecimal => setParamWithQuotation(replacer, v.value.toString())
                 case v: SqlChar => setParamWithQuotation(replacer, v.value.toString())
                 case v: SqlVarchar => setParamWithQuotation(replacer, v.value.toString())
-                case v: SqlClob => setParamWithoutQuotation(replacer, arrayToHexString(inputStremToArray(v.value)))
-                case v: SqlBlob => setParamWithoutQuotation(replacer, arrayToHexString(inputStremToArray(v.value)))
+                case v: SqlClob => setParamWithoutQuotation(replacer, arrayToHexString(inputStreamToArray(v.value)))
+                case v: SqlBlob => setParamWithoutQuotation(replacer, arrayToHexString(inputStreamToArray(v.value)))
                 case v: SqlDate => setParamWithQuotation(replacer, v.value.toString(DB_DATE_FORMAT))
                 case v: SqlTime => setParamWithQuotation(replacer, v.value.toString(DB_TIME_FORMAT))
                 case v: SqlTimeTz => setParamWithQuotation(replacer, v.value.toString(DB_TIME_FORMAT))
@@ -155,12 +155,12 @@ public class ClientPrepareStatement <: Statement {
                 case v: SqlNullableClob => if (v.value.isNone()) {
                     setParamWithoutQuotation(replacer, "NULL")
                 } else {
-                    setParamWithoutQuotation(replacer, arrayToHexString(inputStremToArray(v.value.getOrThrow())))
+                    setParamWithoutQuotation(replacer, arrayToHexString(inputStreamToArray(v.value.getOrThrow())))
                 }
                 case v: SqlNullableBlob => if (v.value.isNone()) {
                     setParamWithoutQuotation(replacer, "NULL")
                 } else {
-                    setParamWithoutQuotation(replacer, arrayToHexString(inputStremToArray(v.value.getOrThrow())))
+                    setParamWithoutQuotation(replacer, arrayToHexString(inputStreamToArray(v.value.getOrThrow())))
                 }
                 case v: SqlNullableDate => if (v.value.isNone()) {
                     setParamWithoutQuotation(replacer, "NULL")

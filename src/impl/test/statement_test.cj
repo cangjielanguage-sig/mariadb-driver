@@ -28,8 +28,8 @@ public class StatementTest{
         var property2= ("password","MySql123!")
         var property3 = ("database","driver_test")
         var property4 = ("ssl.mode","disabled")
-        //var property5 = ("prepare.mode","server")
-        var property5 = ("prepare.mode","client")
+        var property5 = ("prepare.mode","server")
+        //var property5 = ("prepare.mode","client")
         var dataSource = driver.open("mysql://localhost", [property1,property2,property3,property4,property5])
         connection =  dataSource.connect()
     } 
@@ -183,7 +183,7 @@ public class StatementTest{
     public func queryTest(){
 
         var prepare = connection.prepareStatement("select * from full_test where id = ?")
-        var param = SqlInteger(115)
+        var param = SqlInteger(121)
         var id = SqlInteger(-1)
         //tinyint
         var col1 = SqlNullableByte(None)
@@ -304,11 +304,11 @@ public class StatementTest{
            print(" ")
            print(col25.value)
            print(" ")
-           print(inputStremToArray(col26.value.getOrThrow()).size)
+           print(inputStreamToArray(col26.value.getOrThrow()).size)
            print(" ")
-           print(inputStremToArray(col27.value.getOrThrow()).size)
+           print(inputStreamToArray(col27.value.getOrThrow()).size)
            print(" ")
-           print(inputStremToArray(col28.value.getOrThrow()).size)
+           print(inputStreamToArray(col28.value.getOrThrow()).size)
            print(" ")
            print(col29.value)
            print(" ")

@@ -10,15 +10,15 @@ import encoding.json.*
 import cjmd.packet.*
 import std.math.numeric.*
 
-public class BinaryResult <: TabularResult {
+public class BinaryResultSet <: ResultSet {
 
     private var columns: Array<ColumnDefinition>
 
-    private var rows: Array<BinaryResultPacket>
+    private var rows: Array<BinaryResult>
 
     private var currentRow: Int64
 
-    protected BinaryResult(columns: Array<ColumnDefinition>, rows: Array<BinaryResultPacket>) {
+    protected BinaryResultSet(columns: Array<ColumnDefinition>, rows: Array<BinaryResult>) {
         this.columns = columns
         this.rows = rows
         this.currentRow = 0
@@ -55,68 +55,54 @@ public class BinaryResult <: TabularResult {
 
     @OverflowWrapping
     public override func getInt8(index: Int64): ?Int8 {
-        var op = getUInt64(index)
-        if(op.isNone()){
-            return None
-        }else {
-            return Int8(op.getOrThrow())
+        match (getUInt8(index)) {
+            case Some(v) => Int8(v)
+            case None => None
         }
     }
 
     public override func getUInt8(index: Int64): ?UInt8 {
-        var op = getUInt64(index)
-        if(op.isNone()){
-            return None
-        }else {
-            return UInt8(op.getOrThrow())
+        match (getUInt64(index)) {
+            case Some(v) => UInt8(v)
+            case None =>  None
         }
     }
 
     @OverflowWrapping
     public override func getInt16(index: Int64): ?Int16 {
-        var op = getUInt64(index)
-        if(op.isNone()){
-            return None
-        }else {
-            return Int16(op.getOrThrow())
+        match (getUInt16(index)) {
+            case Some(v) => Int16(v)
+            case None => None
         }
     }
 
     public override func getUInt16(index: Int64): ?UInt16 {
-        var op = getUInt64(index)
-        if(op.isNone()){
-            return None
-        }else {
-            return UInt16(op.getOrThrow())
+        match (getUInt64(index)) {
+            case Some(v) => UInt16(v)
+            case None => None
         }
     }
 
     @OverflowWrapping
     public override func getInt32(index: Int64): ?Int32 {
-        var op = getUInt64(index)
-        if(op.isNone()){
-            return None
-        }else {
-            return Int32(op.getOrThrow())
+        match (getUInt32(index)) {
+            case Some(v) => Int32(v)
+            case None => None
         }
     }
 
     public override func getUInt32(index: Int64): ?UInt32 {
-        var op = getUInt64(index)
-        if(op.isNone()){
-            return None
-        }else {
-            return UInt32(op.getOrThrow())
+        match (getUInt64(index)) {
+            case Some(v) => UInt32(v)
+            case None => None
         }
     }
 
     @OverflowWrapping
     public override func getInt64(index: Int64): ?Int64 {
-        var op = getUInt64(index)
-        if(op.isNone()){
-            return None
-        }else {
-            return Int64(op.getOrThrow())
+        match (getUInt64(index)) {
+            case Some(v) => Int64(v)
+            case None => None
         }
     }
 
@@ -148,11 +134,9 @@ public class BinaryResult <: TabularResult {
     }
 
     public override func getFloat16(index: Int64): ?Float16 {
-        var floatOp = getFloat32(index)
-        if(floatOp.isNone()){
-            return None
-        }else {
-            return Float16(floatOp.getOrThrow())
+        match (getFloat32(index)) {
+            case None => None
+            case Some(v) => return Float16(v)
         }
     }
 
@@ -242,7 +226,7 @@ public class BinaryResult <: TabularResult {
     public override func getString(index: Int64): ?String {
         var columnType = getFieldType(index)
         var unsigned = getFieldIsUnsigned(index)
-        var charset = getFieldCharset(index)
+        //var charset = getFieldCharset(index)
         var dataOp = getBinaryData(index)
         if(dataOp.isNone()){
             return None
