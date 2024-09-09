@@ -23,3 +23,9 @@
 ## Feature
 
 - 修复了使用服务端prepare插入Decimal类型时出现错误的bug
+
+# [v0.2.3]
+
+## Feature
+
+- 向DriverManager注册了驱动,优化了导包流程

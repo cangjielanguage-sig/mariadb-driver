@@ -9,5 +9,5 @@
   output-type = "static"
   src-dir = ""
   target-dir = ""
-  version = "0.2.2"
+  version = "0.2.3"
   [package.package-configuration]

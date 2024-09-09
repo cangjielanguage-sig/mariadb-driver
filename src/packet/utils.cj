@@ -308,8 +308,7 @@ protected func dateTimeToProtocolBinaryTime(dateTime: DateTime): Array<Byte> {
  * MySql二进制转DateTime
  */
 protected  func binaryDateTimeToDateTime(data: Array<Byte>): ?DateTime {
-    var stream = ByteArrayStream(data.size)
-    stream.write(data)
+    var stream = arrayToInputStream(data)
     var single = Array<Byte>(1, item: 0)
     stream.read(single)
     var yearArray = Array<Byte>(2, item: 0)
@@ -377,8 +376,7 @@ protected  func binaryDateTimeToDateTime(data: Array<Byte>): ?DateTime {
  * MySql二进制转DateTime
  */
 protected func binaryTimeToDateTime(data: Array<Byte>): ?DateTime {
-    var stream = ByteArrayStream(data.size)
-    stream.write(data)
+    var stream = arrayToInputStream(data)
     var single = Array<Byte>(1, item: 0)
     stream.read(single)
     var negativeArray = Array<Byte>(1, item: 0)
