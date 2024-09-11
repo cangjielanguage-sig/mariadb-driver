@@ -145,7 +145,7 @@ public class ConnectionImpl <: Connection{
             _connection.close()
         }
     }
-
+    
     override public func isClosed(): Bool{
         return _connection.isClosed()
     }

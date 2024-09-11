@@ -89,17 +89,17 @@ protected class ColumnDefinition <: CommonPacket {
         this._originalName = String.fromUtf8(
             buf.getOrThrow({=> InvalidPacketException("This packet is not a Field packet: read original name failed")}))
 
-        var single = Array<Byte>(1, item: 0)
+        var single = Array<Byte>(1, repeat: 0)
         if (stream.read(single) == 0) {
             throw InvalidPacketException("This packet is not a Field packet: read padding failed")
         }
         this._padding = single[0]
-        var charset = Array<Byte>(2, item: 0)
+        var charset = Array<Byte>(2, repeat: 0)
         if (stream.read(charset) == 0) {
             throw InvalidPacketException("This packet is not a Field packet: read charset failed")
         }
         _charset = Charset.of(littleEndianToUInt16(charset))
-        var fieldLength = Array<Byte>(4, item: 0)
+        var fieldLength = Array<Byte>(4, repeat: 0)
         if (stream.read(fieldLength) == 0) {
             throw InvalidPacketException("This packet is not a Field packet: read field length failed")
         }
@@ -108,7 +108,7 @@ protected class ColumnDefinition <: CommonPacket {
             throw InvalidPacketException("This packet is not a Field packet: read field type failed")
         }
         this._columnType = ColumnType.of(single[0])
-        var flags = Array<Byte>(2, item: 0)
+        var flags = Array<Byte>(2, repeat: 0)
         if (stream.read(flags) == 0) {
             throw InvalidPacketException("This packet is not a Field packet: read flags failed")
         }
@@ -209,10 +209,10 @@ protected class BinaryResult <: Response {
     protected BinaryResult(stream: InputStream, columnInfos: Array<ColumnDefinition>) {
         super(stream)
         var columnCount = columnInfos.size
-        var nullMap = Array<Byte>((columnCount + 7 + 2) / 8, item: 0)
+        var nullMap = Array<Byte>((columnCount + 7 + 2) / 8, repeat: 0)
         stream.read(nullMap)
         _nullMap = nullMap
-        _binaryData = Array<?Array<Byte>>(columnCount, item: [])
+        _binaryData = Array<?Array<Byte>>(columnCount, repeat: [])
         for (i in 0..columnCount) {
             var isNull = (_nullMap[(i + 2) / 8] & (1u8 << ((i + 2) % 8))) != 0
             if (isNull) {
@@ -222,27 +222,27 @@ protected class BinaryResult <: Response {
                 var columnType = columnInfo.columnType
                 match (columnType) {
                     case Tiny =>
-                        var array = Array<Byte>(1, item: 0)
+                        var array = Array<Byte>(1, repeat: 0)
                         stream.read(array)
                         _binaryData[i] = array
                     case Short | Year =>
-                        var array = Array<Byte>(2, item: 0)
+                        var array = Array<Byte>(2, repeat: 0)
                         stream.read(array)
                         _binaryData[i] = array
                     case Long | Int24 | Float =>
-                        var array = Array<Byte>(4, item: 0)
+                        var array = Array<Byte>(4, repeat: 0)
                         stream.read(array)
                         _binaryData[i] = array
                     case LongLong | Double =>
-                        var array = Array<Byte>(8, item: 0)
+                        var array = Array<Byte>(8, repeat: 0)
                         stream.read(array)
                         _binaryData[i] = array
                     case String | NewDecimal | Json | Enum | Set | TinyBlob | MediumBlob | LongBlob | Blob | VarString => _binaryData[i] = readLengthEncodedString(
                         stream)
                     case Date | DateTime | Timestamp | Time =>
-                        var single = Array<Byte>(1, item: 0)
+                        var single = Array<Byte>(1, repeat: 0)
                         stream.read(single)
-                        var buffer = Array<Byte>(Int64(single[0]), item: 0)
+                        var buffer = Array<Byte>(Int64(single[0]), repeat: 0)
                         stream.read(buffer)
                         var list = ArrayList<Byte>(Int64(1 + single[0]))
                         list.appendAll(single)

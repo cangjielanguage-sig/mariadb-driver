@@ -27,7 +27,7 @@ protected func littleEndianToUInt64(array: Array<Byte>): UInt64 {
     if (array.size < 1 || array.size > 8) {
         throw IllegalArgumentException("array szie must between 1 and 8")
     }
-    var arr: Array<Byte> = Array<Byte>(8, item: 0x00)
+    var arr: Array<Byte> = Array<Byte>(8, repeat: 0x00)
     var result: UInt64 = 0;
     var i = 0;
     while (i < array.size) {
@@ -44,7 +44,7 @@ protected func littleEndianToUInt32(array: Array<Byte>): UInt32 {
     if (array.size < 1 || array.size > 4) {
         throw IllegalArgumentException("Array size must between 1 and 4")
     }
-    var arr: Array<Byte> = Array<Byte>(4, item: 0x00)
+    var arr: Array<Byte> = Array<Byte>(4, repeat: 0x00)
     var result: UInt32 = 0;
     var i = 0;
     while (i < array.size) {
@@ -77,7 +77,7 @@ protected func littleEndianToUInt16(array: Array<Byte>): UInt16 {
  * UInt64转小端字节数组
  */
 protected  func uInt64ToLittleEndian(number: UInt64): Array<Byte> {
-    var buffer = Array<Byte>(8, item: 0)
+    var buffer = Array<Byte>(8, repeat: 0)
     number.writeLittleEndian(buffer)
     return buffer
 }
@@ -87,7 +87,7 @@ protected  func uInt64ToLittleEndian(number: UInt64): Array<Byte> {
  * UInt32转小端序字节数组
  */
 protected func uInt32ToLittleEndian(number: UInt32): Array<Byte> {
-    var buffer = Array<Byte>(4, item: 0)
+    var buffer = Array<Byte>(4, repeat: 0)
     number.writeLittleEndian(buffer)
     return buffer
 }
@@ -96,7 +96,7 @@ protected func uInt32ToLittleEndian(number: UInt32): Array<Byte> {
  * UInt16转小端序字节数组
  */
 protected  func uInt16ToLittleEndian(number: UInt16): Array<Byte> {
-    var buffer = Array<Byte>(2, item: 0)
+    var buffer = Array<Byte>(2, repeat: 0)
     number.writeLittleEndian(buffer)
     return buffer
 }
@@ -105,7 +105,7 @@ protected  func uInt16ToLittleEndian(number: UInt16): Array<Byte> {
  * Float16转大端字节数组
  */
 protected  func float32ToLittleEndian(number: Float32): Array<Byte> {
-    var array = Array<Byte>(4, item: 0)
+    var array = Array<Byte>(4, repeat: 0)
     number.writeLittleEndian(array)
     return array
 }
@@ -114,7 +114,7 @@ protected  func float32ToLittleEndian(number: Float32): Array<Byte> {
  * Float16转大端字节数组
  */
 protected  func float64ToLittleEndian(number: Float64): Array<Byte> {
-    var array = Array<Byte>(8, item: 0)
+    var array = Array<Byte>(8, repeat: 0)
     number.writeLittleEndian(array)
     return array
 }
@@ -152,7 +152,7 @@ protected func readLengthEncodedString(array: Array<Byte>): ?Array<Byte> {
     return readLengthEncodedString(stream)
 }
 protected func readLengthEncodedString(stream: InputStream): ?Array<Byte> {
-    var single = Array<Byte>(1, item: 0)
+    var single = Array<Byte>(1, repeat: 0)
     stream.read(single)
     var lengthFlag = single[0]
     match (lengthFlag) {
@@ -163,17 +163,17 @@ protected func readLengthEncodedString(stream: InputStream): ?Array<Byte> {
         case 0xFE => return readString(stream, 8)
         case 0xFF => throw InvalidPacketException("This packet is Error packet")
         case _ =>
-            var buf = Array<Byte>(Int64(single[0]), item: 0)
+            var buf = Array<Byte>(Int64(single[0]), repeat: 0)
             stream.read(buf)
             return buf
     }
 }
 
 protected  func readString(stream: InputStream, len: Int64): Array<Byte> {
-    var buf = Array<Byte>(Int64(len), item: 0)
+    var buf = Array<Byte>(Int64(len), repeat: 0)
     stream.read(buf)
     var dataLen = littleEndianToUInt64(buf)
-    var data = Array<Byte>(Int64(dataLen), item: 0)
+    var data = Array<Byte>(Int64(dataLen), repeat: 0)
     stream.read(data)
     return data
 }
@@ -217,22 +217,22 @@ protected  func stringToLengthEncoded(str: ?String): Array<Byte> {
  * x = 0xff: 表示该数据包为 1 个 ERR_Packet
  */
 protected  func readLengthEncodedInteger(stream: InputStream): Array<Byte> {
-    var single = Array<Byte>(1, item: 0)
+    var single = Array<Byte>(1, repeat: 0)
     if (stream.read(single) == 0) {
         return []
     }
     var lengthFlag = single[0]
     match (lengthFlag) {
         case 0xfc =>
-            var buffer = Array<Byte>(2, item: 0)
+            var buffer = Array<Byte>(2, repeat: 0)
             stream.read(buffer)
             return buffer
         case 0xfd =>
-            var buffer = Array<Byte>(3, item: 0)
+            var buffer = Array<Byte>(3, repeat: 0)
             stream.read(buffer)
             return buffer
         case 0xfe =>
-            var buffer = Array<Byte>(8, item: 0)
+            var buffer = Array<Byte>(8, repeat: 0)
             stream.read(buffer)
             return buffer
         case 0xff => throw InvalidPacketException("This packet is Error packet")
@@ -309,15 +309,15 @@ protected func dateTimeToProtocolBinaryTime(dateTime: DateTime): Array<Byte> {
  */
 protected  func binaryDateTimeToDateTime(data: Array<Byte>): ?DateTime {
     var stream = arrayToInputStream(data)
-    var single = Array<Byte>(1, item: 0)
+    var single = Array<Byte>(1, repeat: 0)
     stream.read(single)
-    var yearArray = Array<Byte>(2, item: 0)
-    var monthArray = Array<Byte>(1, item: 0)
-    var dayArray = Array<Byte>(1, item: 0)
-    var hourArray = Array<Byte>(1, item: 0)
-    var minuteArray = Array<Byte>(1, item: 0)
-    var secondArray = Array<Byte>(1, item: 0)
-    var micorSecondArray = Array<Byte>(4, item: 0)
+    var yearArray = Array<Byte>(2, repeat: 0)
+    var monthArray = Array<Byte>(1, repeat: 0)
+    var dayArray = Array<Byte>(1, repeat: 0)
+    var hourArray = Array<Byte>(1, repeat: 0)
+    var minuteArray = Array<Byte>(1, repeat: 0)
+    var secondArray = Array<Byte>(1, repeat: 0)
+    var micorSecondArray = Array<Byte>(4, repeat: 0)
     match (single[0]) {
         case 0 => return None
         case 4 =>
@@ -377,14 +377,14 @@ protected  func binaryDateTimeToDateTime(data: Array<Byte>): ?DateTime {
  */
 protected func binaryTimeToDateTime(data: Array<Byte>): ?DateTime {
     var stream = arrayToInputStream(data)
-    var single = Array<Byte>(1, item: 0)
+    var single = Array<Byte>(1, repeat: 0)
     stream.read(single)
-    var negativeArray = Array<Byte>(1, item: 0)
-    var dayArray = Array<Byte>(4, item: 0)
-    var hourArray = Array<Byte>(1, item: 0)
-    var minuteArray = Array<Byte>(1, item: 0)
-    var secondArray = Array<Byte>(1, item: 0)
-    var micorSecondArray = Array<Byte>(4, item: 0)
+    var negativeArray = Array<Byte>(1, repeat: 0)
+    var dayArray = Array<Byte>(4, repeat: 0)
+    var hourArray = Array<Byte>(1, repeat: 0)
+    var minuteArray = Array<Byte>(1, repeat: 0)
+    var secondArray = Array<Byte>(1, repeat: 0)
+    var micorSecondArray = Array<Byte>(4, repeat: 0)
     match (single[0]) {
         case 0 => return None
         case 8 =>
@@ -438,7 +438,7 @@ protected func binaryTimeToDateTime(data: Array<Byte>): ?DateTime {
  * InputStream转Array
  */
 protected func inputStreamToArray(inputStream: InputStream): Array<Byte> {
-    var buffer = Array<Byte>(1024, item: 0)
+    var buffer = Array<Byte>(1024, repeat: 0)
     var len = inputStream.read(buffer)
     var list = ArrayList<Byte>()
     do {

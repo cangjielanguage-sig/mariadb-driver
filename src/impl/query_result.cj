@@ -11,7 +11,6 @@ import std.time.*
 import std.io.*
 import encoding.json.*
 import std.sync.*
-import std.math.min
 import std.collection.ArrayList
 
 public class QueryResultImpl <: QueryResult {

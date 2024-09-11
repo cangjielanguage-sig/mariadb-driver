@@ -29,12 +29,12 @@ protected open class CommonPacket {
 
     // consturct for response packet
     protected init(stream: InputStream) {
-        var length = Array<Byte>(3, item: 0)
+        var length = Array<Byte>(3, repeat: 0)
         if (stream.read(length) == 0) {
             throw InvalidPacketException("This package is not a mysql package: read length failed")
         }
         _length = littleEndianToUInt32(length)
-        var single = Array<Byte>(1, item: 0)
+        var single = Array<Byte>(1, repeat: 0)
         if (stream.read(single) == 0) {
             throw InvalidPacketException("This package is not a mysql package: read number failed")
         }

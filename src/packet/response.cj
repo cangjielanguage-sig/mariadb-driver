@@ -22,7 +22,7 @@ protected open class Response <: CommonPacket {
 
     internal Response(stream: InputStream){
         super(stream)
-        var single = Array<Byte>(1,item: 0)
+        var single = Array<Byte>(1, repeat: 0)
         if(stream.read(single) == 0){
             throw InvalidPacketException("This packet is not a Response packet: read response code failed")
         }
@@ -78,19 +78,19 @@ protected class OkResponse <: Response {
             throw InvalidPacketException("This packet is not a Ok Repsposne packet: read index failed")
         }
         _index = littleEndianToUInt64(index)
-        var serverStatus = Array<Byte>(2, item: 0)
+        var serverStatus = Array<Byte>(2, repeat: 0)
         if(stream.read(serverStatus) == 0){
             throw InvalidPacketException("This packet is not a Ok Repsposne packet: read server status failed")
         }
         _serverStatus = littleEndianToUInt16(serverStatus)
 
-        var waringCount = Array<Byte>(2, item: 0)
+        var waringCount = Array<Byte>(2, repeat: 0)
         if(stream.read(waringCount) == 0){
             throw InvalidPacketException("This packet is not a Ok Repsposne packet: read waring count failed")
         }
         _waringCount = littleEndianToUInt16(waringCount)
 
-        var message = Array<Byte>(Int64(_length - 5), item: 0)
+        var message = Array<Byte>(Int64(_length - 5), repeat: 0)
         // if(stream.read(message) == 0){
         //     throw InvalidpacketException("This packet is not a Ok Repsposne packet: read message failed")
         // }
@@ -116,22 +116,22 @@ protected class ErrorResponse <: Response{
 
     protected ErrorResponse(stream: InputStream){
         super(stream)
-        var errorCode = Array<Byte>(2,item: 0)
+        var errorCode = Array<Byte>(2,repeat: 0)
         if(stream.read(errorCode) == 0){
             throw InvalidPacketException("This packet is not a Error Repsposne packet: read error code failed")
         }
         _errorCode = littleEndianToUInt16(errorCode)
-        var single = Array<Byte>(1,item: 0)
+        var single = Array<Byte>(1,repeat: 0)
         if(stream.read(single) == 0){
             throw InvalidPacketException("This packet is not a Error Repsposne packet: read server status flag failed")
         }
         _serverStatusFlag = single[0]
-        var sqlStatus = Array<Byte>(5, item: 0)
+        var sqlStatus = Array<Byte>(5, repeat: 0)
         if(stream.read(sqlStatus) == 0){
             throw InvalidPacketException("This packet is not a Error Repsposne packet: read sql status failed")
         }
         _sqlStatus = sqlStatus
-        var message = Array<Byte>(Int64(_length - 8), item: 0)
+        var message = Array<Byte>(Int64(_length - 8), repeat: 0)
         if(stream.read(message) == 0){
             throw InvalidPacketException("This packet is not a Error Repsposne packet: read message failed")
         }
@@ -167,7 +167,7 @@ protected class AuthSwitch <: AbstractEOF{
 
     protected AuthSwitch(stream: InputStream){
         super(stream)
-        var single = Array<Byte>(1, item: 0)
+        var single = Array<Byte>(1, repeat: 0)
         var pluginName = ArrayList<Byte>()
         if(stream.read(single) == 0){
             throw InvalidPacketException("This packet is not a Auth Switch Repsposne packet: read plugin name failed")
@@ -216,12 +216,12 @@ protected class EofResponse <: AbstractEOF{
 
     protected EofResponse(stream: InputStream){
         super(stream)
-        var waringCount = Array<Byte>(2, item: 0)
+        var waringCount = Array<Byte>(2, repeat: 0)
         if(stream.read(waringCount) == 0){
             throw InvalidPacketException("This packet is not a Eof Resposne packet: read effect rows failed")
         }
         _waringCount = littleEndianToUInt16(waringCount)
-        var status = Array<Byte>(2, item: 0)
+        var status = Array<Byte>(2, repeat: 0)
         if(stream.read(status) == 0){
             throw InvalidPacketException("This packet is not a Eof Repsposne packet: read effect rows failed")
         }
@@ -248,23 +248,23 @@ protected class PrepareResposne <: Response{
 
     protected PrepareResposne(stream: InputStream){
         super(stream)
-        var statementId = Array<Byte>(4, item: 0)
+        var statementId = Array<Byte>(4, repeat: 0)
         if(stream.read(statementId) == 0){
             throw InvalidPacketException("This packet is not a PrepareOkResposnePacket: read statementId failed")
         }
         _statementId = littleEndianToUInt32(statementId)
-        var numColumns = Array<Byte>(2, item: 0)
+        var numColumns = Array<Byte>(2, repeat: 0)
         if(stream.read(numColumns) == 0){
             throw InvalidPacketException("This packet is not a PrepareOkResposnePacket: read numColumns failed")
         }
         _numColumns = littleEndianToUInt16(numColumns)
-        var numParams = Array<Byte>(2, item: 0)
+        var numParams = Array<Byte>(2, repeat: 0)
         if(stream.read(numParams) == 0){
             throw InvalidPacketException("This packet is not a PrepareOkResposnePacket: read numParams failed")
         }
         _numParams = littleEndianToUInt16(numParams)
         _reserved = 0x00
-        var warningCount = Array<Byte>(2, item: 0)
+        var warningCount = Array<Byte>(2, repeat: 0)
         if(stream.read(warningCount) == 0){
             throw InvalidPacketException("This packet is not a PrepareOkResposnePacket: read waringCount failed")
         }

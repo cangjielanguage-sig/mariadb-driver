@@ -21,7 +21,7 @@ protected open class AuthMoreData <: Response {
     internal AuthMoreData(stream: InputStream){
 
         super(stream)
-        var authReq = Array<Byte>(Int64(_length), item: 0)
+        var authReq = Array<Byte>(Int64(_length), repeat: 0)
         if(stream.read(authReq) == 0){
             throw InvalidPacketException("This packet is not a Auth Response packet: read auth response failed")
         }

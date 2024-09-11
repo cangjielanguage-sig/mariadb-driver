@@ -125,7 +125,7 @@ protected class ExecuteCommand <: Command {
         _flags = flags
         _iterationCount = iterationCount
         _parameterCount = parameterCount
-        _nullBitMap = Array<Byte>((Int64(_parameterCount) + 7) / 8, item: 0)
+        _nullBitMap = Array<Byte>((Int64(_parameterCount) + 7) / 8, repeat: 0)
         _newParamsBindFlag = boundFlag
         _paramDefinition = parameterDefinition
         _values = values

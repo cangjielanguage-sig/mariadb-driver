@@ -20,7 +20,7 @@ protected class HandshakeResponse <: Request {
 
     private var _charset: Byte = 0x00
 
-    private var _unused: Array<Byte> = Array<Byte>(23, item: 0)
+    private var _unused: Array<Byte> = Array<Byte>(23, repeat: 0)
 
     private var _username: String = ""
 

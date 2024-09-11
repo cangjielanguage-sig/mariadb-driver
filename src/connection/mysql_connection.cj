@@ -3,7 +3,7 @@
  */
 package cjmd.connection
 
-import std.socket.*
+import std.net.*
 import std.collection.*
 import std.convert.*
 import std.io.*
@@ -197,7 +197,7 @@ public class MySqlConnection <: Resource {
                 return data
             }
         }
-        var buffer = Array<Byte>(BUFFER_SIZE, item: 0)
+        var buffer = Array<Byte>(BUFFER_SIZE, repeat: 0)
         var store = ArrayList<Byte>()
         if (_lastRemaining.size > 0) {
             store.appendAll(_lastRemaining)
