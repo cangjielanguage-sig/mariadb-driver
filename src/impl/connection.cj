@@ -7,7 +7,7 @@ import std.database.sql.*
 import cjmd.connection.*
 import std.collection.*
 import cjmd.result.*
-import cjmd.packet.ParameterConvertException
+import cjmd.protocol.*
 import std.sync.*
 import std.convert.*
 

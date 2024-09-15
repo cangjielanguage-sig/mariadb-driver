@@ -6,7 +6,7 @@ package cjmd.impl
 import std.database.sql.ColumnInfo
 import std.database.sql.*
 import cjmd.connection.*
-import cjmd.packet.*
+import cjmd.protocol.*
 
 public class ColumnInfoImpl <: ColumnInfo {
 

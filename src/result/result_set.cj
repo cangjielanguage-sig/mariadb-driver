@@ -7,8 +7,7 @@ import std.time.*
 import std.convert.*
 import std.io.*
 import encoding.json.*
-import cjmd.packet.ColumnType
-import cjmd.packet.Charset
+import cjmd.protocol.*
 import std.math.numeric.Decimal
 
 protected const DB_DATE_TIME_FORMAT: String = "yyyy-MM-dd HH:mm:ss"

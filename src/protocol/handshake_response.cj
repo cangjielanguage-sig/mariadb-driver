@@ -1,7 +1,7 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-package cjmd.packet
+package cjmd.protocol
 
 import std.collection.*
 
@@ -10,9 +10,6 @@ import std.collection.*
 * referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_connection_phase_packets_protocol_handshake_response.html
 */
 protected class HandshakeResponse <: Request {
-
-    //加密后的密码长度
-    private static let PASSWORD_LENGTH: Byte = 0x20
 
     private var _capabilities: UInt32 = 0x00
 
@@ -110,7 +107,7 @@ protected class HandshakeResponse <: Request {
         length += UInt32(unameArray.size)
         length += 1
         //put password
-        arrayList.append(PASSWORD_LENGTH)
+        arrayList.append(UInt8(_password.size))
         length += 1
         arrayList.appendAll(_password)
         length += UInt32(_password.size)
@@ -130,29 +127,31 @@ protected class HandshakeResponse <: Request {
         arrayList.append(0x00)
         length += 1
         //put attributes length placeholder
-        arrayList.append(0x00)
-        var attrLenIndex: UInt32  = length
-        length += 1
-        var attrLen: UInt8 = 0
-        for((k,v) in _attribute){
-            //put attr name length
-            var name = k.toArray()
-            arrayList.append(UInt8(name.size))
-            attrLen++
-            //put attr name
-            arrayList.appendAll(name)
-            attrLen += UInt8(name.size)
-            //put attr value length
-            arrayList.append(UInt8(v.toArray().size))
-            attrLen++
-            //put attr value
-            var valueArr = v.toArray()
-            arrayList.appendAll(valueArr)
-            attrLen += UInt8(valueArr.size)
+        if(getDefault(0).hasCapability(ConnectAttrs)) {
+            arrayList.append(0x00)
+            var attrLenIndex: UInt32  = length
+            length += 1
+            var attrLen: UInt8 = 0
+            for((k,v) in _attribute){
+                //put attr name length
+                var name = k.toArray()
+                arrayList.append(UInt8(name.size))
+                attrLen++
+                //put attr name
+                arrayList.appendAll(name)
+                attrLen += UInt8(name.size)
+                //put attr value length
+                arrayList.append(UInt8(v.toArray().size))
+                attrLen++
+                //put attr value
+                var valueArr = v.toArray()
+                arrayList.appendAll(valueArr)
+                attrLen += UInt8(valueArr.size)
+            }
+            length += UInt32(attrLen)
+            // set attribiters length
+            arrayList.set(Int64(attrLenIndex), attrLen)
         }
-        length += UInt32(attrLen)
-        // set attribiters length
-        arrayList.set(Int64(attrLenIndex), attrLen)
         // set packet length
         var array: Array<Byte> = uInt32ToLittleEndian(UInt32(length) - UInt32(HEADER_SIZE))
         arrayList.set(0, array[0])

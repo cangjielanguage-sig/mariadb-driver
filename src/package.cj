@@ -4,7 +4,6 @@
 package cjmd
 
 public import cjmd.connection.ConnectionOption
-
 import std.database.sql.DriverManager
 import cjmd.impl.MySqlDriver
 

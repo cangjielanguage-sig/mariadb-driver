@@ -1,7 +1,7 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-package cjmd.packet
+package cjmd.protocol
 
 /*
 * 无效数据包异常类,表示数据包解析异常

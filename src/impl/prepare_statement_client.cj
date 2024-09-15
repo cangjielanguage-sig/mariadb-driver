@@ -14,7 +14,7 @@ import cjmd.connection.*
 import cjmd.result.*
 import std.sync.*
 import std.regex.*
-import cjmd.packet.*
+import cjmd.protocol.*
 
 public class ClientPrepareStatement <: Statement {
 

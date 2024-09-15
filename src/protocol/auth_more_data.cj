@@ -1,7 +1,7 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-package cjmd.packet
+package cjmd.protocol
 
 import std.io.*
 

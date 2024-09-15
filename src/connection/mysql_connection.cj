@@ -3,6 +3,7 @@
  */
 package cjmd.connection
 
+import cjmd.protocol.*
 import std.net.*
 import std.collection.*
 import std.convert.*
@@ -14,7 +15,6 @@ import crypto.x509.*
 import crypto.keys.*
 import std.time.*
 import std.sort.*
-import cjmd.packet.*
 import cjmd.result.*
 
 
@@ -366,7 +366,6 @@ public class MySqlConnection <: Resource {
 
             var sslModel = option.get(ConnectionOption.SSLMode).getOrDefault({=> "preferred"})
             var sslable = handshake.hasCapability(Capability.SSL)
-
             if (!sslable && sslModel != "disabled" && sslModel != "preferred") {
                 throw ConnectFailedException("Can't Switch to SSL after handshake")
             }
@@ -389,19 +388,21 @@ public class MySqlConnection <: Resource {
                 throw ConnectFailedException(error.getOrThrow().message)
             }
 
-            var originPassword = option.get(ConnectionOption.Password).getOrThrow(
-                {=> ConnectFailedException("Required connection parameters: password")})
+            var originPassword = option.get(ConnectionOption.Password).getOrThrow({=> ConnectFailedException("Required connection parameters: password")})
             if (response is AuthSwitch) {
                 var authSwitch = (response as AuthSwitch).getOrThrow()
                 if (sslEnabled) {
                     return sendPassword(connection, toNullTerminated(originPassword), authSwitch.number)
                 } else {
-                    var publicKey: String
-                    var lastPacketNumber: UInt8
-                    (publicKey, lastPacketNumber) = requestPublicKey(connection, SHA256_REQUESET_KEY_CODE,
-                        authSwitch.number)
-                    var encryptedPwd = performFullAuthentication(publicKey, originPassword.toArray(), authSwitch.salt)
-                    return sendPassword(connection, encryptedPwd, lastPacketNumber)
+                    match (authSwitch.pluginName) {
+                        case "sha256_password" => 
+                            var publicKey: String
+                            var lastPacketNumber: UInt8
+                            (publicKey, lastPacketNumber) = requestPublicKey(connection, SHA256_REQUESET_KEY_CODE,authSwitch.number)
+                            var encryptedPwd = performFullAuthentication(publicKey, originPassword.toArray(), authSwitch.salt)
+                            return sendPassword(connection, encryptedPwd, lastPacketNumber)
+                        case _ => throw ConnectFailedException("Unsupported auth plugin")
+                    }
                 }
             }
 

@@ -7,7 +7,7 @@ import std.time.*
 import std.convert.*
 import std.io.*
 import encoding.json.*
-import cjmd.packet.*
+import cjmd.protocol.*
 
 public class ChangeResult {
     

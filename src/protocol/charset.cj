@@ -1,4 +1,7 @@
-package cjmd.packet
+/*
+ * Copyright (c) Yesokim. 2024-2024. All rights reserved.
+ */
+package cjmd.protocol
 
 public enum Charset {
     

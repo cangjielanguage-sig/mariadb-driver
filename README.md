@@ -31,7 +31,7 @@ Cangjie MySql Driver是为Cangjie编程语言提供MySql原生驱动程序
 └── src
     ├── connection
     ├── impl
-    ├── packet
+    ├── protocol
     └── result
 ├── CHANGELOG
 ├── cjpm.lock

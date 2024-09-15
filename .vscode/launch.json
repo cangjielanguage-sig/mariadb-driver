@@ -11,6 +11,17 @@
             "args": [
                 "--filter=StatementTest.insertTest"
             ]
+        },
+        {
+            "name": "Cangjie (CJNative-unittest): cjmd.connection.test.ConnectionTest.case1",
+            "program": "c:\\Users\\30247\\Desktop\\cjmd\\target\\debug\\unittest_bin\\cjmd.connection.test.exe",
+            "request": "launch",
+            "type": "cangjieDebug",
+            "externalConsole": false,
+            "env": {},
+            "args": [
+                "--filter=ConnectionTest.case1"
+            ]
         }
     ]
 }
