@@ -1,0 +1,34 @@
+package cjmd.cdbc
+
+import cdbc.*
+import std.collection.Map
+import std.collection.HashMap
+
+public class DatasourceImpl <: Datasource  {
+
+    private var options: Map<String, String>
+
+    public init(){
+        this.options = HashMap<String,String>()
+    }
+
+    public init(options: Map<String, String>){
+        this.options = options
+    }
+
+    public override func connect(): Connection {
+        return ConnectionImpl(options)
+    }
+
+    public override func setOption(key: String, value: String): Unit {
+        options.put(key, value)
+    }
+
+    override public func close(){
+    }
+    
+    override public func isClosed(): Bool{
+        return true
+    }
+
+}
