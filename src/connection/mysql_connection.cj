@@ -1,7 +1,7 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-package cjmd.connection
+protected package cjmd.connection
 
 import cjmd.protocol.*
 import std.net.*
@@ -18,7 +18,7 @@ import std.sort.*
 import cjmd.result.*
 
 
-public class MySqlConnection <: Resource {
+protected class MySqlConnection <: Resource {
 
     private static let SHA256_REQUESET_KEY_CODE: Byte = 0x01
 
@@ -40,10 +40,20 @@ public class MySqlConnection <: Resource {
         _socket = tlsSocket
     }
 
-    public prop mutex: ReentrantMutex {
+    protected prop mutex: ReentrantMutex {
         get() {
             _connectionMutex
         }
+    }
+
+    public override func close() {
+        if (!_socket.isClosed()) {
+            _socket.close()
+        }
+    }
+
+    public override func isClosed(): Bool {
+        return _socket.isClosed()
     }
 
     /**
@@ -56,35 +66,35 @@ public class MySqlConnection <: Resource {
      * Update: 
      *     更新,关注数据更新的结果,执行成功返回ChangeResult,如果命令执行失败抛出ResponseErrorException
      */
-    public func sendCommand(sql: String) {
+    protected func sendCommand(sql: String) {
         synchronized(_connectionMutex) {
             sendQuerySql(sql)
             readCommandResponse()
         }
     }
 
-    public func sendQuery(sql: String): ResultSet {
+    protected func sendQuery(sql: String): ResultSet {
         synchronized(_connectionMutex) {
             sendQuerySql(sql)
             return readQueryResponse()
         }
     }
 
-    public func sendUpdate(sql: String): ChangeResult {
+    protected func sendUpdate(sql: String): ChangeResult {
         synchronized(_connectionMutex) {
             sendQuerySql(sql)
             return readUpdateResponse()
         }
     }
 
-    public func sendPrepare(sql: String): PrepareResult {
+    protected func sendPrepare(sql: String): PrepareResult {
         synchronized(_connectionMutex) {
             writeRequest(PrepareCommand.create(sql))
             return readPrepareResponse()
         }
     }
 
-    public func executeQueryPrepare(prepare: PrepareResult, params: Array<Any>): ResultSet {
+    protected func executeQueryPrepare(prepare: PrepareResult, params: Array<Any>): ResultSet {
         synchronized(_connectionMutex) {
             handleLongData(prepare.id, params)
             writeRequest(ExecuteCommand.default(prepare.id, prepare.parameterDefinition, params))
@@ -92,7 +102,7 @@ public class MySqlConnection <: Resource {
         }
     }
 
-    public func executeUpdatePrepare(prepare: PrepareResult, params: Array<Any>): ChangeResult {
+    protected func executeUpdatePrepare(prepare: PrepareResult, params: Array<Any>): ChangeResult {
         synchronized(_connectionMutex) {
             handleLongData(prepare.id, params)
             writeRequest(ExecuteCommand.default(prepare.id, prepare.parameterDefinition, params))
@@ -100,7 +110,7 @@ public class MySqlConnection <: Resource {
         }
     }
 
-    public func closePrepare(prepare: PrepareResult): Unit {
+    protected func closePrepare(prepare: PrepareResult): Unit {
         synchronized(_connectionMutex) {
             writeRequest(CloseCommand(prepare.id))
         }
@@ -284,7 +294,6 @@ public class MySqlConnection <: Resource {
     }
 
 
-
     /*
     * 处理命令语句响应
     */
@@ -340,21 +349,11 @@ public class MySqlConnection <: Resource {
     }
 
 
-    public override func close() {
-        if (!_socket.isClosed()) {
-            _socket.close()
-        }
-    }
-
-    public override func isClosed(): Bool {
-        return _socket.isClosed()
-    }
-
     /*
      * 创建一个完成认证的mysql连接
      * option: 连接参数
      */
-    public static func createAuthedConnection(option: Map<String, String>): MySqlConnection {
+    protected static func createAuthedConnection(option: Map<String, String>): MySqlConnection {
         try {
             // 1. 建立TCP连接,设置参数
             var socket = connectToServer(option)
@@ -577,7 +576,7 @@ public class MySqlConnection <: Resource {
                     password: option.get(ConnectionOption.SSLKeyPassword))
                 case PublicKeyAlgorithm.ECDSA => ECDSAPrivateKey.decodeFromPem(key.getOrThrow(),
                     password: option.get(ConnectionOption.SSLKeyPassword))
-                case _ => throw ConnectFailedException("Unsupported public key algorithm")
+                case _ => throw ConnectFailedException("Unsupported protected key algorithm")
             }
             return (certificates, privateKey)
         }

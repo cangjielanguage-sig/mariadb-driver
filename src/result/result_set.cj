@@ -1,7 +1,7 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-package cjmd.result
+protected package cjmd.result
 
 import std.time.*
 import std.convert.*
@@ -15,13 +15,15 @@ protected const DB_DATE_FORMAT: String = "yyyy-MM-dd"
 protected const DB_TIME_FORMAT: String = "HH:mm:ss"
 public const DB_TIME_PREFIX: String = "1970-01-01 "
 
-public interface ResultSet {
+protected interface ResultSet {
 
     prop rowSize: Int64
 
     prop columnSize: Int64
 
     func next(): Bool
+
+    func getIndexByName(name: String): Int64
 
     func getBool(index: Int64): ?Bool
 

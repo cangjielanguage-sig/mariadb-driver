@@ -1,7 +1,7 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-package cjmd.impl
+package cjmd.cdbc
 
 import std.database.sql.*
 import encoding.json.*

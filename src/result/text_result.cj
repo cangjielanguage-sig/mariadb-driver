@@ -1,7 +1,7 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-package cjmd.result
+protected package cjmd.result
 
 import std.time.*
 import std.convert.*
@@ -9,8 +9,9 @@ import std.io.*
 import encoding.json.*
 import cjmd.protocol.*
 import std.math.numeric.*
+import std.collection.*
 
-public class TextResultSet <: ResultSet {
+protected class TextResultSet <: ResultSet {
 
     private var _columns: Array<ColumnDefinition>
 
@@ -18,10 +19,16 @@ public class TextResultSet <: ResultSet {
 
     private var _currentRow: Int64
 
+    private var _indexMap: Map<String, Int64>
+
     protected TextResultSet(fields: Array<ColumnDefinition>, rows: Array<TextResult>) {
         _columns = fields
         _rows = rows
         _currentRow = 0
+        _indexMap = HashMap<String, Int64>()
+        for(i in 0.._columns.size){
+            _indexMap.put(_columns[i].name, i + 1)
+        }
     }
 
     public override prop rowSize: Int64 {
@@ -43,6 +50,10 @@ public class TextResultSet <: ResultSet {
             _currentRow++
             return true
         }
+    }
+
+    public override func getIndexByName(name: String): Int64 {
+        return _indexMap.get(name).getOrThrow()
     }
 
     public override func getBool(index: Int64): ?Bool {

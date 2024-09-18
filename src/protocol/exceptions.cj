@@ -1,12 +1,12 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-package cjmd.protocol
+protected package cjmd.protocol
 
 /*
 * 无效数据包异常类,表示数据包解析异常
 */
-public class InvalidPacketException <: Exception {
+protected class InvalidPacketException <: Exception {
 
     init(){
        super()
@@ -21,7 +21,7 @@ public class InvalidPacketException <: Exception {
     }  
 }
 
-public class ParameterConvertException <: Exception {
+protected class ParameterConvertException <: Exception {
 
     init() {
         super()

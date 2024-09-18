@@ -1,7 +1,7 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-package cjmd.result
+protected package cjmd.result
 
 import std.time.*
 import std.convert.*
@@ -9,8 +9,10 @@ import std.io.*
 import encoding.json.*
 import cjmd.protocol.*
 import std.math.numeric.*
+import std.collection.Map
+import std.collection.HashMap
 
-public class BinaryResultSet <: ResultSet {
+protected class BinaryResultSet <: ResultSet {
 
     private var columns: Array<ColumnDefinition>
 
@@ -18,10 +20,16 @@ public class BinaryResultSet <: ResultSet {
 
     private var currentRow: Int64
 
+    private var indexMap: Map<String, Int64>
+
     protected BinaryResultSet(columns: Array<ColumnDefinition>, rows: Array<BinaryResult>) {
         this.columns = columns
         this.rows = rows
         this.currentRow = 0
+        indexMap = HashMap<String, Int64>()
+        for(i in 0..columns.size){
+            indexMap.put(columns[i].name, i + 1)
+        }
     }
     
     public override prop rowSize: Int64 {
@@ -43,6 +51,10 @@ public class BinaryResultSet <: ResultSet {
             currentRow ++
             return true
         }
+    }
+
+    public override func getIndexByName(name: String): Int64 {
+        return indexMap.get(name).getOrThrow()
     }
 
     public override func getBool(index: Int64): ?Bool {
@@ -292,7 +304,7 @@ public class BinaryResultSet <: ResultSet {
         var data = dataOp.getOrThrow()
         match (columnType) {
             case String | VarString | Json | Enum | Set | TinyBlob | Blob | MediumBlob | LongBlob =>
-                return readLengthEncodedString(data)
+                return data
             case _ => throw UnsupportedException("Unsupported database type ${columnType} convert to Array")
         }
     }

@@ -1,12 +1,12 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-package cjmd.connection.test
+protected package cjmd.connection.test
 
 
 import std.unittest.*
 import std.unittest.testmacro.*
-import cjmd.*
+import cjmd.connection.*
 import std.database.sql.*
 @Test
 public class ConnectionTest {

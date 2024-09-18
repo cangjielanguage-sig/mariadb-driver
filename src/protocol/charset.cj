@@ -1,15 +1,15 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-package cjmd.protocol
+protected package cjmd.protocol
 
-public enum Charset {
+protected enum Charset {
     
     | Latin1SwedishCi
     | Utf8mb3GeneralCi
     | Binary
 
-    public func value(): UInt16 {
+    protected func value(): UInt16 {
         match (this) {
             case Latin1SwedishCi => return 8
             case Utf8mb3GeneralCi => return 33
@@ -17,7 +17,7 @@ public enum Charset {
         }
     }
 
-    public static func of(value: UInt16): Charset {
+    protected static func of(value: UInt16): Charset {
         match (value) {
             case 8 => return Latin1SwedishCi
             case 33 => return Utf8mb3GeneralCi

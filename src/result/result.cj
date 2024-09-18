@@ -1,7 +1,7 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-package cjmd.result
+protected package cjmd.result
 
 import std.time.*
 import std.convert.*
@@ -9,7 +9,7 @@ import std.io.*
 import encoding.json.*
 import cjmd.protocol.*
 
-public class ChangeResult {
+protected class ChangeResult {
     
     private var _effectRow: UInt64
 
@@ -33,7 +33,7 @@ public class ChangeResult {
     }
 }
 
-public class PrepareResult {
+protected class PrepareResult {
 
     private var info: PrepareResposne
 

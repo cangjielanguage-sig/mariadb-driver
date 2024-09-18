@@ -1,6 +1,9 @@
-package cjmd.cdbc
+/*
+ * Copyright (c) Yesokim. 2024-2024. All rights reserved.
+ */
+package cjmd.jdbc.impl
 
-import cdbc.*
+import cjmd.jdbc.*
 import std.collection.Map
 import std.collection.HashMap
 

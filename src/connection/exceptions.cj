@@ -1,12 +1,12 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-package cjmd.connection
+protected package cjmd.connection
 
 /*
 * 服务器响应Error异常,表示执行命令后服务器响应Error
 */
-public class ResponseErrorException <: Exception{
+protected class ResponseErrorException <: Exception{
 
     init(){
        super()
@@ -24,12 +24,12 @@ public class ResponseErrorException <: Exception{
 /*
 *  连接失败异常
 */
-public class ConnectFailedException <: Exception{
+protected class ConnectFailedException <: Exception{
     init(){
        super()
     }
 
-    protected ConnectFailedException(message: String) {
+    internal ConnectFailedException(message: String) {
         super(message)    
     }
 

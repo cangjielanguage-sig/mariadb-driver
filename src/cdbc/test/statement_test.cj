@@ -1,13 +1,13 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-package cjmd.impl.test
+package cjmd.cdbc.test
 
 
 import std.unittest.*
 import std.unittest.testmacro.*
 import std.database.sql.*
-import cjmd.impl.*
+import cjmd.cdbc.*
 import std.time.*
 import std.sync.*
 import std.fs.*
@@ -23,7 +23,7 @@ public class StatementTest{
 
 
     static init() {
-        var driver = MySqlDriver.getInstance()
+        var driver = MySqlDriver.instance
         var property1 = ("username","root")
         var property2= ("password","MySql123!")
         var property3 = ("database","driver_test")

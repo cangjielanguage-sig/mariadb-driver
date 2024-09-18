@@ -1,12 +1,12 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-package cjmd.result
+protected package cjmd.result
 
 /*
 * 值转换异常
 */
-public class ValueConvertException <: Exception{
+protected class ValueConvertException <: Exception{
     init(){
        super()
     }

@@ -1,13 +1,14 @@
+/*
+ * Copyright (c) Yesokim. 2024-2024. All rights reserved.
+ */
 package cjmd.cdbc
 
-import std.database.sql.Transaction
-import std.database.sql.TransactionAccessMode
-import std.database.sql.TransactionDeferrableMode
-import std.database.sql.TransactionIsoLevel
-import std.database.sql.SqlException
+import std.database.sql.*
+import cjmd.connection.*
+import std.sync.*
 
-public class TransactionImpl <: Transaction {
-
+class TransactionImpl <: Transaction {
+    
     private static const QUERY_ISO_LEVEL_SQL: String = "SELECT @@transaction_isolation"
 
     private static const QUERY_ACCESS_MODE_SQL = "SELECT @@transaction_read_only"
@@ -172,5 +173,4 @@ public class TransactionImpl <: Transaction {
             throw SqlException("The database Connection has been closed")
         }
     }
-
 }

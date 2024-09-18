@@ -1,13 +1,13 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
- package cjmd.protocol
+protected package cjmd.protocol
 
  /*
 * Column types for MySQL
 * referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/field__types_8h.html
 */
-public enum ColumnType <: ToString {
+protected enum ColumnType <: ToString {
     //| Decimal
     | Tiny
     | Short
@@ -44,7 +44,7 @@ public enum ColumnType <: ToString {
     //| Geometry
 
 
-    public static func of(value: Byte){
+    protected static func of(value: Byte){
         match (value) {
             //case 0x00 => Decimal
             case 0x01 => Tiny
@@ -84,7 +84,7 @@ public enum ColumnType <: ToString {
         }
     }
 
-    public func value(): Byte{
+    protected func value(): Byte{
         match (this) {
             //case Decimal => 0x00
             case Tiny => 0x01
@@ -123,7 +123,7 @@ public enum ColumnType <: ToString {
         }
     }
 
-    public operator func == (right: ColumnType): Bool {
+    protected operator func == (right: ColumnType): Bool {
         return this.value() == right.value()
     }
 

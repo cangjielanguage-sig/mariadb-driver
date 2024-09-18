@@ -1,16 +1,19 @@
+/*
+ * Copyright (c) Yesokim. 2024-2024. All rights reserved.
+ */
 package cjmd.cdbc
 
-import cdbc.*
-import std.collection.Map
-import std.sync.*
-import std.database.sql.SqlException
+import std.database.sql.*
 import cjmd.connection.*
+import std.collection.*
 import cjmd.result.*
 import cjmd.protocol.*
+import std.sync.*
 import std.convert.*
 
-public class ConnectionImpl <: Connection {
-    
+public class ConnectionImpl <: Connection{
+
+    /*描述与数据源连接的当前状态*/
     private var _state: ConnectionState
     
     private var _connection: MySqlConnection
@@ -55,12 +58,12 @@ public class ConnectionImpl <: Connection {
         var prepareMode: String = _options.get(ConnectionOption.PrepareMode).getOrDefault({=>"auto"})
         if(prepareMode == "auto"){
             if(sql.size > 100 && sql.toAsciiLower().startsWith("select")){
-                return ServerPrepareStatement(sql, this)
+                return ServerPrepareStatement(this, sql)
             }else{
                 return ClientPrepareStatement(this,sql)
             }
         }else if(prepareMode == "server"){
-            return ServerPrepareStatement(sql, this)
+            return ServerPrepareStatement(this,sql)
         }else if(prepareMode == "client"){
             return ClientPrepareStatement(this, sql)
         }else {
@@ -79,62 +82,6 @@ public class ConnectionImpl <: Connection {
         }
     }
 
-    public func getConnectionMutex(): ReentrantMutex{
-        return _connection.mutex
-    }
-
-    public func sendCommand(sql: String) {
-        try {
-            return _connection.sendCommand(sql)
-        }catch (e: ResponseErrorException) {
-            throw SqlException(e.message)
-        }
-    }
-
-    public func sendQuery(sql: String): ResultSet {
-        try {
-            return _connection.sendQuery(sql)
-        }catch (e: ResponseErrorException) {
-            throw SqlException(e.message)
-        }
-    }
-
-    public func sendUpdate(sql: String): ChangeResult {
-        try {
-            return _connection.sendUpdate(sql)
-        }catch (e: ResponseErrorException) {
-            throw SqlException(e.message)
-        }
-    }
-
-    public func sendPrepare(sql: String): PrepareResult {
-        try {
-            return _connection.sendPrepare(sql)
-        }catch (e: ResponseErrorException) {
-            throw SqlException(e.message)
-        }
-    }
-
-    public func executeQueryPrepare(prepare: PrepareResult, params: Array<Any>): ResultSet {
-        try {
-            return _connection.executeQueryPrepare(prepare, params)
-        }catch (e: ResponseErrorException | ParameterConvertException) {
-            throw SqlException(e.message)
-        }
-    }
-
-    public func executeUpdatePrepare(prepare: PrepareResult, params: Array<Any>): ChangeResult {
-        try {
-            return _connection.executeUpdatePrepare(prepare, params)
-        }catch (e: ResponseErrorException  | ParameterConvertException) {
-            throw SqlException(e.message)
-        }
-    }
-
-    public func closePrepare(prepare: PrepareResult) {
-        return _connection.closePrepare(prepare)
-    }
-
     override public func close(){
         checkResourceAvailability()
         synchronized(getConnectionMutex()){
@@ -147,12 +94,70 @@ public class ConnectionImpl <: Connection {
         return _connection.isClosed()
     }
 
+    //protected---
+    protected func sendCommand(sql: String) {
+        try {
+            return _connection.sendCommand(sql)
+        }catch (e: ResponseErrorException) {
+            throw SqlException(e.message)
+        }
+    }
+
+    protected func sendQuery(sql: String): ResultSet {
+        try {
+            return _connection.sendQuery(sql)
+        }catch (e: ResponseErrorException) {
+            throw SqlException(e.message)
+        }
+    }
+
+    protected func sendUpdate(sql: String): ChangeResult {
+        try {
+            return _connection.sendUpdate(sql)
+        }catch (e: ResponseErrorException) {
+            throw SqlException(e.message)
+        }
+    }
+
+    protected func sendPrepare(sql: String): PrepareResult {
+        try {
+            return _connection.sendPrepare(sql)
+        }catch (e: ResponseErrorException) {
+            throw SqlException(e.message)
+        }
+    }
+
+    protected func executeQueryPrepare(prepare: PrepareResult, params: Array<Any>): ResultSet {
+        try {
+            return _connection.executeQueryPrepare(prepare, params)
+        }catch (e: ResponseErrorException | ParameterConvertException) {
+            throw SqlException(e.message)
+        }
+    }
+
+    protected func executeUpdatePrepare(prepare: PrepareResult, params: Array<Any>): ChangeResult {
+        try {
+            return _connection.executeUpdatePrepare(prepare, params)
+        }catch (e: ResponseErrorException  | ParameterConvertException) {
+            throw SqlException(e.message)
+        }
+    }
+
+    protected func closePrepare(prepare: PrepareResult) {
+        return _connection.closePrepare(prepare)
+    }
+
+    protected func getConnectionMutex(): ReentrantMutex{
+        return _connection.mutex
+    }
+
+    //private---
     private func checkEmptySql(sql: String){
         if(sql.size == 0){
             throw SqlException("Empty SQL")
         }
     }
-
+    
     private func checkResourceAvailability(){
         if(isClosed()){
             throw SqlException("The database Connection has been closed")
@@ -180,5 +185,4 @@ public class ConnectionImpl <: Connection {
              }
         }
     }
-
 }

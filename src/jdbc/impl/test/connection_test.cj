@@ -1,4 +1,4 @@
-package cjmd.cdbc.test
+package cjmd.jdbc.impl.test
 
 
 import std.unittest.*
@@ -10,8 +10,10 @@ import std.io.*
 import std.math.numeric.*
 import encoding.json.*
 
-import cjmd.cdbc.*
+import cjmd.jdbc.*
+import cjmd.jdbc.impl.*
 import cjmd.protocol.inputStreamToArray
+
 @Test
 public class StatementTest{
 
@@ -190,6 +192,50 @@ public class StatementTest{
             println(result.getJsonValue(30))
             println(result.getString(31))
             println(result.getString(32))
+        }
+    }
+
+    /*
+    * 查询数据
+    */
+    @TestCase
+    public func queryByNameTest(){
+        var prepare = connection.prepareStatement("select * from full_test where id = ?")
+        var result = prepare.query([199])
+        while (result.next()) {
+            println(result.getInt64("id"))
+            println(result.getInt8("tinyint_col"))
+            println(result.getUInt8("utinyint_col"))
+            println(result.getInt16("smallint_col"))
+            println(result.getUInt16("usmallint_col"))
+            println(result.getInt32("mediumint_col"))
+            println(result.getUInt32("umediumint_col"))
+            println(result.getInt32("int_col"))
+            println(result.getUInt32("uint_col"))
+            println(result.getInt64("bigint_col"))
+            println(result.getUInt64("ubigint_col"))
+            println(result.getFloat32("float_col"))
+            println(result.getFloat64("double_col"))
+            println(result.getDecimal("decimal_col"))
+            println(result.getDate("date_col"))
+            println(result.getTime("time_col"))
+            println(result.getDateTime("datetime_col"))
+            println(result.getDateTime("date_col"))
+            println(result.getInt16("year_col"))
+
+            println(result.getString("char_col"))
+            println(result.getString("varchar_col"))
+            println(result.getString("tinytext_col"))
+            println(result.getString("text_col"))
+            println(result.getString("mediumtext_col"))
+            println(result.getString("longtext_col"))
+            println(result.getArray("tinyblob_col"))
+            println(result.getArray("blob_col"))
+            println(result.getArray("mediumblob_col"))
+            println(inputStreamToArray(result.getInputStream("longblob_col").getOrThrow()).size)
+            println(result.getJsonValue("json_col"))
+            println(result.getString("set_col"))
+            println(result.getString("enum_col"))
         }
     }
 

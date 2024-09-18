@@ -29,3 +29,10 @@
 ## Feature
 
 - 向DriverManager注册了驱动,优化了导包流程
+
+# [v0.3]
+
+## Feature
+
+- 修复了getArray()数据不准确的bug
+- 添加了经典的JDBC接口支持
