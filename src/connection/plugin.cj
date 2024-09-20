@@ -14,6 +14,9 @@ caching_sha2_password 插件
 XOR(SHA256(password), SHA256(SHA256(SHA256(password)), nonce))
 */
 internal func cachingSha2Password(password: Array<Byte>, salt: Array<Byte>): Array<Byte> {
+    if(password.size == 0){
+        return []
+    }
     var sha256= SHA256()
     // 1. SHA256(password)
     sha256.write(password)
@@ -28,17 +31,23 @@ internal func cachingSha2Password(password: Array<Byte>, salt: Array<Byte>): Arr
     sha256.write(salt)
     var scramble: Array<Byte> = sha256.finish()
     sha256.reset()
-    var x: Int64 = 0
+    //var x: Int64 = 0
     // 4. XOR(SHA256(password), SHA256(SHA256(SHA256(password)), nonce))
-    while (x < scramble.size) {
-        scramble[x] ^= digestStage1[x]
-        x++
+    // while (x < scramble.size) {
+    //     scramble[x] ^= digestStage1[x]
+    //     x++
+    // }
+    for(i in 0..scramble.size){
+        scramble[i] ^= digestStage1[i]
     }
     return scramble
 }
 
 
 internal func performFullAuthentication(pubPem: String,password: Array<Byte>, salt: Array<Byte>): Array<Byte>{
+    if(password.size == 0){
+        return []
+    }
     var x: Int64 = 0
     var array = ArrayList<Byte>()
     array.appendAll(password)
@@ -56,3 +65,23 @@ internal func performFullAuthentication(pubPem: String,password: Array<Byte>, sa
     return outStream.bytes()
 }
 
+internal func mysqlNativePassword(password: Array<Byte>, salt: Array<Byte>): Array<Byte> {
+    if(password.size == 0){
+        return []
+    }
+    var sha1 = SHA1()
+    sha1.write(password)
+    var stage1 = sha1.finish()
+    sha1.reset()
+    sha1.write(stage1)
+    var stage2 = sha1.finish()
+    sha1.reset()
+    sha1.write(salt)
+    sha1.write(stage2)
+    var scramble = sha1.finish()
+    sha1.reset()
+    for(i in 0..scramble.size){
+        scramble[i] ^= stage1[i]
+    }
+    return scramble
+}

@@ -1,7 +1,7 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-package cjmd.cdbc.test
+package cjmd.test.cdbc
 
 
 import std.unittest.*
@@ -16,7 +16,7 @@ import std.math.numeric.*
 import cjmd.protocol.*
 import encoding.json.*
 @Test
-public class StatementTest{
+public class MySqlTest{
 
 
     private static var connection: Connection

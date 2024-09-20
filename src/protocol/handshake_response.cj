@@ -205,6 +205,7 @@ protected class HandshakeResponse <: Request {
                             .setCapability(CanHandleExpiredPasswords)
                             .setCapability(SessionTrack)
                             .setCapability(RememberOptions)
+                            .setCapability(Reserved2)
                             //.setCapability(QueryAttributes)
                             .setCharset(33)
                             .setMaxPacket(1073741824)

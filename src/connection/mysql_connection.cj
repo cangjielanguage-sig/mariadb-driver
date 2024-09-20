@@ -387,6 +387,10 @@ protected class MySqlConnection <: Resource {
                 throw ConnectFailedException(error.getOrThrow().message)
             }
 
+            if(response is OkResponse) {
+                return connection
+            }
+
             var originPassword = option.get(ConnectionOption.Password).getOrThrow({=> ConnectFailedException("Required connection parameters: password")})
             if (response is AuthSwitch) {
                 var authSwitch = (response as AuthSwitch).getOrThrow()
@@ -394,39 +398,48 @@ protected class MySqlConnection <: Resource {
                     return sendPassword(connection, toNullTerminated(originPassword), authSwitch.number)
                 } else {
                     match (authSwitch.pluginName) {
+                        case "caching_sha2_password" =>
+                            var encryptedPwd = cachingSha2Password(originPassword.toArray(), authSwitch.salt)
+                            connection.writeRequest(SendPassword(authSwitch.number + 1, encryptedPwd))
+                            var response = connection.readResponse()
+                            return checkCachingSha2PasswordAuthStatus(connection, response, originPassword, authSwitch.salt, sslEnabled)
                         case "sha256_password" => 
                             var publicKey: String
                             var lastPacketNumber: UInt8
                             (publicKey, lastPacketNumber) = requestPublicKey(connection, SHA256_REQUESET_KEY_CODE,authSwitch.number)
                             var encryptedPwd = performFullAuthentication(publicKey, originPassword.toArray(), authSwitch.salt)
                             return sendPassword(connection, encryptedPwd, lastPacketNumber)
+                        case "mysql_native_password" =>
+                            var encryptedPwd = mysqlNativePassword(originPassword.toArray(), authSwitch.salt)
+                            return sendPassword(connection, encryptedPwd, authSwitch.number);
                         case _ => throw ConnectFailedException("Unsupported auth plugin")
                     }
                 }
             }
 
             if (response is AuthStatus) {
-                var authState = (response as AuthStatus).getOrThrow()
-                if (authState.state == AuthState.PerformFullAuthentication) {
-                    if (sslEnabled) {
-                        return sendPassword(connection, toNullTerminated(originPassword), authState.number)
-                    } else {
-                        var publicKey: String
-                        var lastPacketNumber: UInt8
-                        (publicKey, lastPacketNumber) = requestPublicKey(connection, CACHING_SHA2_REQUEST_KEY_CODE,
-                            authState.number)
-                        var encryptedPwd = performFullAuthentication(publicKey, originPassword.toArray(), handshake.salt
-                        )
-                        return sendPassword(connection, encryptedPwd, lastPacketNumber)
-                    }
-                } else if (authState.state == AuthState.FastAuthSuccess) {
-                    var response = connection.readResponse()
-                    match (response) {
-                        case r: OkResponse => return connection
-                        case r: ErrorResponse => throw ConnectFailedException(r.message)
-                        case _ => throw ConnectFailedException("Out expect Response")
-                    }
-                }
+                return checkCachingSha2PasswordAuthStatus(connection, response, originPassword, handshake.salt, sslEnabled)
+                // var authState = (response as AuthStatus).getOrThrow()
+                // if (authState.state == AuthState.PerformFullAuthentication) {
+                //     if (sslEnabled) {
+                //         return sendPassword(connection, toNullTerminated(originPassword), authState.number)
+                //     } else {
+                //         var publicKey: String
+                //         var lastPacketNumber: UInt8
+                //         (publicKey, lastPacketNumber) = requestPublicKey(connection, CACHING_SHA2_REQUEST_KEY_CODE,
+                //             authState.number)
+                //         var encryptedPwd = performFullAuthentication(publicKey, originPassword.toArray(), handshake.salt
+                //         )
+                //         return sendPassword(connection, encryptedPwd, lastPacketNumber)
+                //     }
+                // } else if (authState.state == AuthState.FastAuthSuccess) {
+                //     var response = connection.readResponse()
+                //     match (response) {
+                //         case r: OkResponse => return connection
+                //         case r: ErrorResponse => throw ConnectFailedException(r.message)
+                //         case _ => throw ConnectFailedException("Out expect Response")
+                //     }
+                // }
             }
         } catch (e: SocketException | SocketTimeoutException) {
             throw ConnectFailedException(e.message)
@@ -466,6 +479,8 @@ protected class MySqlConnection <: Resource {
         match (handshake.authPlugin) {
             case "caching_sha2_password" =>
                 encryptedPassword = cachingSha2Password(originPassword.toArray(),handshake.salt)
+            case "mysql_native_password" =>
+                encryptedPassword = mysqlNativePassword(originPassword.toArray(),handshake.salt)
             case _ => throw ConnectFailedException("Unknow authentication plugin")
         }
         authReq.setUsername(username).setPassword(encryptedPassword).setClientAuthPlugin(handshake.authPlugin)
@@ -514,6 +529,29 @@ protected class MySqlConnection <: Resource {
             case r: ErrorResponse => throw ConnectFailedException(r.message)
             case _ => throw ConnectFailedException("Out expect connection response")
         }
+    }
+
+    private static func checkCachingSha2PasswordAuthStatus(connection: MySqlConnection, response: Response, originPassword: String, salt: Array<Byte>, sslEnabled: Bool): MySqlConnection{
+        var authState = (response as AuthStatus).getOrThrow()
+        if (authState.state == AuthState.PerformFullAuthentication) {
+            if (sslEnabled) {
+                return sendPassword(connection, toNullTerminated(originPassword), authState.number)    
+            } else {
+                var publicKey: String
+                var lastPacketNumber: UInt8
+                (publicKey, lastPacketNumber) = requestPublicKey(connection, CACHING_SHA2_REQUEST_KEY_CODE,authState.number)
+                var encryptedPwd = performFullAuthentication(publicKey, originPassword.toArray(), salt)
+                return sendPassword(connection, encryptedPwd, lastPacketNumber)
+            }
+        } else if (authState.state == AuthState.FastAuthSuccess) {
+            var response = connection.readResponse()
+            match (response) {
+                case r: OkResponse => return connection
+                case r: ErrorResponse => throw ConnectFailedException(r.message)
+                case _ => throw ConnectFailedException("Out expect Response")
+            }
+        }
+        throw ConnectFailedException("connect to mysql failed")
     }
 
     private static func requestPublicKey(connection: MySqlConnection, requestKeyCode: Byte, lastPacketNumber: UInt8): (String, 

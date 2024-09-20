@@ -16,23 +16,28 @@ public class Date <: ToString {
         }
     }
 
-    public init(dateTime: DateTime){
+    public init(year: Int64, month: Int64, day: Int64) {
+        _dateTime = DateTime.of(year: year, month: month, dayOfMonth: day)
+    }
+    
+    public init(timestamp: Int64) {
+        _dateTime = DateTime.fromUnixTimeStamp(timestamp * Duration.second)
+    }
+
+    public init(dateTime: DateTime) {
         _dateTime = dateTime
-    }
-
-    public init(date: String) {
-        _dateTime = DateTime.parse(date)
-    }
-
-    public init(date: String, format: String) {
-        _dateTime = DateTime.parse(date, format)
     }
 
     public func toString(): String {
         return _dateTime.toString("yyyy-MM-dd")
     }
 
-    public func toString(format: String): String{
-        return _dateTime.toString(format)
+    public func toString(foramt: String): String {
+        return _dateTime.toString(foramt)
     }
+
+    public static func valueOf(s: String): Date {
+        return Date(DateTime.parse(s, "yyyy-MM-dd"))
+    }
+
 }

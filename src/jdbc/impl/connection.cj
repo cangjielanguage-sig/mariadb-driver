@@ -13,198 +13,284 @@ import cjmd.protocol.*
 
 public class ConnectionImpl <: Connection {
     
-    
-    private var _connection: MySqlConnection
+    private static const QUERY_ISO_LEVEL_SQL: String = "SELECT @@transaction_isolation"
 
+    private static const QUERY_ACCESS_MODE_SQL = "SELECT @@transaction_read_only"
 
-    private var _options: Map<String, String>
+    private static const QUERY_AUTO_COMMIT = "SELECT @@autocommit"
 
+    private static const START_TRANSACTION_SQL = "BEGIN"
 
-    public ConnectionImpl(options: Map<String, String>){
-        _options = options
+    private static const COMMIT_TRANSACTION_SQL = "COMMIT"
+
+    private static const ROLLBACK_TRANSACTION_SQL = "ROLLBACK"
+
+    private static const SAVE_TRANSACTION_SQL = "SAVEPOINT"
+
+    private static const ROLLBACK_TO_SAVEPOINT_SQL = "ROLLBACK TO"
+
+    private static const RELEASE_SAVEPOINT_SQL = "RELEASE SAVEPOINT"
+
+    private static const CHANGE_TO_READ_UNCOMMITED_SQL = "SET SESSION transaction_isolation = 'READ-UNCOMMITTED'"
+
+    private static const CHANGE_TO_READ_COMMITED_SQL = "SET SESSION transaction_isolation = 'READ-COMMITTED'"
+
+    private static const CHANGE_TO_REPEATABLE_READ_SQL = "SET SESSION transaction_isolation = 'REPEATABLE-READ'"
+
+    private static const CHANGE_TO_READ_SERIALIZABLE_SQL = "SET SESSION transaction_isolation = 'SERIALIZABLE'"
+
+    private static const CHANGE_TO_READ_WRITE_SQL = "SET SESSION transaction_read_only = OFF"
+
+    private static const CHANGE_TO_READ_ONLY_SQL = "SET SESSION transaction_read_only = ON"
+
+    private static const CLOSE_AUTO_COMMIT = "SET SESSION autocommit = 0"
+
+    private static const OPEN_AUTO_COMMIT = "SET SESSION autocommit = 1"
+
+    private var connection: MySqlConnection
+
+    private var options: Map<String, String>
+
+    public ConnectionImpl(options: Map<String, String>) {
+        this.options = options
         try {
-             _connection = MySqlConnection.createAuthedConnection(options)
-             applyOptions()
-        }catch (e: ConnectFailedException) {
+            connection = MySqlConnection.createAuthedConnection(options)
+            applyOptions()
+        } catch (e: ConnectFailedException) {
             throw SqlException(e.message)
         }
     }
 
-    override public func getMetaData(): Map<String,String>{
+    public override func getMetaData(): Map<String, String> {
         checkResourceAvailability()
-        return _options
+        return options
     }
-    
-    override public func prepareStatement(sql: String): Statement{
+
+    public override func prepareStatement(sql: String): Statement {
         checkResourceAvailability()
         checkEmptySql(sql)
         //return ClientPrepareStatement(this,sql)
         //return ServerPrepareStatement(this, sql)
-        var prepareMode: String = _options.get(ConnectionOption.PrepareMode).getOrDefault({=>"auto"})
-        if(prepareMode == "auto"){
-            if(sql.size > 100 && sql.toAsciiLower().startsWith("select")){
+        var prepareMode: String = options.get(ConnectionOption.PrepareMode).getOrDefault({=> "auto"})
+        if (prepareMode == "auto") {
+            if (sql.size > 100 && sql.toAsciiLower().startsWith("select")) {
                 return ServerPrepareStatement(sql, this)
-            }else{
-                return ClientPrepareStatement(this,sql)
+            } else {
+                return ClientPrepareStatement(this, sql)
             }
-        }else if(prepareMode == "server"){
+        } else if (prepareMode == "server") {
             return ServerPrepareStatement(sql, this)
-        }else if(prepareMode == "client"){
+        } else if (prepareMode == "client") {
             return ClientPrepareStatement(this, sql)
-        }else {
+        } else {
             throw SqlException("Unknow prepare mode: ${prepareMode} option: auto, server or client")
         }
     }
 
-    override public func setAutoCommit(autoCommit: Bool): Unit {
-        
-    }
-
-    override public func getAutoCommit(): Bool {
-        return true
-    }
-
-    override public func setTransactionIsolation(level: IsolationLevel): Unit {
-
-    }
-
-    override public func getTransactionIsolation(): IsolationLevel {
-        return Unsupported
-    }
-
-    override public func begin(): Unit {
-
-    }
-
-    override public func commit(): Unit {
-
-    }
-
-    override public func rollback(): Unit {
-
-    }
-
-    override public func setSavepoint(name: String): Unit {
-
-    }
-
-    override public func rollback(name: String): Unit {
-
-    }
-
-    override public func releaseSavepoint(name: String): Unit {
-
-    }
-
-    override public func setReadOnly(readOnly: Bool): Unit {
-
-    }
-
-    override public func isReadOnly(): Bool {
-        return true
-    }
-
-    override public func close(){
+    public override func getAutoCommit(): Bool {
         checkResourceAvailability()
-        synchronized(getConnectionMutex()){
-            _connection.close()
+        var result = connection.sendQuery(QUERY_ISO_LEVEL_SQL)
+        if (!result.next() || result.rowSize != 1 || result.columnSize != 1) {
+            throw SqlException("Query transaction isolation level failed")
+        }
+        var autoCommit: String = result.getString(1).getOrThrow()
+        match (autoCommit) {
+            case "0" => false
+            case "1" => true
+            case _ => throw SqlException("Unknown transaction isolation level")
         }
     }
-    
-    override public func isClosed(): Bool{
-        return _connection.isClosed()
+
+    public override func setAutoCommit(autoCommit: Bool): Unit {
+        checkResourceAvailability()
+        var changeAutoCommite = match (autoCommit) {
+            case true => OPEN_AUTO_COMMIT
+            case false => CLOSE_AUTO_COMMIT
+        }
+        connection.sendCommand(changeAutoCommite)
+    }
+
+    public override func getTransactionIsolation(): IsolationLevel {
+        checkResourceAvailability()
+        var result = connection.sendQuery(QUERY_ISO_LEVEL_SQL)
+        if (!result.next() || result.rowSize != 1 || result.columnSize != 1) {
+            throw SqlException("Query transaction isolation level failed")
+        }
+        var isoLevel: String = result.getString(1).getOrThrow()
+        match (isoLevel) {
+            case "READ-UNCOMMITTED" => ReadUncommitted
+            case "READ-COMMITTED" => ReadCommitted
+            case "REPEATABLE-READ" => RepeatableRead
+            case "SERIALIZABLE" => Serializable
+            case _ => throw SqlException("Unknown transaction isolation level")
+        }
+    }
+
+    public override func setTransactionIsolation(level: IsolationLevel): Unit {
+        checkResourceAvailability()
+        var changeIsoLevel = match (level) {
+            case ReadUncommitted => CHANGE_TO_READ_UNCOMMITED_SQL
+            case ReadCommitted => CHANGE_TO_READ_COMMITED_SQL
+            case RepeatableRead => CHANGE_TO_REPEATABLE_READ_SQL
+            case Serializable => CHANGE_TO_READ_SERIALIZABLE_SQL
+            case Unspecified => CHANGE_TO_REPEATABLE_READ_SQL
+        }
+        connection.sendCommand(changeIsoLevel)
+    }
+
+    public override func begin(): Unit {
+        checkResourceAvailability()
+        connection.sendCommand(START_TRANSACTION_SQL)
+    }
+
+    public override func commit(): Unit {
+        checkResourceAvailability()
+        connection.sendCommand(COMMIT_TRANSACTION_SQL)
+    }
+
+    public override func rollback(): Unit {
+        checkResourceAvailability()
+        connection.sendCommand(ROLLBACK_TRANSACTION_SQL)
+    }
+
+    public override func setSavepoint(name: String): Unit {
+        checkResourceAvailability()
+        connection.sendCommand("${SAVE_TRANSACTION_SQL} ${name}")
+    }
+
+    public override func rollback(name: String): Unit {
+        checkResourceAvailability()
+        connection.sendCommand("${ROLLBACK_TO_SAVEPOINT_SQL} ${name}")
+    }
+
+    public override func releaseSavepoint(name: String): Unit {
+        checkResourceAvailability()
+        connection.sendCommand("${RELEASE_SAVEPOINT_SQL} ${name}")
+    }
+
+    public override func setReadOnly(readOnly: Bool): Unit {
+        checkResourceAvailability()
+        var changeAccessMode = match (readOnly) {
+            case false => CHANGE_TO_READ_WRITE_SQL
+            case true => CHANGE_TO_READ_ONLY_SQL
+        }
+        connection.sendCommand(changeAccessMode)
+    }
+
+    public override func isReadOnly(): Bool {
+        checkResourceAvailability()
+        var result = connection.sendQuery(QUERY_ACCESS_MODE_SQL)
+        if (!result.next() || result.rowSize != 1 || result.columnSize != 1) {
+            throw SqlException("Query transaction isolation level failed")
+        }
+        var accessMode: String = result.getString(1).getOrThrow()
+        match (accessMode) {
+            case "0" => false
+            case "1" => true
+            case _ => throw SqlException("Unkonw transaction access mode")
+        }
+    }
+
+    public override func close() {
+        checkResourceAvailability()
+        synchronized(getConnectionMutex()) {
+            connection.close()
+        }
+    }
+
+    public override func isClosed(): Bool {
+        return connection.isClosed()
     }
 
     //protected
-    protected func getConnectionMutex(): ReentrantMutex{
-        return _connection.mutex
+    protected func getConnectionMutex(): ReentrantMutex {
+        return connection.mutex
     }
 
     protected func sendCommand(sql: String) {
         try {
-            return _connection.sendCommand(sql)
-        }catch (e: ResponseErrorException) {
+            return connection.sendCommand(sql)
+        } catch (e: ResponseErrorException) {
             throw SqlException(e.message)
         }
     }
 
     protected func sendQuery(sql: String): ResultSet {
         try {
-            return _connection.sendQuery(sql)
-        }catch (e: ResponseErrorException) {
+            return connection.sendQuery(sql)
+        } catch (e: ResponseErrorException) {
             throw SqlException(e.message)
         }
     }
 
     protected func sendUpdate(sql: String): ChangeResult {
         try {
-            return _connection.sendUpdate(sql)
-        }catch (e: ResponseErrorException) {
+            return connection.sendUpdate(sql)
+        } catch (e: ResponseErrorException) {
             throw SqlException(e.message)
         }
     }
 
     protected func sendPrepare(sql: String): PrepareResult {
         try {
-            return _connection.sendPrepare(sql)
-        }catch (e: ResponseErrorException) {
+            return connection.sendPrepare(sql)
+        } catch (e: ResponseErrorException) {
             throw SqlException(e.message)
         }
     }
 
     protected func executeQueryPrepare(prepare: PrepareResult, params: Array<Any>): ResultSet {
         try {
-            return _connection.executeQueryPrepare(prepare, params)
-        }catch (e: ResponseErrorException | ParameterConvertException) {
+            return connection.executeQueryPrepare(prepare, params)
+        } catch (e: ResponseErrorException | ParameterConvertException) {
             throw SqlException(e.message)
         }
     }
 
     protected func executeUpdatePrepare(prepare: PrepareResult, params: Array<Any>): ChangeResult {
         try {
-            return _connection.executeUpdatePrepare(prepare, params)
-        }catch (e: ResponseErrorException  | ParameterConvertException) {
+            return connection.executeUpdatePrepare(prepare, params)
+        } catch (e: ResponseErrorException | ParameterConvertException) {
             throw SqlException(e.message)
         }
     }
 
     protected func closePrepare(prepare: PrepareResult) {
-        return _connection.closePrepare(prepare)
+        return connection.closePrepare(prepare)
     }
 
     //private
-    private func checkEmptySql(sql: String){
-        if(sql.size == 0){
+    private func checkEmptySql(sql: String) {
+        if (sql.size == 0) {
             throw SqlException("Empty SQL")
         }
     }
 
-    private func checkResourceAvailability(){
-        if(isClosed()){
+    private func checkResourceAvailability() {
+        if (isClosed()) {
             throw SqlException("The database Connection has been closed")
         }
     }
 
-    private func applyOptions(){
-        var queryTimeout = _options.get(ConnectionOption.QueryTimeout)
-        if(!queryTimeout.isNone()){
+    private func applyOptions() {
+        var queryTimeout = options.get(ConnectionOption.QueryTimeout)
+        if (!queryTimeout.isNone()) {
             try {
                 var timeout = Int64.parse(queryTimeout.getOrThrow())
                 sendCommand("set session max_execution_time = ${timeout}")
-            }catch (e: IllegalArgumentException) {
+            } catch (e: IllegalArgumentException) {
                 throw IllegalArgumentException("parse query_timeout failed")
             }
         }
 
-        var updateTimeout = _options.get(ConnectionOption.UpdateTimeout)
-        if(!updateTimeout.isNone()){
-             try {
+        var updateTimeout = options.get(ConnectionOption.UpdateTimeout)
+        if (!updateTimeout.isNone()) {
+            try {
                 var timeout = Int64.parse(updateTimeout.getOrThrow())
                 sendCommand("set session lock_wait_timeout = ${timeout}")
-             }catch (e: IllegalArgumentException) {
+            } catch (e: IllegalArgumentException) {
                 throw IllegalArgumentException("parse update_timeout failed")
-             }
+            }
         }
     }
-
 }

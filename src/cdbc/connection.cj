@@ -12,7 +12,7 @@ import std.sync.*
 import std.convert.*
 
 public class ConnectionImpl <: Connection{
-
+    
     /*描述与数据源连接的当前状态*/
     private var _state: ConnectionState
     

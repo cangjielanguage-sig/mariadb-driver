@@ -3,7 +3,7 @@
 </div>
 
 <p align="center">
-<img alt="" src="https://img.shields.io/badge/release-v0.2.3-brightgreen" style="display: inline-block;" />
+<img alt="" src="https://img.shields.io/badge/release-v0.3.1-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/cjc-v0.55.3-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/cjcov-0.0%25-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/state-孵化-brightgreen" style="display: inline-block;" />
@@ -14,7 +14,7 @@
 
 ### 1.1 项目特性
 
-Cangjie MySql Driver是为Cangjie编程语言提供MySql原生驱动程序
+Cangjie MySql Driver是为Cangjie编程语言提供MySql原生驱动程序,基于MySql协议. 同时适配TIDB等国产数据库
 
 ### 1.2 项目计划
 

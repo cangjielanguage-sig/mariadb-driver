@@ -44,6 +44,94 @@
             "args": [
                 "--filter=StatementTest.queryTest"
             ]
+        },
+        {
+            "name": "Cangjie (CJNative-unittest): cjmd.test.connection.DmTest.case1",
+            "program": "c:\\Users\\30247\\Desktop\\cjmd\\target\\debug\\unittest_bin\\cjmd.test.connection.exe",
+            "request": "launch",
+            "type": "cangjieDebug",
+            "externalConsole": false,
+            "env": {},
+            "args": [
+                "--filter=DmTest.case1"
+            ]
+        },
+        {
+            "name": "Cangjie (CJNative-unittest): cjmd.test.connection.MySqlTest.case2",
+            "program": "c:\\Users\\30247\\Desktop\\cjmd\\target\\debug\\unittest_bin\\cjmd.test.connection.exe",
+            "request": "launch",
+            "type": "cangjieDebug",
+            "externalConsole": false,
+            "env": {},
+            "args": [
+                "--filter=MySqlTest.case2"
+            ]
+        },
+        {
+            "name": "Cangjie (CJNative-unittest): cjmd.test.connection.TidbTest.case1",
+            "program": "c:\\Users\\30247\\Desktop\\cjmd\\target\\debug\\unittest_bin\\cjmd.test.connection.exe",
+            "request": "launch",
+            "type": "cangjieDebug",
+            "externalConsole": false,
+            "env": {},
+            "args": [
+                "--filter=TidbTest.case1"
+            ]
+        },
+        {
+            "name": "Cangjie (CJNative-unittest): cjmd.test.jdbc.impl.TidbTest",
+            "program": "c:\\Users\\30247\\Desktop\\cjmd\\target\\debug\\unittest_bin\\cjmd.test.jdbc.impl.exe",
+            "request": "launch",
+            "type": "cangjieDebug",
+            "externalConsole": false,
+            "env": {},
+            "args": [
+                "--filter=TidbTest.*"
+            ]
+        },
+        {
+            "name": "Cangjie (CJNative-unittest): cjmd.test.jdbc.impl.TidbTest.case1",
+            "program": "c:\\Users\\30247\\Desktop\\cjmd\\target\\debug\\unittest_bin\\cjmd.test.jdbc.impl.exe",
+            "request": "launch",
+            "type": "cangjieDebug",
+            "externalConsole": false,
+            "env": {},
+            "args": [
+                "--filter=TidbTest.case1"
+            ]
+        },
+        {
+            "name": "Cangjie (CJNative-unittest): cjmd.test.jdbc.impl.StatementTest",
+            "program": "c:\\Users\\30247\\Desktop\\cjmd\\target\\debug\\unittest_bin\\cjmd.test.jdbc.impl.exe",
+            "request": "launch",
+            "type": "cangjieDebug",
+            "externalConsole": false,
+            "env": {},
+            "args": [
+                "--filter=StatementTest.*"
+            ]
+        },
+        {
+            "name": "Cangjie (CJNative-unittest): cjmd.test.jdbc.impl.MySqlTest",
+            "program": "c:\\Users\\30247\\Desktop\\cjmd\\target\\debug\\unittest_bin\\cjmd.test.jdbc.impl.exe",
+            "request": "launch",
+            "type": "cangjieDebug",
+            "externalConsole": false,
+            "env": {},
+            "args": [
+                "--filter=MySqlTest.*"
+            ]
+        },
+        {
+            "name": "Cangjie (CJNative-unittest): cjmd.test.jdbc.impl.MySqlTest.insertTest",
+            "program": "c:\\Users\\30247\\Desktop\\cjmd\\target\\debug\\unittest_bin\\cjmd.test.jdbc.impl.exe",
+            "request": "launch",
+            "type": "cangjieDebug",
+            "externalConsole": false,
+            "env": {},
+            "args": [
+                "--filter=MySqlTest.insertTest"
+            ]
         }
     ]
 }
