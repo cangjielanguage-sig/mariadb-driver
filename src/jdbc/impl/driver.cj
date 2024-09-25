@@ -4,7 +4,7 @@
 package cjmd.jdbc.impl
 
 import encoding.url.*
-import cjmd.connection.ConnectionOption
+import cjmd.connection.Params
 import cjmd.jdbc.*
 
 public class MySqlDriver <: Driver {
@@ -38,8 +38,8 @@ public class MySqlDriver <: Driver {
                 port = "3306"
             }
             var datasource = DatasourceImpl()
-            datasource.setOption(ConnectionOption.Host, host)
-            datasource.setOption(ConnectionOption.Port, port)
+            datasource.setOption(Params.Host, host)
+            datasource.setOption(Params.Port, port)
             for ((k, v) in opts) {
                 datasource.setOption(k, v)
             }

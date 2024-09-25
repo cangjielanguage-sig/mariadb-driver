@@ -3,7 +3,6 @@
  */
 package cjmd.cdbc
 
-public import cjmd.connection.ConnectionOption
 import std.database.sql.DriverManager
 
 let _ = DriverManager.register("mysql", MySqlDriver.instance)

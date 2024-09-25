@@ -21,7 +21,7 @@ protected class ColumnCount <: CommonPacket {
         }
     }
 
-    protected ColumnCount(stream: InputStream) {
+    protected init(stream: InputStream) {
         super(stream)
         var count = readLengthEncodedInteger(stream)
         if (count.size == 0) {
@@ -61,7 +61,7 @@ protected class ColumnDefinition <: CommonPacket {
     /*浮点型精度*/
     private var _decimals: Byte
 
-    protected ColumnDefinition(stream: InputStream) {
+    protected init(stream: InputStream) {
         super(stream)
         var buf: ?Array<Byte>
         buf = readLengthEncodedString(stream)
@@ -168,7 +168,7 @@ protected class TextResult <: CommonPacket {
         }
     }
 
-    protected TextResult(stream: InputStream, columnCount: Int64) {
+    protected init(stream: InputStream, columnCount: Int64) {
         super(stream)
         var list = ArrayList<?Array<Byte>>(columnCount)
         var buffer: ?Array<Byte>
@@ -206,7 +206,7 @@ protected class BinaryResult <: Response {
         }
     }
 
-    protected BinaryResult(stream: InputStream, columnInfos: Array<ColumnDefinition>) {
+    protected init(stream: InputStream, columnInfos: Array<ColumnDefinition>) {
         super(stream)
         var columnCount = columnInfos.size
         var nullMap = Array<Byte>((columnCount + 7 + 2) / 8, repeat: 0)

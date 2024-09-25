@@ -43,7 +43,6 @@ internal func cachingSha2Password(password: Array<Byte>, salt: Array<Byte>): Arr
     return scramble
 }
 
-
 internal func performFullAuthentication(pubPem: String,password: Array<Byte>, salt: Array<Byte>): Array<Byte>{
     if(password.size == 0){
         return []

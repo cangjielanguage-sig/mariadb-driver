@@ -25,7 +25,7 @@ public class ClientPrepareStatement <: AllocateStatement {
 
     private var _closed: AtomicBool
 
-    public ClientPrepareStatement(connection: ConnectionImpl, originSql: String) {
+    public ClientPrepareStatement(originSql: String, connection: ConnectionImpl) {
         super(originSql)
         _connection = connection
         _originSql = originSql

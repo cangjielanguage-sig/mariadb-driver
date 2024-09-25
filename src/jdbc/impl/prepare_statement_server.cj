@@ -31,7 +31,7 @@ public class ServerPrepareStatement <: AllocateStatement {
     public override func query(params: Array<Any>): QueryResult {
         checkResourceAvailability()
         for(i in 0..params.size){
-            match(i){
+            match(params[i]){
                 case v: Date => params[i] = v.dateTime
                 case v: Time => params[i] = v.dateTime
                 case _ => nothingTodo(0)

@@ -52,21 +52,12 @@ public class ConnectionImpl <: Connection{
     override public func prepareStatement(sql: String): Statement{
         checkResourceAvailability()
         checkEmptySql(sql)
-        //return ClientPrepareStatement(this,sql)
-        //return ServerPrepareStatement(this, sql)
-
-        var prepareMode: String = _options.get(ConnectionOption.PrepareMode).getOrDefault({=>"auto"})
-        if(prepareMode == "auto"){
-            if(sql.size > 100 && sql.toAsciiLower().startsWith("select")){
-                return ServerPrepareStatement(this, sql)
-            }else{
-                return ClientPrepareStatement(this,sql)
-            }
-        }else if(prepareMode == "server"){
-            return ServerPrepareStatement(this,sql)
-        }else if(prepareMode == "client"){
-            return ClientPrepareStatement(this, sql)
-        }else {
+        var prepareMode: String = _options.get(Params.PrepareMode).getOrDefault({=> "client"})
+        if (prepareMode == "server") {
+            return ServerPrepareStatement(sql, this)
+        } else if (prepareMode == "client") {
+            return ClientPrepareStatement(sql, this)
+        } else {
             throw SqlException("Unknow prepare mode: ${prepareMode} option: auto, server or client")
         }
     }
@@ -165,7 +156,7 @@ public class ConnectionImpl <: Connection{
     }
 
     private func applyOptions(){
-        var queryTimeout = _options.get(ConnectionOption.QueryTimeout)
+        var queryTimeout = _options.get(Params.QueryTimeout)
         if(!queryTimeout.isNone()){
             try {
                 var timeout = Int64.parse(queryTimeout.getOrThrow())
@@ -175,7 +166,7 @@ public class ConnectionImpl <: Connection{
             }
         }
 
-        var updateTimeout = _options.get(ConnectionOption.UpdateTimeout)
+        var updateTimeout = _options.get(Params.UpdateTimeout)
         if(!updateTimeout.isNone()){
              try {
                 var timeout = Int64.parse(updateTimeout.getOrThrow())

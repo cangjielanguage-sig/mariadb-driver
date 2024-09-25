@@ -41,7 +41,7 @@ protected open class CommonPacket {
         _number = single[0]
     }
     //constructor for request packet
-    protected CommonPacket(length: UInt32, number: UInt8) {
+    protected init(length: UInt32, number: UInt8) {
         this._length = length
         this._number = number
     }
@@ -61,7 +61,7 @@ protected open class CommonPacket {
 
 protected open class Request <: CommonPacket {
 
-    protected Request(length: UInt32, number: UInt8) {
+    protected init(length: UInt32, number: UInt8) {
         super(length, number)
     }
     

@@ -44,3 +44,13 @@
 - 添加了对mysql_native_password认证插件的支持
 - 支持国产数据库TIDB
 - 完善了jdbc接口的实现
+
+# [v0.3.2]
+
+## Feature
+
+- 支持国产数据库OceanBase
+
+## BugFix
+
+- 修复了某些认证插件在进行ssl连接后认证失败的bug

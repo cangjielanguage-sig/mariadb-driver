@@ -18,8 +18,7 @@ protected open class AuthMoreData <: Response {
     internal var _authRep: Array<Byte>
 
 
-    internal AuthMoreData(stream: InputStream){
-
+    internal init(stream: InputStream){
         super(stream)
         var authReq = Array<Byte>(Int64(_length), repeat: 0)
         if(stream.read(authReq) == 0){
@@ -41,7 +40,7 @@ protected class PublicKeyResponse <: AuthMoreData {
         }
     }
 
-    protected PublicKeyResponse(stream: InputStream){
+    protected init(stream: InputStream){
         super(stream)
     }
 }
@@ -57,7 +56,7 @@ protected class AuthStatus <: AuthMoreData {
         }
     }
 
-    protected AuthStatus(stream: InputStream){
+    protected init(stream: InputStream){
         super(stream)
     }
     

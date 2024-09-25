@@ -3,7 +3,6 @@
  */
 package cjmd.jdbc.impl
 
-public import cjmd.connection.ConnectionOption
 import cjmd.jdbc.DriverManager
 
 let _ = DriverManager.register("mysql", MySqlDriver.instance)

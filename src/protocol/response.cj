@@ -20,7 +20,7 @@ protected open class Response <: CommonPacket {
     //     }
     // }
 
-    internal Response(stream: InputStream){
+    internal init(stream: InputStream){
         super(stream)
         var single = Array<Byte>(1, repeat: 0)
         if(stream.read(single) == 0){
@@ -65,7 +65,7 @@ protected class OkResponse <: Response {
         }
     }
 
-    protected OkResponse(stream: InputStream){
+    protected init(stream: InputStream){
         super(stream)
         var effectRows = readLengthEncodedInteger(stream)
         if(effectRows.size == 0){
@@ -114,7 +114,7 @@ protected class ErrorResponse <: Response{
 
     private var _message: String
 
-    protected ErrorResponse(stream: InputStream){
+    protected init(stream: InputStream){
         super(stream)
         var errorCode = Array<Byte>(2,repeat: 0)
         if(stream.read(errorCode) == 0){
@@ -131,7 +131,7 @@ protected class ErrorResponse <: Response{
             throw InvalidPacketException("This packet is not a Error Repsposne packet: read sql status failed")
         }
         _sqlStatus = sqlStatus
-        var message = Array<Byte>(Int64(_length - 8), repeat: 0)
+        var message = Array<Byte>(Int64(_length - (8 + 1)), repeat: 0)
         if(stream.read(message) == 0){
             throw InvalidPacketException("This packet is not a Error Repsposne packet: read message failed")
         }
@@ -151,7 +151,7 @@ protected class ErrorResponse <: Response{
 */
 protected open class AbstractEOF <: Response{
 
-    internal AbstractEOF(stream: InputStream){
+    internal init(stream: InputStream){
         super(stream)
     }
 }
@@ -165,7 +165,7 @@ protected class AuthSwitch <: AbstractEOF{
 
     private var _salt: Array<Byte>
 
-    protected AuthSwitch(stream: InputStream){
+    protected init(stream: InputStream){
         super(stream)
         var single = Array<Byte>(1, repeat: 0)
         var pluginName = ArrayList<Byte>()
@@ -214,7 +214,7 @@ protected class EofResponse <: AbstractEOF{
     private var _status: UInt16
 
 
-    protected EofResponse(stream: InputStream){
+    protected init(stream: InputStream){
         super(stream)
         var waringCount = Array<Byte>(2, repeat: 0)
         if(stream.read(waringCount) == 0){
@@ -246,7 +246,7 @@ protected class PrepareResposne <: Response{
 
     private var _warningCount: UInt16
 
-    protected PrepareResposne(stream: InputStream){
+    protected init(stream: InputStream){
         super(stream)
         var statementId = Array<Byte>(4, repeat: 0)
         if(stream.read(statementId) == 0){

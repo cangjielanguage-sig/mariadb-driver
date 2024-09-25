@@ -69,19 +69,11 @@ public class ConnectionImpl <: Connection {
     public override func prepareStatement(sql: String): Statement {
         checkResourceAvailability()
         checkEmptySql(sql)
-        //return ClientPrepareStatement(this,sql)
-        //return ServerPrepareStatement(this, sql)
-        var prepareMode: String = options.get(ConnectionOption.PrepareMode).getOrDefault({=> "auto"})
-        if (prepareMode == "auto") {
-            if (sql.size > 100 && sql.toAsciiLower().startsWith("select")) {
-                return ServerPrepareStatement(sql, this)
-            } else {
-                return ClientPrepareStatement(this, sql)
-            }
-        } else if (prepareMode == "server") {
+        var prepareMode: String = options.get(Params.PrepareMode).getOrDefault({=> "client"})
+        if (prepareMode == "server") {
             return ServerPrepareStatement(sql, this)
         } else if (prepareMode == "client") {
-            return ClientPrepareStatement(this, sql)
+            return ClientPrepareStatement(sql, this)
         } else {
             throw SqlException("Unknow prepare mode: ${prepareMode} option: auto, server or client")
         }
@@ -89,7 +81,7 @@ public class ConnectionImpl <: Connection {
 
     public override func getAutoCommit(): Bool {
         checkResourceAvailability()
-        var result = connection.sendQuery(QUERY_ISO_LEVEL_SQL)
+        var result = connection.sendQuery(QUERY_AUTO_COMMIT)
         if (!result.next() || result.rowSize != 1 || result.columnSize != 1) {
             throw SqlException("Query transaction isolation level failed")
         }
@@ -273,7 +265,7 @@ public class ConnectionImpl <: Connection {
     }
 
     private func applyOptions() {
-        var queryTimeout = options.get(ConnectionOption.QueryTimeout)
+        var queryTimeout = options.get(Params.QueryTimeout)
         if (!queryTimeout.isNone()) {
             try {
                 var timeout = Int64.parse(queryTimeout.getOrThrow())
@@ -283,7 +275,7 @@ public class ConnectionImpl <: Connection {
             }
         }
 
-        var updateTimeout = options.get(ConnectionOption.UpdateTimeout)
+        var updateTimeout = options.get(Params.UpdateTimeout)
         if (!updateTimeout.isNone()) {
             try {
                 var timeout = Int64.parse(updateTimeout.getOrThrow())

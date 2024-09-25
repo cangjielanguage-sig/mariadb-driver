@@ -30,7 +30,7 @@ protected class TextResultSet <: ResultSet {
             _indexMap.put(_columns[i].name, i + 1)
         }
     }
-
+    
     public override prop rowSize: Int64 {
         get() {
             _rows.size

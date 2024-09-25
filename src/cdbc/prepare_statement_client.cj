@@ -30,7 +30,7 @@ public class ClientPrepareStatement <: Statement {
 
     private var _closed: AtomicBool
 
-    public ClientPrepareStatement(connection: ConnectionImpl, originSql: String) {
+    public ClientPrepareStatement(originSql: String,connection: ConnectionImpl) {
         _parameterColumnInfos = Array<ColumnInfo>()
         _connection = connection
         _originSql = originSql

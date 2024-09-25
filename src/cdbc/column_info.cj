@@ -41,26 +41,31 @@ public class ColumnInfoImpl <: ColumnInfo {
             return _name
         }
     }
+    
     public override prop typeName: String {
         get() {
             return _type
         }
     }
+
     public override prop displaySize: Int64 {
         get() {
             return _displaySize
         }
     }
+
     public override prop length: Int64 {
         get() {
             return _length
         }
     }
+
     public override prop scale: Int64 {
         get() {
             return _scale
         }
     }
+
     public override prop nullable: Bool {
         get() {
             return _nullable

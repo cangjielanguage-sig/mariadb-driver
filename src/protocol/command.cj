@@ -19,7 +19,7 @@ protected abstract class Command <: Request {
 
     private let _commandType: CommandType
 
-    protected Command(command: CommandType) {
+    protected init(command: CommandType) {
         super(1, 0)
         _commandType = command
     }
@@ -40,7 +40,7 @@ protected class QueryCommand <: Command {
 
     private let _query: String
 
-    protected QueryCommand(query: String) {
+    protected init(query: String) {
         super(Query)
         this._length += UInt32(query.size)
         _query = query
@@ -66,7 +66,7 @@ protected class PrepareCommand <: Command {
 
     private let _sql: String
 
-    internal PrepareCommand(sql: String) {
+    internal init(sql: String) {
         super(StmtPrepare)
         this._length += UInt32(sql.size)
         _sql = sql
@@ -106,7 +106,7 @@ protected class ExecuteCommand <: Command {
 
     private var _values: Array<Any>
 
-    private ExecuteCommand(
+    private init(
         id: UInt32,
         flags: CursorType,
         iterationCount: UInt32,
@@ -293,6 +293,7 @@ protected class ExecuteCommand <: Command {
                     return appendFloat64(index, list, Float64(integer))
                 case String | VarString | NewDecimal => 
                     return appendString(index, list, integer.toString())
+                case TinyBlob | Blob | LongBlob => appendUInt8(index, list, UInt8(integer));
                 case _ => 
                     throw Exception("The parameter of the Int8 type does not match the corresponding column type ${columnType}")
             }
@@ -305,7 +306,7 @@ protected class ExecuteCommand <: Command {
             var integer = value.getOrThrow()
             var columnType = _paramDefinition[index].columnType
             match (columnType) {
-                case Tiny => 
+                case Tiny | Blob => 
                     list.append(value.getOrThrow())
                     return 1
                 case Short => 
@@ -659,7 +660,7 @@ protected class FetchCommand <: Command {
 
     private var numRows: UInt32
 
-    protected FetchCommand(statemetnId: UInt32, numRows: UInt32){
+    protected init(statemetnId: UInt32, numRows: UInt32){
         super(StmtClose)
         this._length += 8
         this.statemetnId = statemetnId
@@ -684,7 +685,7 @@ protected class CloseCommand <: Command {
 
     private var _statementId: UInt32
 
-    protected CloseCommand(id: UInt32){
+    protected init(id: UInt32){
         super(StmtClose)
         this._length += 4
         _statementId = id
@@ -706,7 +707,7 @@ protected class ResetCommand <: Command {
 
     private var _statementId: UInt32
 
-    internal ResetCommand(statementId: UInt32){
+    internal init(statementId: UInt32){
         super(StmtClose)
         this._length += 4
         _statementId = statementId
@@ -732,7 +733,7 @@ protected class SendLongDataCommand <: Command {
 
     private var data: Array<Byte>
 
-    protected SendLongDataCommand(statemetnId: UInt32, parameterId: UInt16, data: Array<Byte>){
+    protected init(statemetnId: UInt32, parameterId: UInt16, data: Array<Byte>){
         super(StmtSendLongData)
         this._length += UInt32(data.size + 6)
         this.statemetnId = statemetnId

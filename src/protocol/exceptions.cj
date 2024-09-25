@@ -12,7 +12,7 @@ protected class InvalidPacketException <: Exception {
        super()
     }
 
-    protected InvalidPacketException(message: String) {
+    protected init(message: String) {
         super(message)    
     }
 
@@ -27,7 +27,7 @@ protected class ParameterConvertException <: Exception {
         super()
     }
 
-    protected ParameterConvertException(message: String) {
+    protected init(message: String) {
         super(message)
     }
 

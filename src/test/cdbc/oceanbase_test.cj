@@ -16,22 +16,22 @@ import std.math.numeric.*
 import cjmd.protocol.*
 import encoding.json.*
 @Test
-public class MySqlTest{
+public class OceanBaseTest{
 
 
-    private static var connection: Connection
+    private var connection: Connection
 
 
-    static init() {
+    init() {
         var driver = MySqlDriver.instance
-        var property1 = ("username","root")
-        var property2= ("password","MySql123!")
+        var property1 = ("username","super")
+        var property2= ("password","lV6YwSVyN5sJ%wCzFSvhEILpdqQU")
         var property3 = ("database","driver_test")
         var property4 = ("ssl.mode","disabled")
-        var property5 = ("prepare.mode","server")
-        //var property5 = ("prepare.mode","client")
-        var dataSource = driver.open("mysql://localhost", [property1,property2,property3,property4,property5])
+        var property5 = ("prepare.mode","client")
+        var dataSource = driver.open("mysql://obmtm94oeja8d1h0-mi.cn-hangzhou.oceanbase.aliyuncs.com", [property1,property2,property3,property4,property5])
         connection =  dataSource.connect()
+        println("OceanBaseTest init")
     } 
 
     /*
@@ -151,31 +151,6 @@ public class MySqlTest{
         prepare.close()
     }
 
-    /*
-    * 删除数据测试
-    */
-    @TestCase
-    public func deleteTest(){
-        var prepare = connection.prepareStatement("delete from full_test where id = ?")
-        var param = SqlInteger(30)
-        var result = prepare.update([param])
-        println("effect rows: ${result.rowCount}")
-        println("last insert id: ${result.lastInsertId}")
-    }
-
-    /*
-    * 更新数据测试
-    */
-    @TestCase
-    public func updateTest(){
-        var prepare = connection.prepareStatement("update full_test set varchar_col = ? where varchar_col = ?")
-        var param1 = SqlChar("yesokim")
-        var param2 = SqlChar("varchar")
-        var result = prepare.update([param1,param2])
-        println("effect rows: ${result.rowCount}")
-        println("last insert id: ${result.lastInsertId}")
-        
-    }
 
     /*
     * 查询数据测试
@@ -183,8 +158,7 @@ public class MySqlTest{
     @TestCase
     public func queryTest(){
 
-        var prepare = connection.prepareStatement("select * from full_test where id = ?")
-        var param = SqlInteger(121)
+        var prepare = connection.prepareStatement("select * from full_test")
         var id = SqlInteger(-1)
         //tinyint
         var col1 = SqlNullableByte(None)
@@ -248,7 +222,7 @@ public class MySqlTest{
         var col30 = SqlNullableVarchar(None)
         //enum
         var col31 = SqlNullableVarchar(None)
-        var result = prepare.query([param])
+        var result = prepare.query([])
 
         var row: Array<SqlDbType> = [id,col1,col2,col3,col4,col5,col6,col7,col8,col9,col10,col11,col12,col13,col14,col15,col16,col17,col18,col19,col20,col21,col22,col23,col24,col25,col26,col27,col28,col29,col30,col31]
         
@@ -352,14 +326,8 @@ public class MySqlTest{
         spawn {
             insertTest()
         }
-        spawn {
-            deleteTest()
-        }
         spawn{
             queryTest()
-        }
-        spawn {
-            updateTest()
         }
         sleep(Duration.second * 5)
     }
@@ -435,5 +403,3 @@ public class MySqlTest{
     }
 
 }
-
-   

@@ -4,3 +4,4 @@ build
 *.cj.macrocall
 *.zip
 *.pem
+tmpFilea*

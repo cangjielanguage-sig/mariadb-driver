@@ -26,7 +26,7 @@ public class ServerPrepareStatement <: Statement {
 
     private var _closed: AtomicBool
 
-    public ServerPrepareStatement(connection: ConnectionImpl, originSql: String) {
+    public ServerPrepareStatement(originSql: String, connection: ConnectionImpl) {
         _connection = connection
         _prepareResult = _connection.sendPrepare(originSql)
         _option = HashMap<String, String>()
