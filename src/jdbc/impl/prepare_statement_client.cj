@@ -122,106 +122,111 @@ public class ClientPrepareStatement <: AllocateStatement {
                     setParamWithQuotation(replacer, v.toJsonString())
                 case v: String => 
                     setParamWithQuotation(replacer, v)
-                case v: ?Bool => 
-                    match(v){
-                        case None => setParamWithoutQuotation(replacer, "NULL")
-                        case Some(v) => setParamWithoutQuotation(replacer, boolToInteger(v).toString())
-                    }
-                case v: ?Int8 => 
+                case v: ?Any => 
                     match (v) {
                         case None => setParamWithoutQuotation(replacer, "NULL")
-                        case Some(v) => setParamWithoutQuotation(replacer, v.toString())
+                        case Some(v) => throw UnsupportedException("An unsupported input type: index ${i}")
                     }
-                case v: ?UInt8 => 
-                    match (v) {
-                        case None => setParamWithoutQuotation(replacer, "NULL")
-                        case Some(v) => setParamWithoutQuotation(replacer, v.toString())
-                    }
-                case v: ?Int16 => 
-                    match (v) {
-                        case None => setParamWithoutQuotation(replacer, "NULL")
-                        case Some(v) => setParamWithoutQuotation(replacer, v.toString())
-                    }
-                case v: ?UInt16 => 
-                    match (v) {
-                        case None => setParamWithoutQuotation(replacer, "NULL")
-                        case Some(v) => setParamWithoutQuotation(replacer, v.toString())
-                    }
-                case v: ?Int32 => 
-                    match (v) {
-                        case None => setParamWithoutQuotation(replacer, "NULL")
-                        case Some(v) => setParamWithoutQuotation(replacer, v.toString())
-                    }
-                case v: ?UInt32 => 
-                    match (v) {
-                        case None => setParamWithoutQuotation(replacer, "NULL")
-                        case Some(v) => setParamWithoutQuotation(replacer, v.toString())
-                    }
-                case v: ?Int64 => 
-                    match (v) {
-                        case None => setParamWithoutQuotation(replacer, "NULL")
-                        case Some(v) => setParamWithoutQuotation(replacer, v.toString())
-                    }
-                case v: ?UInt64 => 
-                    match (v) {
-                        case None => setParamWithoutQuotation(replacer, "NULL")
-                        case Some(v) => setParamWithoutQuotation(replacer, v.toString())
-                    }
-                case v: ?Float16 => 
-                    match (v) {
-                        case None => setParamWithoutQuotation(replacer, "NULL")
-                        case Some(v) => setParamWithoutQuotation(replacer, v.toString())
-                    }
-                case v: ?Float32 => 
-                    match (v) {
-                        case None => setParamWithoutQuotation(replacer, "NULL")
-                        case Some(v) => setParamWithoutQuotation(replacer, v.toString())
-                    }
-                case v: ?Float64=> 
-                    match (v) {
-                        case None => setParamWithoutQuotation(replacer, "NULL")
-                        case Some(v) => setParamWithoutQuotation(replacer, v.toString())
-                    }
-                case v: ?Decimal => 
-                    match (v) {
-                        case None => setParamWithoutQuotation(replacer, "NULL")
-                        case Some(v) => setParamWithQuotation(replacer, v.toString())
-                    }
-                case v: ?Date => 
-                    match (v) {
-                        case None => setParamWithoutQuotation(replacer, "NULL")
-                        case Some(v) => setParamWithQuotation(replacer, v.toString(DB_DATE_FORMAT))
-                    }
-                case v: ?Time => 
-                    match (v) {
-                        case None => setParamWithoutQuotation(replacer, "NULL")
-                        case Some(v) => setParamWithQuotation(replacer, v.toString(DB_TIME_FORMAT))
-                    }
-                case v: ?DateTime => 
-                    match (v) {
-                        case None => setParamWithoutQuotation(replacer, "NULL")
-                        case Some(v) => setParamWithQuotation(replacer,v.toString(DB_DATE_TIME_FORMAT))
-                    }
-                case v: ?InputStream => 
-                    match (v) {
-                        case None => setParamWithoutQuotation(replacer, "NULL")
-                        case Some(v) => setParamWithoutQuotation(replacer, arrayToHexString(inputStreamToArray(v)))
-                    }
-                case v: ?String => 
-                    match (v) {
-                        case None => setParamWithoutQuotation(replacer, "NULL")
-                        case Some(v) => setParamWithQuotation(replacer, v)
-                    }
-                case v: ?Array<Byte> => 
-                    match (v) {
-                        case None => setParamWithoutQuotation(replacer, "NULL")
-                        case Some(v) => setParamWithoutQuotation(replacer, arrayToHexString(v))
-                    }
-                case v: ?JsonValue =>
-                    match (v) {
-                        case None => setParamWithoutQuotation(replacer, "NULL")
-                        case Some(v) => setParamWithQuotation(replacer, v.toString())
-                    }
+                // case v: ?Bool => 
+                //     match(v){
+                //         case None => setParamWithoutQuotation(replacer, "NULL")
+                //         case Some(v) => setParamWithoutQuotation(replacer, boolToInteger(v).toString())
+                //     }
+                // case v: ?Int8 => 
+                //     match (v) {
+                //         case None => setParamWithoutQuotation(replacer, "NULL")
+                //         case Some(v) => setParamWithoutQuotation(replacer, v.toString())
+                //     }
+                // case v: ?UInt8 => 
+                //     match (v) {
+                //         case None => setParamWithoutQuotation(replacer, "NULL")
+                //         case Some(v) => setParamWithoutQuotation(replacer, v.toString())
+                //     }
+                // case v: ?Int16 => 
+                //     match (v) {
+                //         case None => setParamWithoutQuotation(replacer, "NULL")
+                //         case Some(v) => setParamWithoutQuotation(replacer, v.toString())
+                //     }
+                // case v: ?UInt16 => 
+                //     match (v) {
+                //         case None => setParamWithoutQuotation(replacer, "NULL")
+                //         case Some(v) => setParamWithoutQuotation(replacer, v.toString())
+                //     }
+                // case v: ?Int32 => 
+                //     match (v) {
+                //         case None => setParamWithoutQuotation(replacer, "NULL")
+                //         case Some(v) => setParamWithoutQuotation(replacer, v.toString())
+                //     }
+                // case v: ?UInt32 => 
+                //     match (v) {
+                //         case None => setParamWithoutQuotation(replacer, "NULL")
+                //         case Some(v) => setParamWithoutQuotation(replacer, v.toString())
+                //     }
+                // case v: ?Int64 => 
+                //     match (v) {
+                //         case None => setParamWithoutQuotation(replacer, "NULL")
+                //         case Some(v) => setParamWithoutQuotation(replacer, v.toString())
+                //     }
+                // case v: ?UInt64 => 
+                //     match (v) {
+                //         case None => setParamWithoutQuotation(replacer, "NULL")
+                //         case Some(v) => setParamWithoutQuotation(replacer, v.toString())
+                //     }
+                // case v: ?Float16 => 
+                //     match (v) {
+                //         case None => setParamWithoutQuotation(replacer, "NULL")
+                //         case Some(v) => setParamWithoutQuotation(replacer, v.toString())
+                //     }
+                // case v: ?Float32 => 
+                //     match (v) {
+                //         case None => setParamWithoutQuotation(replacer, "NULL")
+                //         case Some(v) => setParamWithoutQuotation(replacer, v.toString())
+                //     }
+                // case v: ?Float64=> 
+                //     match (v) {
+                //         case None => setParamWithoutQuotation(replacer, "NULL")
+                //         case Some(v) => setParamWithoutQuotation(replacer, v.toString())
+                //     }
+                // case v: ?Decimal => 
+                //     match (v) {
+                //         case None => setParamWithoutQuotation(replacer, "NULL")
+                //         case Some(v) => setParamWithQuotation(replacer, v.toString())
+                //     }
+                // case v: ?Date => 
+                //     match (v) {
+                //         case None => setParamWithoutQuotation(replacer, "NULL")
+                //         case Some(v) => setParamWithQuotation(replacer, v.toString(DB_DATE_FORMAT))
+                //     }
+                // case v: ?Time => 
+                //     match (v) {
+                //         case None => setParamWithoutQuotation(replacer, "NULL")
+                //         case Some(v) => setParamWithQuotation(replacer, v.toString(DB_TIME_FORMAT))
+                //     }
+                // case v: ?DateTime => 
+                //     match (v) {
+                //         case None => setParamWithoutQuotation(replacer, "NULL")
+                //         case Some(v) => setParamWithQuotation(replacer,v.toString(DB_DATE_TIME_FORMAT))
+                //     }
+                // case v: ?InputStream => 
+                //     match (v) {
+                //         case None => setParamWithoutQuotation(replacer, "NULL")
+                //         case Some(v) => setParamWithoutQuotation(replacer, arrayToHexString(inputStreamToArray(v)))
+                //     }
+                // case v: ?String => 
+                //     match (v) {
+                //         case None => setParamWithoutQuotation(replacer, "NULL")
+                //         case Some(v) => setParamWithQuotation(replacer, v)
+                //     }
+                // case v: ?Array<Byte> => 
+                //     match (v) {
+                //         case None => setParamWithoutQuotation(replacer, "NULL")
+                //         case Some(v) => setParamWithoutQuotation(replacer, arrayToHexString(v))
+                //     }
+                // case v: ?JsonValue =>
+                //     match (v) {
+                //         case None => setParamWithoutQuotation(replacer, "NULL")
+                //         case Some(v) => setParamWithQuotation(replacer, v.toString())
+                //     }
                 case _ => throw UnsupportedException("An unsupported input type: index ${i}")
             }
         }

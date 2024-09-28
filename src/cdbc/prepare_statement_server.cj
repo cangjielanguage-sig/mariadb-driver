@@ -196,7 +196,7 @@ public class ServerPrepareStatement <: Statement {
 
     public override func close() {
         checkResourceAvailability()
-        _connection.closePrepare(_prepareResult)
+        _connection.closePrepare(_id)
         _closed.store(true)
     }
 

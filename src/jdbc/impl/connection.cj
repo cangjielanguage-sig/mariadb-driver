@@ -247,8 +247,8 @@ public class ConnectionImpl <: Connection {
         }
     }
 
-    protected func closePrepare(prepare: PrepareResult) {
-        return connection.closePrepare(prepare)
+    protected func closePrepare(id: UInt32) {
+        return connection.closePrepare(id)
     }
 
     //private

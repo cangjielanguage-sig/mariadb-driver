@@ -25,7 +25,7 @@ public class TidbTest{
         var property2= ("password","vLCfT9KIHkTonNft")
         var property3 = ("database","driver_test")
         var property4 = ("ssl.mode","required")
-        var property5 = ("prepare.mode","client")
+        var property5 = ("prepare.mode","server")
         var dataSource = driver.open("mysql://gateway01.ap-northeast-1.prod.aws.tidbcloud.com:4000", [property1,property2,property3,property4,property5])
         connection =  dataSource.connect()
         println("TiDBTest init")

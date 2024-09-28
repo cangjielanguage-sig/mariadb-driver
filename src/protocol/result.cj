@@ -237,8 +237,8 @@ protected class BinaryResult <: Response {
                         var array = Array<Byte>(8, repeat: 0)
                         stream.read(array)
                         _binaryData[i] = array
-                    case String | NewDecimal | Json | Enum | Set | TinyBlob | MediumBlob | LongBlob | Blob | VarString => _binaryData[i] = readLengthEncodedString(
-                        stream)
+                    case String | NewDecimal | Json | Enum | Set | TinyBlob | MediumBlob | LongBlob | Blob | VarString =>
+                         _binaryData[i] = readLengthEncodedString(stream)
                     case Date | DateTime | Timestamp | Time =>
                         var single = Array<Byte>(1, repeat: 0)
                         stream.read(single)

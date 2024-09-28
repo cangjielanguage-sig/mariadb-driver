@@ -15,10 +15,6 @@ protected class InvalidPacketException <: Exception {
     protected init(message: String) {
         super(message)    
     }
-
-    public func toString(): String{
-        return message
-    }  
 }
 
 protected class ParameterConvertException <: Exception {
@@ -30,9 +26,5 @@ protected class ParameterConvertException <: Exception {
     protected init(message: String) {
         super(message)
     }
-
-    public func toString(): String{
-        return message
-    } 
 
 }

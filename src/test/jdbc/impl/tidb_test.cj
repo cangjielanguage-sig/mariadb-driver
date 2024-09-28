@@ -24,14 +24,10 @@ public class TidbTest {
 
     static init() {
         var driver = MySqlDriver.instance
-        var property1 = ("username","root")
-        var property2= ("password","")
+        var property1 = ("username","3VaBbhPVncyrhn6.root")
+        var property2= ("password","vLCfT9KIHkTonNft")
         var property3 = ("database","driver_test")
-        var property4 = ("ssl.mode","disabled")
-        //var property5 = ("prepare.mode","server")
-        var property5 = ("prepare.mode","client")
-        var dataSource = driver.open("mysql://47.115.56.208:4000", [property1,property2,property3,property4,property5])
-
+        var dataSource = driver.open("mysql://gateway01.ap-northeast-1.prod.aws.tidbcloud.com:4000", [property1,property2,property3])
         connection =  dataSource.connect()
     }
 
@@ -151,6 +147,94 @@ public class TidbTest {
         println("effect rows: ${result.effectRow}")
         println("last insert id: ${result.lastInsertId}")
         prepare.close()
+    }
+
+    /*
+    * 查询数据
+    */
+    @TestCase
+    public func queryTest(){
+        var prepare = connection.prepareStatement("select * from full_test where id = ?")
+        var result = prepare.query([270001])
+        while (result.next()) {
+            println(result.getInt64(1))
+            println(result.getInt8(2))
+            println(result.getUInt8(3))
+            println(result.getInt16(4))
+            println(result.getUInt16(5))
+            println(result.getInt32(6))
+            println(result.getUInt32(7))
+            println(result.getInt32(8))
+            println(result.getUInt32(9))
+            println(result.getInt64(10))
+            println(result.getUInt64(11))
+            println(result.getFloat32(12))
+            println(result.getFloat64(13))
+            println(result.getDecimal(14))
+            println(result.getDate(15))
+            println(result.getTime(16))
+            println(result.getDateTime(17))
+            println(result.getDateTime(18))
+            println(result.getInt16(19))
+
+            println(result.getString(20))
+            println(result.getString(21))
+            println(result.getString(22))
+            println(result.getString(23))
+            println(result.getString(24))
+            println(result.getString(25))
+            println(result.getArray(26))
+            println(result.getArray(27))
+            println(result.getArray(28))
+            println(inputStreamToArray(result.getInputStream(29).getOrThrow()).size)
+            println(result.getJsonValue(30))
+            println(result.getString(31))
+            println(result.getString(32))
+        }
+    }
+
+    /*
+    * 查询数据
+    */
+    @TestCase
+    public func queryByNameTest(){
+        var prepare = connection.prepareStatement("select * from full_test where id = ?")
+        var result = prepare.query([270001])
+        while (result.next()) {
+            println(result.getInt64("id"))
+            println(result.getInt8("tinyint_col"))
+            println(result.getUInt8("utinyint_col"))
+            println(result.getInt16("smallint_col"))
+            println(result.getUInt16("usmallint_col"))
+            println(result.getInt32("mediumint_col"))
+            println(result.getUInt32("umediumint_col"))
+            println(result.getInt32("int_col"))
+            println(result.getUInt32("uint_col"))
+            println(result.getInt64("bigint_col"))
+            println(result.getUInt64("ubigint_col"))
+            println(result.getFloat32("float_col"))
+            println(result.getFloat64("double_col"))
+            println(result.getDecimal("decimal_col"))
+            println(result.getDate("date_col"))
+            println(result.getTime("time_col"))
+            println(result.getDateTime("datetime_col"))
+            println(result.getDateTime("timestamp_col"))
+            println(result.getInt16("year_col"))
+
+            println(result.getString("char_col"))
+            println(result.getString("varchar_col"))
+            println(result.getString("tinytext_col"))
+            println(result.getString("text_col"))
+            println(result.getString("mediumtext_col"))
+            println(result.getString("longtext_col"))
+            println(result.getArray("tinyblob_col"))
+            println(result.getArray("blob_col"))
+            println(result.getArray("mediumblob_col"))
+            println(inputStreamToArray(result.getInputStream("longblob_col").getOrThrow()).size)
+            println(result.getJsonValue("json_col"))
+            println(result.getString("set_col"))
+            println(result.getString("enum_col"))
+        }
     }
 
 

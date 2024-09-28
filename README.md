@@ -3,9 +3,8 @@
 </div>
 
 <p align="center">
-<img alt="" src="https://img.shields.io/badge/release-v0.3.1-brightgreen" style="display: inline-block;" />
+<img alt="" src="https://img.shields.io/badge/release-v0.3.3-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/cjc-v0.55.3-brightgreen" style="display: inline-block;" />
-<img alt="" src="https://img.shields.io/badge/cjcov-0.0%25-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/state-孵化-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/domain-HOS/Cloud-brightgreen" style="display: inline-block;" />
 </p>
@@ -29,16 +28,20 @@ Cangjie MySql Driver是为Cangjie编程语言提供MySql原生驱动程序,基�
 ├── doc
     └── readme-image
 └── src
-    ├── connection
-    ├── impl
-    ├── protocol
-    └── result
+    ├── cdbc
+    ├── connection 
+    ├── jdbc
+    ├── protocol 
+    ├── result
+    └── test
 ├── CHANGELOG
 ├── cjpm.lock
 ├── cjpm.toml
 ├── LICENSE
 ├── README.md
 ```
+
+![cjmd.drawio](doc/readme-image/cjmd.drawio.png)
 
 ### 2.2 接口说明
 
@@ -408,7 +411,11 @@ main() {
 | pool.max_idle_size      | 最大空闲连接数量，超过这个数量的空闲连接会被关闭，负数或0表示无限制。    |                                                            | 0         | No                                |
 | pool.max_life_time      | 自连接创建以来的持续时间，在该持续时间之后，连接将自动关闭。单位 m       |                                                            | 30        | No                                |
 | pool.max_size           | 连接池最大连接数量，负数或0表示无限制。                                  |                                                            | 10        | No                                |
-| prepare.mode            | 预编译模式                                                               | auto: 自动选择, server: 服务端预编译, client: 客户端预编译 | auto      | No                                |
+| prepare.mode            | 预编译模式                                                               | auto: 自动选择, server: 服务端预编译                       | client    | No                                |
+
+### 3.4目前已知的一些问题
+
+- 使用该驱动操作TIDB以及OceanBase暂不支持使用服务端预编译(prepare.mode=server)
 
 ## <img alt="" src="./doc/readme-image/readme-icon-contribute.png" style="display: inline-block;" width=3%/>4 参与贡献
 

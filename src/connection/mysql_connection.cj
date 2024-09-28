@@ -1,5 +1,6 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
+ * @author Yesokim
  */
 protected package cjmd.connection
 
@@ -17,47 +18,38 @@ import std.time.*
 import std.sort.*
 import cjmd.result.*
 
-
 protected class MySqlConnection <: Resource {
 
     private static let SHA256_REQUESET_KEY_CODE: Byte = 0x01
 
     private static let CACHING_SHA2_REQUEST_KEY_CODE: Byte = 0x02
+    
+    private let connectionMutex: ReentrantMutex = ReentrantMutex()
 
-    private static let BUFFER_SIZE = 1024
+    private var channel: MySqlChannel
 
-    private var _socket: StreamingSocket
-
-    private var _lastRemaining: Array<Byte> = Array<Byte>()
-
-    private let _connectionMutex: ReentrantMutex = ReentrantMutex()
-
-    private MySqlConnection(socket: TcpSocket) {
-        _socket = socket
-    }
-
-    private func setTlsSocket(tlsSocket: TlsSocket) {
-        _socket = tlsSocket
+    private MySqlConnection(channel: MySqlChannel) {
+        this.channel = channel
     }
 
     protected prop mutex: ReentrantMutex {
         get() {
-            _connectionMutex
+            connectionMutex
         }
     }
 
     public override func close() {
-        if (!_socket.isClosed()) {
-            _socket.close()
+        if (!channel.isClosed()) {
+            channel.close()
         }
     }
 
     public override func isClosed(): Bool {
-        return _socket.isClosed()
+        return channel.isClosed()
     }
 
     /**
-     * 将sql语句按可能返回的数据包类型分为一下三种
+     * 将Query类型语句按可能返回的数据包类型分为一下三种
      * Command: 
      *     执行后只返回OkResponse或者ErrorResponse,同时只关注命令是否执行成功,
      *     不关注返回值,如果命令执行失败抛出ResponseErrorException
@@ -66,53 +58,92 @@ protected class MySqlConnection <: Resource {
      * Update: 
      *     更新,关注数据更新的结果,执行成功返回ChangeResult,如果命令执行失败抛出ResponseErrorException
      */
-    protected func sendCommand(sql: String) {
-        synchronized(_connectionMutex) {
+
+
+    /**
+    * 向MySql服务器发送一条命令
+    * @throws ResponseErrorException
+    */
+    protected func sendCommand(sql: String): Unit {
+        synchronized(connectionMutex) {
             sendQuerySql(sql)
             readCommandResponse()
         }
     }
 
+    /**
+    * 向MySql发送一条查询语句
+    * @return ResultSet
+    * @throw ResponseErrorException
+    */
     protected func sendQuery(sql: String): ResultSet {
-        synchronized(_connectionMutex) {
+        synchronized(connectionMutex) {
             sendQuerySql(sql)
             return readQueryResponse()
         }
     }
 
+    /**
+    * 向MySql发送一条更新语句
+    * @return ChangeResult
+    * @throw ResponseErrorException
+    */
     protected func sendUpdate(sql: String): ChangeResult {
-        synchronized(_connectionMutex) {
+        synchronized(connectionMutex) {
             sendQuerySql(sql)
             return readUpdateResponse()
         }
     }
 
+    /**
+    * 向MySql发送一条预编译语句
+    * @return PrepareResult
+    * @throw ResponseErrorException
+    */
     protected func sendPrepare(sql: String): PrepareResult {
-        synchronized(_connectionMutex) {
+        synchronized(connectionMutex) {
             writeRequest(PrepareCommand.create(sql))
             return readPrepareResponse()
         }
     }
 
+    /**
+    * 执行查询预编译语句
+    * @param prepare: PrepareResult 预编译语句结果
+    * @param params: Array<Any> 语句参数
+    * @result ResultSet 查询结果集
+    * @throws ResponseErrorException
+    */
     protected func executeQueryPrepare(prepare: PrepareResult, params: Array<Any>): ResultSet {
-        synchronized(_connectionMutex) {
+        synchronized(connectionMutex) {
             handleLongData(prepare.id, params)
             writeRequest(ExecuteCommand.default(prepare.id, prepare.parameterDefinition, params))
             return readExecutePrepareResponse()
         }
     }
 
+    /**
+    * 执行更新预编译语句
+    * @param prepare: PrepareResult 预编译语句结果
+    * @param params: Array<Any> 语句参数
+    * @result ResultSet 更新结果
+    * @throws ResponseErrorException
+    */
     protected func executeUpdatePrepare(prepare: PrepareResult, params: Array<Any>): ChangeResult {
-        synchronized(_connectionMutex) {
+        synchronized(connectionMutex) {
             handleLongData(prepare.id, params)
             writeRequest(ExecuteCommand.default(prepare.id, prepare.parameterDefinition, params))
             return readUpdateResponse()
         }
     }
 
-    protected func closePrepare(prepare: PrepareResult): Unit {
-        synchronized(_connectionMutex) {
-            writeRequest(CloseCommand(prepare.id))
+    /**
+    * 释放预编译语句
+    * @param id: UInt32 预编译语句id
+    */
+    protected func closePrepare(id: UInt32): Unit {
+        synchronized(connectionMutex) {
+            writeRequest(CloseCommand(id))
         }
     }
 
@@ -138,7 +169,7 @@ protected class MySqlConnection <: Resource {
      * 读取预执行语句响应
      */
     private func readPrepareResponse(): PrepareResult {
-        var array = read()
+        var array = channel.read()
         var stream = arrayToInputStream(array)
         if (array[4] == ResponseCode.Error.value()) {
             var error = ErrorResponse(stream)
@@ -148,17 +179,17 @@ protected class MySqlConnection <: Resource {
         var parameters = ArrayList<ColumnDefinition>(Int64(prepareResponse.numParams))
         if(prepareResponse.numParams > 0){
             for (_ in 0..prepareResponse.numParams) {
-                parameters.append(ColumnDefinition(arrayToInputStream(read())))
+                parameters.append(ColumnDefinition(arrayToInputStream(channel.read())))
             }
-            read()
+            channel.read()
         }
         
         var columns = ArrayList<ColumnDefinition>(Int64(prepareResponse.numColumns))
         if(prepareResponse.numColumns > 0){
             for (_ in 0..prepareResponse.numColumns) {
-            columns.append(ColumnDefinition(arrayToInputStream(read())))
+            columns.append(ColumnDefinition(arrayToInputStream(channel.read())))
             }
-            read()
+            channel.read()
         }
         return PrepareResult(prepareResponse, parameters.toArray(), columns.toArray())
     }
@@ -167,7 +198,7 @@ protected class MySqlConnection <: Resource {
     * 读取执行查询预执行语句响应
     */
     private func readExecutePrepareResponse(): ResultSet {
-        var array = read()
+        var array = channel.read()
         var stream = arrayToInputStream(array)
         if (array[4] == ResponseCode.Error.value()) {
             var error = ErrorResponse(stream)
@@ -176,92 +207,34 @@ protected class MySqlConnection <: Resource {
         var filedsCount = ColumnCount(stream)
         var fields = ArrayList<ColumnDefinition>()
         for (_ in 0..filedsCount.count) {
-            var field = ColumnDefinition(arrayToInputStream(read()))
+            var field = ColumnDefinition(arrayToInputStream(channel.read()))
             fields.append(field)
         }
         //丢弃Eof包
-        read()
-        array = read()
+        channel.read()
+        array = channel.read()
         var rowPackets = ArrayList<BinaryResult>()
         while (array[4] != ResponseCode.Eof.value() || array.size > 9) {
             var row = BinaryResult(arrayToInputStream(array), fields.toArray())
             rowPackets.append(row)
-            array = read()
+            array = channel.read()
         }
         return BinaryResultSet(fields.toArray(), rowPackets.toArray())
     }
 
-    /*
-     * read a mysql package from socket
-     */
-    private func read(): Array<Byte> {
-        //上一次读取有数据剩余
-        if (this._lastRemaining.size > 3) {
-            //尝试从上一次剩余的数据读取一个完整的数据包
-            var subPacketLength = littleEndianToUInt32(_lastRemaining.slice(0, 3))
-            var fullPacketLength = Int64(subPacketLength) + 4
-            if (_lastRemaining.size >= fullPacketLength) {
-                var data = _lastRemaining.slice(0, fullPacketLength)
-                var remainingSize = _lastRemaining.size - fullPacketLength
-                _lastRemaining = _lastRemaining.slice(fullPacketLength, remainingSize)
-                return data
-            }
-        }
-        var buffer = Array<Byte>(BUFFER_SIZE, repeat: 0)
-        var store = ArrayList<Byte>()
-        if (_lastRemaining.size > 0) {
-            store.appendAll(_lastRemaining)
-        }
-        var len = _socket.read(buffer)
-        if(len == 0){
-            throw IOException("Read bytes from socket failed")
-        }
-        store.appendAll(buffer.slice(0, len))
-        var subPacketLength = littleEndianToUInt32(store.toArray().slice(0, 3))
-        var fullPacketLength = Int64(subPacketLength) + 4
-        if (store.size < fullPacketLength) {
-            // 发生拆包的情况
-            var len: Int64 = 0
-            while (store.size < fullPacketLength) {
-                len = _socket.read(buffer)
-                store.appendAll(buffer.slice(0, len))
-            }
-        }
-        //可能发生粘包的情况
-        //存储下一个包的剩余数据
-        var remainingSize = store.size - fullPacketLength
-        _lastRemaining = store.toArray().slice(fullPacketLength, remainingSize)
-        return store.toArray().slice(0, fullPacketLength)
-    }
 
     /*
-     * write a mysql package to socket
-     */
-    private func write(data: Array<Byte>) {
-        _socket.write(data)
-    }
-
-    /*
-     * flsuh buffer
-     */
-    private func flush() {
-        _socket.flush()
-    }
-
-    /*
-     * read a mysql handshake package
+     * 读取握手报文
      */
     private func readHandhake(): Handshake {
-        var stream = ByteArrayStream()
-        stream.write(read())
-        return Handshake(stream)
+        return Handshake(arrayToInputStream(channel.read()))
     }
 
     /*
      * 读取一个mysql响应报文,可能是OkResponse、ErrorResponse、AbstructEof和AuthStateResponse 或者其子类
      */
     private func readResponse(): Response {
-        var array = read()
+        var array = channel.read()
         var code = ResponseCode.get(array[4])
         match (code) {
             case ResponseCode.Ok =>
@@ -293,7 +266,7 @@ protected class MySqlConnection <: Resource {
     }
 
     private func writeRequest(req: Request) {
-        write(req.toByteArray())
+        channel.write(req.toByteArray())
     }
 
 
@@ -312,7 +285,7 @@ protected class MySqlConnection <: Resource {
      * 处理查询语句的响应
      */
     private func readQueryResponse(): ResultSet {
-        var array = read()
+        var array = channel.read()
         var stream = arrayToInputStream(array)
         if (array[4] == ResponseCode.Error.value()) {
             var error = ErrorResponse(stream)
@@ -321,18 +294,18 @@ protected class MySqlConnection <: Resource {
         var columnCount = ColumnCount(stream)
         var fields = ArrayList<ColumnDefinition>()
         for (_ in 0..columnCount.count) {
-            var field = ColumnDefinition(arrayToInputStream(read()))
+            var field = ColumnDefinition(arrayToInputStream(channel.read()))
             fields.append(field)
         }
         //丢弃Eof包
-        read()
-        array = read()
+        channel.read()
+        array = channel.read()
         var rowPackets = ArrayList<TextResult>()
         while (array[4] != ResponseCode.Eof.value() || array.size > 9) {
             var row: TextResult
             row = TextResult(arrayToInputStream(array), Int64(columnCount.count))
             rowPackets.append(row)
-            array = read()
+            array = channel.read()
         }
         return TextResultSet(fields.toArray(), rowPackets.toArray())
     }
@@ -341,7 +314,7 @@ protected class MySqlConnection <: Resource {
      * 处理更新语句的响应
      */
     private func readUpdateResponse(): ChangeResult {
-        var array = read()
+        var array = channel.read()
         var stream = arrayToInputStream(array)
         if (array[4] == ResponseCode.Error.value()) {
             var error = ErrorResponse(stream)
@@ -352,9 +325,9 @@ protected class MySqlConnection <: Resource {
     }
 
 
-    /*
+    /**
      * 创建一个完成认证的mysql连接
-     * option: 连接参数
+     * @params option: Map<String, String> 连接参数
      */
     protected static func createAuthedConnection(option: Map<String, String>): MySqlConnection {
         try {
@@ -362,25 +335,26 @@ protected class MySqlConnection <: Resource {
             var socket = connectToServer(option)
 
             // 2. 准备认证报文
-            var connection = MySqlConnection(socket)
+            var connection = MySqlConnection(MySqlChannel(socket))
             var handshake = connection.readHandhake()
             var sslModel = option.get(Params.SSLMode).getOrDefault({=> "preferred"})
             var sslable = handshake.hasCapability(Capability.SSL)
             if (!sslable && sslModel != "disabled" && sslModel != "preferred") {
                 throw ConnectFailedException("Can't Switch to SSL after handshake")
             }
+
             // 3. 建立安全连接
             var sslEnabled = sslable && sslModel != "disabled"
             var authReq = prepareAuthRequest(handshake, option, sslEnabled)
             if (sslEnabled) {
-                connection.write(authReq.setCapability(SSL).sslRequest())
+                connection.channel.write(authReq.setCapability(SSL).sslRequest())
                 sslHandshake(connection, option)
                 authReq.setNumber(authReq.number + 1)
             }
             
             // 4.发送认证报文
             connection.writeRequest(authReq)
-            connection.flush()
+            connection.channel.flush()
 
             // 5. 处理认证响应,可能是 ErrorResponse, OkResponse, PublicKey ,AuthStatePacket 和 AuthSwitch这几种数据包
             var originPassword = option.get(Params.Password).getOrThrow({=> ConnectFailedException("Required connection parameters: password")})
@@ -424,31 +398,26 @@ protected class MySqlConnection <: Resource {
     }
 
     private static func connectToServer(option: Map<String, String>): TcpSocket {
-        var host = option.get(Params.Host).getOrThrow(
-            {=> IllegalArgumentException("Required connection parameters: host")})
-        var port = option.get(Params.Port).getOrThrow(
-            {=> IllegalArgumentException("Required connection parameters: port")})
-        var connectionTimeout = option.get(Params.ConnectionTimeOut)
+        var host = option.get(Params.Host).getOrThrow({=> IllegalArgumentException("Required connection parameters: host")})
+        var port = option.get(Params.Port).getOrThrow({=> IllegalArgumentException("Required connection parameters: port")})
+        var connectionTimeout = option.get(Params.ConnectionTimeout)
         var socket = TcpSocket(host, UInt16.parse(port))
-        if (!connectionTimeout.isNone()) {
-            try {
-                var timeout = Int64.parse(connectionTimeout.getOrThrow())
-                socket.connect(timeout: Duration.millisecond * timeout)
-            } catch (e: IllegalArgumentException) {
-                throw ConnectFailedException("parse connection timeout failed")
-            }
-        } else {
-            socket.connect()
+        match (connectionTimeout) {
+            case None => socket.connect()
+            case Some(v) => 
+                try {
+                    var timeout = Int64.parse(v)
+                    socket.connect(timeout: Duration.millisecond * timeout)
+                } catch (e: IllegalArgumentException) {
+                    throw IllegalArgumentException("parse connection timeout failed")
+                }
         }
-
         return socket
     }
 
     private static func prepareAuthRequest(handshake: Handshake, option: Map<String, String>, sslEnabled: Bool): HandshakeResponse {
-        var username = option.get(Params.Username).getOrThrow(
-            {=> IllegalArgumentException("Required connection parameters: username")})
-        var originPassword = option.get(Params.Password).getOrThrow(
-            {=> IllegalArgumentException("Required connection parameters: password")})
+        var username = option.get(Params.Username).getOrThrow({=> IllegalArgumentException("Required connection parameters: username")})
+        var originPassword = option.get(Params.Password).getOrThrow({=> IllegalArgumentException("Required connection parameters: password")})
         var database = option.get(Params.Database).getOrDefault({=> ""})
         var authReq = HandshakeResponse.getDefault(handshake.number + 1)
         var encryptedPassword: Array<Byte>
@@ -487,16 +456,14 @@ protected class MySqlConnection <: Resource {
         }
         config.clientCertificate = getClientCertificate(option)
         config.domain = option.get(Params.SSLSni)
-        config.cipherSuitesV1_2 = option.get(Params.Tls12Ciphersuites)
-                                        .getOrDefault({=> ""}).split(":",removeEmpty: true)
-        config.cipherSuitesV1_3 = option.get(Params.Tls13Ciphersuites)
-                                        .getOrDefault({=> ""}).split(":",removeEmpty: true)
-        (config.minVersion, config.maxVersion) = getMinAndMaxTlsVersion(option.get(Params.TlsVersion))
+        config.cipherSuitesV1_2 = option.get(Params.Tls12Ciphersuites).getOrDefault({=> ""}).split(":",removeEmpty: true)
+        config.cipherSuitesV1_3 = option.get(Params.Tls13Ciphersuites).getOrDefault({=> ""}).split(":",removeEmpty: true)
+        //(config.minVersion, config.maxVersion) = getMinAndMaxTlsVersion(option.get(Params.TlsVersion))
         var lastSession: ?TlsSession = None
         try {
-            var tls: TlsSocket = TlsSocket.client(connection._socket, session: lastSession, clientConfig: config)
+            var tls: TlsSocket = TlsSocket.client(connection.channel.getSocket(), session: lastSession, clientConfig: config)
             tls.handshake()
-            connection.setTlsSocket(tls)
+            connection.channel.setSocket(tls)
         } catch (e: TlsException) {
             throw ConnectFailedException(e.message)
         }
@@ -556,50 +523,47 @@ protected class MySqlConnection <: Resource {
         return list.toArray()
     }
 
-    private static func getMinAndMaxTlsVersion(val: ?String): (TlsVersion, TlsVersion) {
-        if (val.isNone()) {
-            return (V1_2, V1_3)
-        } else {
-            var values = val.getOrThrow().split(",", removeEmpty: true)
-            values.sort()
-            var versions = ArrayList<TlsVersion>()
-            var tls12used = false
-            var tls13used = false
-            for (i in values) {
-                match (i) {
-                    case "TLSv1.2" => if (!tls12used) {
-                        versions.append(V1_2)
-                        tls12used = true
-                    }
-                    case "TLSv1.3" => if (!tls13used) {
-                        versions.append(V1_3)
-                        tls13used = true
-                    }
-                    case _ => throw ConnectFailedException("Unkonw TLS version: ${i}")
-                }
-            }
-            return (versions[0], versions[versions.size - 1])
-        }
-    }
+    // private static func getMinAndMaxTlsVersion(val: ?String): (TlsVersion, TlsVersion) {
+    //     if (val.isNone()) {
+    //         return (V1_2, V1_3)
+    //     } else {
+    //         var values = val.getOrThrow().split(",", removeEmpty: true)
+    //         values.sort()
+    //         var versions = ArrayList<TlsVersion>()
+    //         var tls12used = false
+    //         var tls13used = false
+    //         for (i in values) {
+    //             match (i) {
+    //                 case "TLSv1.2" => if (!tls12used) {
+    //                     versions.append(V1_2)
+    //                     tls12used = true
+    //                 }
+    //                 case "TLSv1.3" => if (!tls13used) {
+    //                     versions.append(V1_3)
+    //                     tls13used = true
+    //                 }
+    //                 case _ => throw ConnectFailedException("Unkonw TLS version: ${i}")
+    //             }
+    //         }
+    //         return (versions[0], versions[versions.size - 1])
+    //     }
+    // }
 
     private static func getClientCertificate(option: Map<String, String>): ?(Array<X509Certificate>, PrivateKey) {
-        var clientCertificate = option.get(Params.SSLCert)
-        if (!clientCertificate.isNone()) {
-            var key = option.get(Params.SSLKey)
-            if (key.isNone()) {
-                throw ConnectFailedException("")
+        match (option.get(Params.SSLCert)) {
+            case None => None
+            case Some(publicKeyPath) => 
+                match (option.get(Params.SSLKey)) {
+                    case None => throw ConnectFailedException()
+                    case Some(privateKeyPath) => 
+                        var certificates = X509Certificate.decodeFromPem(String.fromUtf8(File.readFrom(publicKeyPath)))
+                        var privateKey: PrivateKey = match (certificates[0].publicKeyAlgorithm) {
+                            case PublicKeyAlgorithm.RSA => RSAPrivateKey.decodeFromPem(privateKeyPath, password: option.get(Params.SSLKeyPassword))
+                            case PublicKeyAlgorithm.ECDSA => ECDSAPrivateKey.decodeFromPem(privateKeyPath, password: option.get(Params.SSLKeyPassword))
+                            case _ => throw ConnectFailedException("Unsupported protected key algorithm")
+                        }
+                        return (certificates, privateKey)
+                }
             }
-            var certificates = X509Certificate.decodeFromPem(
-                String.fromUtf8(File.readFrom(clientCertificate.getOrThrow())))
-            var privateKey: PrivateKey = match (certificates[0].publicKeyAlgorithm) {
-                case PublicKeyAlgorithm.RSA => RSAPrivateKey.decodeFromPem(key.getOrThrow(),
-                    password: option.get(Params.SSLKeyPassword))
-                case PublicKeyAlgorithm.ECDSA => ECDSAPrivateKey.decodeFromPem(key.getOrThrow(),
-                    password: option.get(Params.SSLKeyPassword))
-                case _ => throw ConnectFailedException("Unsupported protected key algorithm")
-            }
-            return (certificates, privateKey)
-        }
-        return None
     }
 }

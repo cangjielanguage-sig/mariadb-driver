@@ -134,8 +134,8 @@ public class ConnectionImpl <: Connection{
         }
     }
 
-    protected func closePrepare(prepare: PrepareResult) {
-        return _connection.closePrepare(prepare)
+    protected func closePrepare(id: UInt32) {
+        return _connection.closePrepare(id)
     }
 
     protected func getConnectionMutex(): ReentrantMutex{

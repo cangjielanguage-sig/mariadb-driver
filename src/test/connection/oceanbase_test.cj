@@ -9,7 +9,7 @@ import std.collection.*
 public class OceanBaseTest {
 
     @TestCase
-    public func case1() {
+    public func case1(): Unit {
         var attr = HashMap<String, String>()
         attr.put(Params.Username, "yesokim")
         attr.put(Params.Password, "^ynAW@7W5Fdxi6f")
@@ -20,7 +20,7 @@ public class OceanBaseTest {
     }
 
     @TestCase
-    public func case2() {
+    public func case2(): Unit {
         var attr = HashMap<String, String>()
         attr.put(Params.Username, "yesokim")
         attr.put(Params.Password, "^ynAW@7W5Fdxi6f")

@@ -253,6 +253,17 @@
             "args": [
                 "--filter=OceanBaseTest.insertTest"
             ]
+        },
+        {
+            "name": "Cangjie (CJNative-unittest): cjmd.test.jdbc.impl.TidbTest.queryByNameTest",
+            "program": "c:\\Users\\30247\\Desktop\\cjmd\\target\\debug\\unittest_bin\\cjmd.test.jdbc.impl.exe",
+            "request": "launch",
+            "type": "cangjieDebug",
+            "externalConsole": false,
+            "env": {},
+            "args": [
+                "--filter=TidbTest.queryByNameTest"
+            ]
         }
     ]
 }

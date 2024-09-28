@@ -51,6 +51,12 @@
 
 - 支持国产数据库OceanBase
 
-## BugFix
+## Bugfix
 
 - 修复了某些认证插件在进行ssl连接后认证失败的bug
+
+# [v0.3.3]
+
+## Bugfix
+
+- 修复了jdbc接口插入Null值失败的bug

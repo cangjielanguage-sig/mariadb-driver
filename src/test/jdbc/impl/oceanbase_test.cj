@@ -1,8 +1,9 @@
 package cjmd.test.jdbc.impl
 
-
 import std.unittest.*
 import std.unittest.testmacro.*
+import cjmd.jdbc.impl.*
+import cjmd.jdbc.*
 import std.time.*
 import std.sync.*
 import std.fs.*
@@ -15,7 +16,7 @@ import cjmd.jdbc.impl.*
 import cjmd.protocol.inputStreamToArray
 
 @Test
-public class MySqlTest{
+public class OceanBaseTest {
 
 
     private static var connection: Connection
@@ -23,15 +24,12 @@ public class MySqlTest{
 
     static init() {
         var driver = MySqlDriver.instance
-        var property1 = ("username","root")
-        var property2= ("password","MySql123!")
+        var property1 = ("username","super")
+        var property2= ("password","lV6YwSVyN5sJ%wCzFSvhEILpdqQU")
         var property3 = ("database","driver_test")
-        var property4 = ("ssl.mode","disabled")
-        var property5 = ("prepare.mode","server")
-        //var property5 = ("prepare.mode","client")
-        var dataSource = driver.open("mysql://localhost", [property1,property2,property3,property4,property5])
+        var dataSource = driver.open("mysql://obmtm94oeja8d1h0-mi.cn-hangzhou.oceanbase.aliyuncs.com", [property1,property2,property3])
         connection =  dataSource.connect()
-    } 
+    }
 
     /*
     * 插入数据测试
@@ -157,7 +155,7 @@ public class MySqlTest{
     @TestCase
     public func queryTest(){
         var prepare = connection.prepareStatement("select * from full_test where id = ?")
-        var result = prepare.query([199])
+        var result = prepare.query([22])
         while (result.next()) {
             println(result.getInt64(1))
             println(result.getInt8(2))
@@ -201,7 +199,7 @@ public class MySqlTest{
     @TestCase
     public func queryByNameTest(){
         var prepare = connection.prepareStatement("select * from full_test where id = ?")
-        var result = prepare.query([199])
+        var result = prepare.query([270001])
         while (result.next()) {
             println(result.getInt64("id"))
             println(result.getInt8("tinyint_col"))
@@ -220,7 +218,7 @@ public class MySqlTest{
             println(result.getDate("date_col"))
             println(result.getTime("time_col"))
             println(result.getDateTime("datetime_col"))
-            println(result.getDateTime("timestamp_col"))
+            println(result.getDateTime("date_col"))
             println(result.getInt16("year_col"))
 
             println(result.getString("char_col"))
@@ -238,5 +236,78 @@ public class MySqlTest{
             println(result.getString("enum_col"))
         }
     }
+
+
+    /*
+    * NULL值插入测试
+    */
+    @TestCase
+    public func insertNullTest() {
+        var sql = ###"insert into full_test (
+                                tinyint_col,
+                                utinyint_col, 
+                                smallint_col, 
+                                usmallint_col, 
+                                mediumint_col, 
+                                umediumint_col, 
+                                int_col, 
+                                uint_col, 
+                                bigint_col, 
+                                ubigint_col, 
+                                float_col, 
+                                double_col, 
+                                decimal_col, 
+                                date_col, 
+                                time_col, 
+                                datetime_col,
+                                timestamp_col, 
+                                year_col,
+                                char_col,
+                                varchar_col,
+                                tinytext_col,
+                                text_col,
+                                mediumtext_col,
+                                longtext_col,
+                                tinyblob_col,
+                                blob_col,
+                                mediumblob_col,
+                                longblob_col) 
+                                values
+                                (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"###
+        var prepare = connection.prepareStatement(sql)
+        prepare.setNull(1)
+        prepare.setNull(2)
+        prepare.setNull(3)
+        prepare.setNull(4)
+        prepare.setNull(5)
+        prepare.setNull(6)
+        prepare.setNull(7)
+        prepare.setNull(8)
+        prepare.setNull(9)
+        prepare.setNull(10)
+        prepare.setNull(11)
+        prepare.setNull(12)
+        prepare.setNull(13)
+        prepare.setNull(14)
+        prepare.setNull(15)
+        prepare.setNull(16)
+        prepare.setNull(16)
+        prepare.setNull(17)
+        prepare.setNull(18)
+        prepare.setNull(19)
+        prepare.setNull(20)
+        prepare.setNull(21)
+        prepare.setNull(22)
+        prepare.setNull(23)
+        prepare.setNull(24)
+        prepare.setNull(25)
+        prepare.setNull(26)
+        prepare.setNull(27)
+        prepare.setNull(28)
+        var result = prepare.update()
+        println("effect rows: ${result.effectRow}")
+        println("last insert id: ${result.lastInsertId}")
+    }
+
 
 }

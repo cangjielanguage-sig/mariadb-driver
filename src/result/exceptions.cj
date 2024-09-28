@@ -11,11 +11,8 @@ protected class ValueConvertException <: Exception{
        super()
     }
 
-    ValueConvertException(message: String) {
+    init(message: String) {
         super(message)    
     }
 
-    public func toString(): String{
-        return message
-    }
 }

@@ -16,9 +16,6 @@ protected class ResponseErrorException <: Exception{
         super(message)    
     }
 
-    public func toString(): String{
-        return message
-    }
 }
 
 /*
@@ -31,9 +28,5 @@ protected class ConnectFailedException <: Exception{
 
     internal ConnectFailedException(message: String) {
         super(message)    
-    }
-
-    public func toString(): String{
-        return message
     }
 }

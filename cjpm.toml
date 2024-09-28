@@ -1,11 +1,11 @@
 [package]
   cjc-version = "0.55.3"
   compile-option = "--incremental-compile --diagnostic-format=noColor"
-  description = "nothing here"
+  description = "mysql driver for cangjie"
   link-option = ""
   name = "cjmd"
   output-type = "static"
   src-dir = ""
   target-dir = ""
-  version = "0.3.1"
-  [package.package-configuration]
+  version = "0.3.3"
+[package.package-configuration]

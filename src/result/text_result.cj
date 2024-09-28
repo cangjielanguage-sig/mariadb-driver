@@ -351,8 +351,8 @@ protected class TextResultSet <: ResultSet {
     private func stringParseToDateTime(index: Int64, str: String): DateTime {
         try {
             return DateTime.parse(str, DB_DATE_TIME_FORMAT)
-        } catch (e: IllegalArgumentException) {
-            throw ValueConvertException("Parse to Time failed: column name is '${getFieldName(index)}', raw value is ${str}.")
+        } catch (e: TimeParseException) {
+            throw ValueConvertException("Parse to DateTime failed: column name is '${getFieldName(index)}', raw value is ${str}.")
         }
     } 
 }
