@@ -14,27 +14,27 @@ import std.binary.*
 */
 protected class Handshake <: CommonPacket {
 
-    private var _protocol: Byte
+    private var _protocol: Byte = 0x00
 
-    private var _version: String
+    private var _version: String = ""
 
-    private var _threadId: UInt32
+    private var _threadId: UInt32 = 0x00
 
-    private var _salt1: Array<Byte>
+    private var _salt1: Array<Byte> = []
 
-    private var _serverCapabilities: UInt16
+    private var _serverCapabilities: UInt16 = 0x00
 
-    private var _serverLanguage: Byte
+    private var _serverLanguage: Byte = 0x00
 
-    private var _serverStatus: UInt16
+    private var _serverStatus: UInt16 = 0x00
 
-    private var _extendedServerCapabilities: UInt16
+    private var _extendedServerCapabilities: UInt16 = 0x00
 
-    private var _authenticationDataLength: Byte
+    private var _authenticationDataLength: Byte = 0x00
 
-    private var _salt2: Array<Byte>
+    private var _salt2: Array<Byte> = []
 
-    private var _authenticationPlugin: String
+    private var _authenticationPlugin: String = ""
 
     protected prop capabilities: UInt32{
         get() {
@@ -127,11 +127,15 @@ protected class Handshake <: CommonPacket {
         }
         this._extendedServerCapabilities = littleEndianToUInt16(extendedServerCapabilities)
         // 认证插件长度: 1 byte
-        var authenticationDataLength = Array<Byte>(1, repeat: 0)
-        if(stream.read(authenticationDataLength) == 0){
-            throw InvalidPacketException("This packet is not a Handshake packet: read length of authentication plugin name failed")
+        if(hasCapability(PluginAuth)){
+            var authenticationDataLength = Array<Byte>(1, repeat: 0)
+            if(stream.read(authenticationDataLength) == 0){
+                throw InvalidPacketException("This packet is not a Handshake packet: read length of authentication plugin name failed")
+            }
+            this._authenticationDataLength = authenticationDataLength[0]
+        }else{
+            this._authenticationDataLength = 0x00
         }
-        this._authenticationDataLength = authenticationDataLength[0]
         // 未使用: 10 byte
         var unused = Array<Byte>(10, repeat: 0)
         if(stream.read(unused) == 0){
@@ -149,16 +153,18 @@ protected class Handshake <: CommonPacket {
         } while (single[0] != 0)
         this._salt2 = salt2.toArray()
         // 认证插件: n byte
-        var authenticationPlugin = ArrayList<Byte>()
-        do {
-            if(stream.read(single) == 0){
-                throw InvalidPacketException("This packet is not a Handshake packet: read second salt failed")
-            }
-            if(single[0] != 0){
-                authenticationPlugin.append(single[0])
-            }
-        } while (single[0] != 0)
-        this._authenticationPlugin = String.fromUtf8(authenticationPlugin.toArray())
+        if(hasCapability(PluginAuth)){
+            var authenticationPlugin = ArrayList<Byte>()
+            do {
+                if(stream.read(single) == 0){
+                    throw InvalidPacketException("This packet is not a Handshake packet: read second salt failed")
+                }
+                if(single[0] != 0){
+                    authenticationPlugin.append(single[0])
+                }
+            } while (single[0] != 0)
+            this._authenticationPlugin = String.fromUtf8(authenticationPlugin.toArray())
+        }
     }
 
 }

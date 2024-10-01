@@ -10,11 +10,6 @@ import encoding.json.*
 import cjmd.protocol.*
 import std.math.numeric.Decimal
 
-protected const DB_DATE_TIME_FORMAT: String = "yyyy-MM-dd HH:mm:ss"
-protected const DB_DATE_FORMAT: String = "yyyy-MM-dd"
-protected const DB_TIME_FORMAT: String = "HH:mm:ss"
-public const DB_TIME_PREFIX: String = "1970-01-01 "
-
 protected interface ResultSet {
 
     prop rowSize: Int64

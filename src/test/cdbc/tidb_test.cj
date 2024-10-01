@@ -1,4 +1,4 @@
-package cjmd.test.cdbc
+protected package cjmd.test.cdbc
 
 import std.unittest.*
 import std.unittest.testmacro.*

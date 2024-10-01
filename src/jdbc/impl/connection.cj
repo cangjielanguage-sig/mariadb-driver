@@ -47,6 +47,10 @@ public class ConnectionImpl <: Connection {
 
     private static const OPEN_AUTO_COMMIT = "SET SESSION autocommit = 1"
 
+    private static const SET_SCHEMA = "USE"
+
+    private static const GET_SCHEMA = "SELECT DATABASE()"
+
     private var connection: MySqlConnection
 
     private var options: Map<String, String>
@@ -185,13 +189,25 @@ public class ConnectionImpl <: Connection {
 
     public override func close() {
         checkResourceAvailability()
-        synchronized(getConnectionMutex()) {
-            connection.close()
-        }
+        connection.close()
     }
 
     public override func isClosed(): Bool {
         return connection.isClosed()
+    }
+
+    public func setSchema(schema: String): Unit {
+        checkResourceAvailability()
+        sendCommand("${SET_SCHEMA} ${schema}")
+    }
+
+    public func getSchema(): String {
+        checkResourceAvailability()
+        var result = connection.sendQuery(GET_SCHEMA)
+        if (!result.next() || result.rowSize != 1 || result.columnSize != 1) {
+            throw SqlException("Query the current database failed")
+        }
+        return result.getString(1).getOrThrow()
     }
 
     //protected

@@ -15,10 +15,6 @@
 
 Cangjie MySql Driver是为Cangjie编程语言提供MySql原生驱动程序,基于MySql协议. 同时适配TIDB等国产数据库
 
-### 1.2 项目计划
-
-实现CDBC接口，完成对MySql数据库的基本操作
-
 ## <img alt="" src="./doc/readme-image/readme-icon-framework.png" style="display: inline-block;" width=3%/> 2 架构
 
 ### 2.1 项目结构
@@ -88,11 +84,10 @@ import cjmd.cdbc.*
 
 main(){
     var driver = DriverManager.getDriver("mysql").getOrThrow()
-    var property1 = (ConnectionOption.Username, "root")
-    var property2 = (ConnectionOption.Password, "MySql123!")
-    var property3 = (ConnectionOption.Database, "test")
-    var property4= (ConnectionOption.SSLMode, "disabled")
-    var dataSource = driver.open("mysql://localhost:3306", [property1,property2,property3,property4])
+    var property1 = ("username", "root")
+    var property2 = ("password", "MySql123!")
+    var property3 = ("database", "test")
+    var dataSource = driver.open("mysql://localhost:3306", [property1,property2,property3])
     var connection =  dataSource.connect()
 }
 ```
@@ -106,11 +101,10 @@ import std.time.DateTime
 
 main(){
     var driver = DriverManager.getDriver("mysql").getOrThrow()
-    var property1 = (ConnectionOption.Username, "root")
-    var property2 = (ConnectionOption.Password, "MySql123!")
-    var property3 = (ConnectionOption.Database, "test")
-    var property4= (ConnectionOption.SSLMode, "disabled")
-    var dataSource = driver.open("mysql://localhost:3306", [property1,property2,property3,property4])
+    var property1 = ("username" "root")
+    var property2 = ("password", "MySql123!")
+    var property3 = ("database", "test")
+    var dataSource = driver.open("mysql://localhost:3306", [property1,property2,property3])
     var connection =  dataSource.connect()
     var prepare = connection.prepareStatement("insert into test (varchar_col, char_col, tinyint_col, smallint_col, mediumint_col,    int_col, bigint_col, float_col, double_col, decimal_col, date_col, datetime_col, timestamp_col, time_col, year_col) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)")
     var param1 = SqlVarchar("varchar")
@@ -142,11 +136,10 @@ import std.database.sql.*
 
 main(){
     var driver = DriverManager.getDriver("mysql").getOrThrow()
-    var property1 = (ConnectionOption.Username, "root")
-    var property2 = (ConnectionOption.Password, "MySql123!")
-    var property3 = (ConnectionOption.Database, "test")
-    var property4= (ConnectionOption.SSLMode, "disabled")
-    var dataSource = driver.open("mysql://localhost:3306", [property1,property2,property3,property4])
+    var property1 = ("username" "root")
+    var property2 = ("password", "MySql123!")
+    var property3 = ("database", "test")
+    var dataSource = driver.open("mysql://localhost:3306", [property1,property2,property3])
     var connection =  dataSource.connect()
   
     var prepare = connection.prepareStatement("select * from test")
@@ -176,11 +169,10 @@ import std.database.sql.*
 
 main(){
     var driver = DriverManager.getDriver("mysql").getOrThrow()
-    var property1 = (ConnectionOption.Username, "root")
-    var property2 = (ConnectionOption.Password, "MySql123!")
-    var property3 = (ConnectionOption.Database, "test")
-    var property4= (ConnectionOption.SSLMode, "disabled")
-    var dataSource = driver.open("mysql://localhost:3306", [property1,property2,property3,property4])
+    var property1 = ("username" "root")
+    var property2 = ("password", "MySql123!")
+    var property3 = ("database", "test")
+    var dataSource = driver.open("mysql://localhost:3306", [property1,property2,property3])
     var connection =  dataSource.connect()
     var transaction = connection.createTransaction()
     transaction.begin()
@@ -195,6 +187,7 @@ main(){
 ```
 import cjmd.jdbc.*
 import cjmd.jdbc.impl.*
+
 import std.time.*
 import std.math.numeric.*
 import std.io.*
@@ -203,11 +196,10 @@ import encoding.json.*
 
 main() {
     var driver = DriverManager.getDriver("mysql").getOrThrow()
-    var property1 = (ConnectionOption.Username, "root")
-    var property2 = (ConnectionOption.Password, "MySql123!")
-    var property3 = (ConnectionOption.Database, "driver_test")
-    var property4= (ConnectionOption.SSLMode, "disabled")
-    var dataSource = driver.open("mysql://localhost:3306", [property1,property2,property3,property4])
+    var property1 = ("username", "root")
+    var property2 = ("password", "MySql123!")
+    var property3 = ("database", "driver_test")
+    var dataSource = driver.open("mysql://localhost:3306", [property1,property2,property3])
     var connection =  dataSource.connect()
       var sql = ###"insert into full_test (
                                 tinyint_col,
@@ -328,6 +320,7 @@ main() {
 ```
 import cjmd.jdbc.*
 import cjmd.jdbc.impl.*
+
 import std.time.*
 import std.math.numeric.*
 import std.io.*
@@ -336,11 +329,10 @@ import encoding.json.*
 
 main() {
     var driver = DriverManager.getDriver("mysql").getOrThrow()
-    var property1 = (ConnectionOption.Username, "root")
-    var property2 = (ConnectionOption.Password, "MySql123!")
-    var property3 = (ConnectionOption.Database, "driver_test")
-    var property4= (ConnectionOption.SSLMode, "disabled")
-    var dataSource = driver.open("mysql://localhost:3306", [property1,property2,property3,property4])
+    var property1 = ("username", "root")
+    var property2 = ("password", "MySql123!")
+    var property3 = ("database", "driver_test")
+    var dataSource = driver.open("mysql://localhost:3306", [property1,property2,property3])
     var connection =  dataSource.connect()
     var prepare = connection.prepareStatement("select * from full_test where id = ?")
     var result = prepare.query([199])

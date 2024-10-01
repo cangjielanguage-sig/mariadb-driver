@@ -434,7 +434,7 @@ protected class MySqlConnection <: Resource {
                 encryptedPassword = mysqlNativePassword(originPassword.toArray(),handshake.salt)
             case _ => throw ConnectFailedException("Unknow authentication plugin")
         }
-        authReq.setUsername(username).setPassword(encryptedPassword).setClientAuthPlugin(handshake.authPlugin)
+        authReq.setUsername(username).setAuthResponse(encryptedPassword).setClientAuthPlugin(handshake.authPlugin)
         if (database != "") {
             authReq.setCapability(ConnectWithDB).setDatabase(database)
         }

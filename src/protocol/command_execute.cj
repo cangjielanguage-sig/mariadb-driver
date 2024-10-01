@@ -519,19 +519,19 @@ protected class ExecuteCommand <: Command {
                     }
                 case Date => 
                     try {
-                        return appendDateTime(index, list, DateTime.parse(str,"yyyy-MM-dd"))
+                        return appendDateTime(index, list, DateTime.parse(str, DB_DATE_FORMAT))
                     }catch(e: TimeParseException) {
                         throw ParameterConvertException("parameter convert to date failed: index : ${index + 1}, raw value: ${str}")
                     }
                 case Time =>
                     try {
-                        return appendDateTime(index, list, DateTime.parse("1970-01-01 " + str, "yyyy-MM-dd HH:mm:ss"))
+                        return appendDateTime(index, list, DateTime.parse(DB_TIME_PREFIX + str, DB_DATE_TIME_FORMAT))
                     }catch (e: TimeParseException) {
                         throw ParameterConvertException("parameter convert to time failed: index : ${index + 1}, raw value: ${str}")
                     }
                 case DateTime | Timestamp =>
                     try {
-                        return appendDateTime(index, list, DateTime.parse(str,"yyyy-MM-dd HH:mm:ss"))
+                        return appendDateTime(index, list, DateTime.parse(str,DB_DATE_TIME_FORMAT))
                     }catch (e: TimeParseException) {
                         throw ParameterConvertException("parameter convert to datetime/timestamp failed: index : ${index + 1}, raw value: ${str}")
                     }

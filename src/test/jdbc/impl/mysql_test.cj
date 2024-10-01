@@ -1,5 +1,4 @@
-package cjmd.test.jdbc.impl
-
+protected package cjmd.test.jdbc.impl
 
 import std.unittest.*
 import std.unittest.testmacro.*

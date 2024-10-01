@@ -21,7 +21,7 @@ protected class HandshakeResponse <: Request {
 
     private var _username: String = ""
 
-    private var _password: Array<Byte> = []
+    private var _authResponse: Array<Byte> = []
     
     private var _schema: String = ""
 
@@ -29,6 +29,7 @@ protected class HandshakeResponse <: Request {
 
     private var _attribute: Map<String, String> = HashMap<String, String>()
 
+    private var _zstdCompressionLevel: Byte = 0x00
     
     protected init(number: UInt8) {
         super(0, number)
@@ -54,8 +55,8 @@ protected class HandshakeResponse <: Request {
         return this
     }
 
-    protected func setPassword(password: Array<Byte>): HandshakeResponse {
-        this._password = password
+    protected func setAuthResponse(authResponse: Array<Byte>): HandshakeResponse {
+        this._authResponse = authResponse
         return this
     }
 
@@ -71,6 +72,11 @@ protected class HandshakeResponse <: Request {
 
     protected func setAttrbiture(name: String, value: String): HandshakeResponse {
         this._attribute.put(name, value)
+        return this
+    }
+
+    protected func setZstdCompressionLevel(level: Byte) {
+        this._zstdCompressionLevel = level
         return this
     }
 
@@ -106,11 +112,16 @@ protected class HandshakeResponse <: Request {
         arrayList.append(0x00)
         length += UInt32(unameArray.size)
         length += 1
-        //put password
-        arrayList.append(UInt8(_password.size))
-        length += 1
-        arrayList.appendAll(_password)
-        length += UInt32(_password.size)
+        //put auth response
+        if(hasCapability(PluginAuthLenencClientData)){
+            arrayList.append(UInt8(_authResponse.size))
+            length += 1
+            arrayList.appendAll(_authResponse)
+            length += UInt32(_authResponse.size)
+        }else{
+            arrayList.appendAll(_authResponse)
+            length += UInt32(_authResponse.size)
+        }
         // put schema if 'Connect With DB' are set
         if(hasCapability(ConnectWithDB)){
             var schema = _schema.toArray()
@@ -120,14 +131,15 @@ protected class HandshakeResponse <: Request {
             length += 1
         }
         //put client auth plguin
-        var pluginArray: Array<Byte> = _clientAuthPlugin.toArray()
-        arrayList.appendAll(pluginArray)
-        //arrayList.append(0x00)
-        length += UInt32(pluginArray.size)
-        arrayList.append(0x00)
-        length += 1
+        if(hasCapability(PluginAuth)){
+            var pluginArray: Array<Byte> = _clientAuthPlugin.toArray()
+            arrayList.appendAll(pluginArray)
+            length += UInt32(pluginArray.size)
+            arrayList.append(0x00)
+            length += 1
+        }
         //put attributes length placeholder
-        if(getDefault(0).hasCapability(ConnectAttrs)) {
+        if(hasCapability(ConnectAttrs)) {
             arrayList.append(0x00)
             var attrLenIndex: UInt32  = length
             length += 1
@@ -151,6 +163,11 @@ protected class HandshakeResponse <: Request {
             length += UInt32(attrLen)
             // set attribiters length
             arrayList.set(Int64(attrLenIndex), attrLen)
+        }
+
+        if(hasCapability(ZSTDCompressionAlgorithm)) {
+            arrayList.append(_zstdCompressionLevel)
+            length += 1
         }
         // set packet length
         var array: Array<Byte> = uInt32ToLittleEndian(UInt32(length) - UInt32(HEADER_SIZE))
@@ -244,17 +261,17 @@ protected class RequestPublicKey <: Request{
  */
 protected class SendPassword <: Request{
 
-    private var _password: Array<Byte>
+    private var _authResponse: Array<Byte>
 
     protected init(number: UInt8,password: Array<Byte>){
         super(UInt32(password.size),number)
-        this._password = password
+        this._authResponse = password
     }
 
     protected override func toByteArray(): Array<Byte>{
         var appender = ArrayList<Byte>()
         appender.appendAll(super.toByteArray())
-        appender.appendAll(_password)
+        appender.appendAll(_authResponse)
         return appender.toArray()
     }
 

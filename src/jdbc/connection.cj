@@ -37,7 +37,9 @@ public interface Connection <: Resource{
 
     func isReadOnly(): Bool
 
+    func setSchema(schema: String): Unit
 
+    func getSchema(): String
 }
 
 

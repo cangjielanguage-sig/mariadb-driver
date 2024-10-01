@@ -1,4 +1,4 @@
-package cjmd.test.connection
+protected package cjmd.test.connection
 
 import std.unittest.*
 import std.unittest.testmacro.*
