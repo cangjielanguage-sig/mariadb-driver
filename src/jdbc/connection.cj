@@ -8,7 +8,6 @@ import std.collection.Map
 
 public interface Connection <: Resource{
 
-
     func getMetaData(): Map<String,String>
 
     func prepareStatement(sql: String): Statement
