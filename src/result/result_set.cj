@@ -8,7 +8,7 @@ import std.convert.*
 import std.io.*
 import encoding.json.*
 import cjmd.protocol.*
-import std.math.numeric.Decimal
+import std.math.numeric.{Decimal, BigInt}
 
 protected interface ResultSet {
 
@@ -43,6 +43,8 @@ protected interface ResultSet {
     func getFloat32(index: Int64): ?Float32
 
     func getFloat64(index: Int64): ?Float64
+
+    func getBigInt(index: Int64): ?BigInt
 
     func getDecimal(index: Int64): ?Decimal
 

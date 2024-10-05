@@ -49,24 +49,12 @@ protected class MySqlConnection <: Resource {
     }
 
     /**
-     * 将Query类型语句按可能返回的数据包类型分为一下三种
-     * Command: 
-     *     执行后只返回OkResponse或者ErrorResponse,同时只关注命令是否执行成功,
-     *     不关注返回值,如果命令执行失败抛出ResponseErrorException
-     * Query: 
-     *     查询,关注查询的数据结果,如果执行成功返回TaularResult,如果命令执行失败抛出ResponseErrorException
-     * Update: 
-     *     更新,关注数据更新的结果,执行成功返回ChangeResult,如果命令执行失败抛出ResponseErrorException
-     */
-
-
-    /**
     * 向MySql服务器发送一条命令
     * @throws ResponseErrorException
     */
     protected func sendCommand(sql: String): Unit {
         synchronized(connectionMutex) {
-            sendQuerySql(sql)
+            writeRequest(QueryCommand.create(sql))
             readCommandResponse()
         }
     }
@@ -78,7 +66,7 @@ protected class MySqlConnection <: Resource {
     */
     protected func sendQuery(sql: String): ResultSet {
         synchronized(connectionMutex) {
-            sendQuerySql(sql)
+            writeRequest(QueryCommand.create(sql))
             return readQueryResponse()
         }
     }
@@ -90,7 +78,7 @@ protected class MySqlConnection <: Resource {
     */
     protected func sendUpdate(sql: String): ChangeResult {
         synchronized(connectionMutex) {
-            sendQuerySql(sql)
+            writeRequest(QueryCommand.create(sql))
             return readUpdateResponse()
         }
     }
@@ -145,10 +133,6 @@ protected class MySqlConnection <: Resource {
         synchronized(connectionMutex) {
             writeRequest(CloseCommand(id))
         }
-    }
-
-    private func sendQuerySql(sql: String) {
-        writeRequest(QueryCommand.create(sql))
     }
 
     private func handleLongData(statementId: UInt32, params: Array<Any>){
@@ -330,71 +314,66 @@ protected class MySqlConnection <: Resource {
      * @params option: Map<String, String> 连接参数
      */
     protected static func createAuthedConnection(option: Map<String, String>): MySqlConnection {
-        try {
-            // 1. 建立TCP连接,设置参数
-            var socket = connectToServer(option)
+        // 1. 建立TCP连接,设置参数
+        var socket = connectToServer(option)
 
-            // 2. 准备认证报文
-            var connection = MySqlConnection(MySqlChannel(socket))
-            var handshake = connection.readHandhake()
-            var sslModel = option.get(Params.SSLMode).getOrDefault({=> "preferred"})
-            var sslable = handshake.hasCapability(Capability.SSL)
-            if (!sslable && sslModel != "disabled" && sslModel != "preferred") {
-                throw ConnectFailedException("Can't Switch to SSL after handshake")
-            }
-
-            // 3. 建立安全连接
-            var sslEnabled = sslable && sslModel != "disabled"
-            var authReq = prepareAuthRequest(handshake, option, sslEnabled)
-            if (sslEnabled) {
-                connection.channel.write(authReq.setCapability(SSL).sslRequest())
-                sslHandshake(connection, option)
-                authReq.setNumber(authReq.number + 1)
-            }
-            
-            // 4.发送认证报文
-            connection.writeRequest(authReq)
-            connection.channel.flush()
-
-            // 5. 处理认证响应,可能是 ErrorResponse, OkResponse, PublicKey ,AuthStatePacket 和 AuthSwitch这几种数据包
-            var originPassword = option.get(Params.Password).getOrThrow({=> ConnectFailedException("Required connection parameters: password")})
-
-            match (connection.readResponse()) {
-                case ok: OkResponse => return connection
-                case error: ErrorResponse => throw ConnectFailedException(error.message)
-                case key: PublicKeyResponse => 
-                    var encryptedPwd = performFullAuthentication(key.publicKey, originPassword.toArray(), handshake.salt)
-                    return sendPassword(connection, encryptedPwd, key.number)
-                case authSwitch: AuthSwitch =>
-                        match (authSwitch.pluginName) {
-                            case "caching_sha2_password" =>
-                                var encryptedPwd = cachingSha2Password(originPassword.toArray(), authSwitch.salt)
-                                connection.writeRequest(SendPassword(authSwitch.number + 1, encryptedPwd))
-                                var response = connection.readResponse()
-                                return checkCachingSha2PasswordAuthStatus(connection, response, originPassword, authSwitch.salt, sslEnabled)
-                            case "sha256_password" => 
-                                if(sslEnabled){
-                                    return sendPassword(connection, toNullTerminated(originPassword), authSwitch.number)
-                                }else{
-                                    var publicKey: String
-                                    var lastPacketNumber: UInt8
-                                    (publicKey, lastPacketNumber) = requestPublicKey(connection, SHA256_REQUESET_KEY_CODE,authSwitch.number)
-                                    var encryptedPwd = performFullAuthentication(publicKey, originPassword.toArray(), authSwitch.salt)
-                                    return sendPassword(connection, encryptedPwd, lastPacketNumber)
-                                }
-                            case "mysql_native_password" =>
-                                var encryptedPwd = mysqlNativePassword(originPassword.toArray(), authSwitch.salt)
-                                return sendPassword(connection, encryptedPwd, authSwitch.number);
-                            case _ => throw ConnectFailedException("Unsupported auth plugin")
-                        }
-                case authStatus: AuthStatus => 
-                    return checkCachingSha2PasswordAuthStatus(connection, authStatus, originPassword, handshake.salt, sslEnabled)
-                case _ => throw ConnectFailedException("connect to mysql failed")
-            }
-        } catch (e: SocketException | SocketTimeoutException) {
-            throw ConnectFailedException(e.message)
+        // 2. 准备认证报文
+        var connection = MySqlConnection(MySqlChannel(socket))
+        var handshake = connection.readHandhake()
+        var sslModel = option.get(Params.SSLMode).getOrDefault({=> "preferred"})
+        var sslable = handshake.hasCapability(Capability.SSL)
+        if (!sslable && sslModel != "disabled" && sslModel != "preferred") {
+            throw ConnectFailedException("Can't Switch to SSL after handshake")
         }
-        throw ConnectFailedException("connect to mysql failed")
+
+        // 3. 建立安全连接
+        var sslEnabled = sslable && sslModel != "disabled"
+        var authReq = prepareAuthRequest(handshake, option, sslEnabled)
+        if (sslEnabled) {
+            connection.channel.write(authReq.setCapability(SSL).sslRequest())
+            sslHandshake(connection, option)
+            authReq.setNumber(authReq.number + 1)
+        }
+            
+        // 4.发送认证报文
+        connection.writeRequest(authReq)
+        connection.channel.flush()
+
+        // 5. 处理认证响应,可能是 ErrorResponse, OkResponse, PublicKey ,AuthStatePacket 和 AuthSwitch这几种数据包
+        var originPassword = option.get(Params.Password).getOrThrow({=> ConnectFailedException("Required connection parameters: password")})
+
+        match (connection.readResponse()) {
+            case ok: OkResponse => return connection
+            case error: ErrorResponse => throw ConnectFailedException(error.message)
+            case key: PublicKeyResponse => 
+                var encryptedPwd = performFullAuthentication(key.publicKey, originPassword.toArray(), handshake.salt)
+                return sendPassword(connection, encryptedPwd, key.number)
+            case authSwitch: AuthSwitch =>
+                match (authSwitch.pluginName) {
+                    case "caching_sha2_password" =>
+                        var encryptedPwd = cachingSha2Password(originPassword.toArray(), authSwitch.salt)
+                        connection.writeRequest(SendPassword(authSwitch.number + 1, encryptedPwd))
+                        var response = connection.readResponse()
+                        return checkCachingSha2PasswordAuthStatus(connection, response, originPassword, authSwitch.salt, sslEnabled)
+                    case "sha256_password" => 
+                        if(sslEnabled){
+                            return sendPassword(connection, toNullTerminated(originPassword), authSwitch.number)
+                        }else{
+                            var publicKey: String
+                            var lastPacketNumber: UInt8
+                            (publicKey, lastPacketNumber) = requestPublicKey(connection, SHA256_REQUESET_KEY_CODE,authSwitch.number)
+                            var encryptedPwd = performFullAuthentication(publicKey, originPassword.toArray(), authSwitch.salt)
+                            return sendPassword(connection, encryptedPwd, lastPacketNumber)
+                        }
+                    case "mysql_native_password" =>
+                        var encryptedPwd = mysqlNativePassword(originPassword.toArray(), authSwitch.salt)
+                        return sendPassword(connection, encryptedPwd, authSwitch.number);
+                    case _ => throw ConnectFailedException("Unsupported auth plugin")
+                }
+            case authStatus: AuthStatus => 
+                return checkCachingSha2PasswordAuthStatus(connection, authStatus, originPassword, handshake.salt, sslEnabled)
+            case _ => throw ConnectFailedException("connect to mysql failed")
+        }
     }
 
     private static func connectToServer(option: Map<String, String>): TcpSocket {
@@ -403,13 +382,20 @@ protected class MySqlConnection <: Resource {
         var connectionTimeout = option.get(Params.ConnectionTimeout)
         var socket = TcpSocket(host, UInt16.parse(port))
         match (connectionTimeout) {
-            case None => socket.connect()
+            case None => 
+                try {
+                    socket.connect()
+                }catch (e: SocketException | SocketTimeoutException) {
+                    throw ConnectFailedException(e.message)
+                }
             case Some(v) => 
                 try {
                     var timeout = Int64.parse(v)
                     socket.connect(timeout: Duration.millisecond * timeout)
                 } catch (e: IllegalArgumentException) {
                     throw IllegalArgumentException("parse connection timeout failed")
+                } catch (e: SocketException | SocketTimeoutException) {
+                    throw ConnectFailedException(e.message)
                 }
         }
         return socket

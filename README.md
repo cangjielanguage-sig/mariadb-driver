@@ -3,7 +3,7 @@
 </div>
 
 <p align="center">
-<img alt="" src="https://img.shields.io/badge/release-v0.3.3-brightgreen" style="display: inline-block;" />
+<img alt="" src="https://img.shields.io/badge/release-v0.3.4-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/cjc-v0.55.3-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/state-孵化-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/domain-HOS/Cloud-brightgreen" style="display: inline-block;" />
@@ -47,13 +47,14 @@ Cangjie MySql Driver是为Cangjie编程语言提供MySql原生驱动程序,基�
 
 ### 3.1 编译构建（Win/Linux/Mac）
 
-```
+```toml
 [dependencies]
   cjmd = {git = "https://gitcode.com/weixin_64400442/cjmd.git", branch="master", version = "1.0.0"}
 ```
 
 ### 3.2 功能示例
 
+```sql
 CREATE TABLE `test` (
 `id` int NOT NULL AUTO_INCREMENT,
 `varchar_col` varchar(255) DEFAULT NULL,
@@ -73,12 +74,13 @@ CREATE TABLE `test` (
 `year_col` year DEFAULT NULL,
 PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+```
 
 #### 3.2.1 官方数据库接口
 
 ##### 获取连接
 
-```
+```cangjie
 import std.database.sql.*
 import cjmd.cdbc.*
 

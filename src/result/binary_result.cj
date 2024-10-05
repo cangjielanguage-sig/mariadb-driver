@@ -182,6 +182,23 @@ protected class BinaryResultSet <: ResultSet {
         }
     }
 
+    public override func getBigInt(index: Int64): ?BigInt {
+        var columnType = getFieldType(index)
+        var dataOp = getBinaryData(index)
+        if(dataOp.isNone()){
+            return None
+        }
+        var data = dataOp.getOrThrow()
+        match (columnType) {
+            case Tiny => return BigInt(getInt8(index).getOrThrow())
+            case Short | Year => return BigInt(getInt16(index).getOrThrow())
+            case Int24 | Long => return BigInt(getInt32(index).getOrThrow())
+            case LongLong => return BigInt(getInt64(index).getOrThrow())
+            case String | VarString => return BigInt(getString(index).getOrThrow())
+            case _ => throw ValueConvertException("Unsupported conversion from ${columnType} to BigInt")
+        }
+    }
+
     public func getDecimal(index: Int64): ?Decimal {
         var columnType = getFieldType(index)
         var dataOp = getBinaryData(index)

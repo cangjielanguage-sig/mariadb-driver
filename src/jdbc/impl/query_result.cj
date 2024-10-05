@@ -3,7 +3,7 @@
  */
 package cjmd.jdbc.impl
 
-import std.math.numeric.Decimal
+import std.math.numeric.{Decimal, BigInt}
 import std.time.DateTime
 import std.io.InputStream
 import encoding.json.JsonValue
@@ -84,6 +84,10 @@ public class QueryResultImpl <: QueryResult {
 
     override public func getDecimal(index: Int64): ?Decimal {
         return resultSet.getDecimal(index)
+    }
+
+    override public func getBigInt(index: Int64): ?BigInt {
+        return resultSet.getBigInt(index)
     }
 
     override public func getDate(index: Int64): ?Date {
@@ -174,6 +178,10 @@ public class QueryResultImpl <: QueryResult {
 
     override public func getDecimal(name: String): ?Decimal {
         return resultSet.getDecimal(getIndexByName(name))
+    }
+
+    override public func getBigInt(name: String): ?BigInt {
+        return resultSet.getBigInt(getIndexByName(name))
     }
 
     override public func getDate(name: String): ?Date {

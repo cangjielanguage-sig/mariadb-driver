@@ -140,6 +140,13 @@ protected class TextResultSet <: ResultSet {
         }
     }
 
+    public override func getBigInt(index: Int64): ?BigInt {
+        match (getString(index)) {
+            case None => None
+            case Some(v) => stringParseToBigInt(index, v)
+        }
+    }
+
     public override func getDecimal(index: Int64): ?Decimal {
         match (getString(index)) {
             case None => None
@@ -321,6 +328,14 @@ protected class TextResultSet <: ResultSet {
             return Float64.parse(str)
         } catch (e: IllegalArgumentException) {
             throw ValueConvertException("Parse to Float64 failed: column name is '${getFieldName(index)}', raw value is ${str}")
+        }
+    }
+
+    private func stringParseToBigInt(index: Int64, str: String): ?BigInt {
+        try {
+            return BigInt(str)
+        } catch (e: IllegalArgumentException) {
+            throw ValueConvertException("Parse to BigInt failed: column name is '${getFieldName(index)}', raw value is ${str}")
         }
     }
 

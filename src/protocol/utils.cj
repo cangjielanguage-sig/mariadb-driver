@@ -8,7 +8,8 @@ import std.binary.*
 import std.time.*
 import std.io.*
 import encoding.hex.*
-
+import std.math.numeric.*
+import encoding.json.*
 /*
  * Bool转整数 true -> 1 false -> 0
  */
@@ -468,6 +469,34 @@ protected func arrayToHexString(array: Array<Byte>): String {
     builder.append("0x")
     builder.append(toHexString(array))
     return builder.toString()
+}
+
+protected func isNone(value: Any): Bool {
+    match (value) {
+        case v: ?Any => if(v.isNone()){return true}else {return false}
+        case v: ?Object => if(v.isNone()){return true}else {return false}
+        case v: ?Bool => if(v.isNone()){return true}else {return false}
+        case v: ?Int8 => if(v.isNone()){return true}else {return false}
+        case v: ?UInt8 => if(v.isNone()){return true}else {return false}
+        case v: ?Int16 => if(v.isNone()){return true}else {return false}
+        case v: ?UInt16 => if(v.isNone()){return true}else {return false}
+        case v: ?Int32 => if(v.isNone()){return true}else {return false}
+        case v: ?UInt32 => if(v.isNone()){return true}else {return false}
+        case v: ?Int64 => if(v.isNone()){return true}else {return false}
+        case v: ?UInt64 => if(v.isNone()){return true}else {return false}
+        case v: ?Float16 => if(v.isNone()){return true}else {return false}
+        case v: ?Float32 => if(v.isNone()){return true}else {return false}
+        case v: ?Float64 => if(v.isNone()){return true}else {return false}
+        case v: ?String => if(v.isNone()){return true}else {return false}
+        case v: ?Array<Byte> => if(v.isNone()){return true}else {return false}
+        case v: ?InputStream => if(v.isNone()){return true}else {return false}
+        case v: ?JsonValue => if(v.isNone()){return true}else {return false}
+        case v: ?DateTime => if(v.isNone()){return true}else {return false}
+        case v: ?Decimal => if(v.isNone()){return true}else {return false}
+        case v: ?BigInt => if(v.isNone()){return true}else {return false}
+        case _ => return false
+    }
+
 }
 
 /*

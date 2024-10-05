@@ -3,7 +3,7 @@
  */
 package cjmd.jdbc
 
-import std.math.numeric.Decimal
+import std.math.numeric.{Decimal, BigInt}
 import std.time.DateTime
 import std.io.InputStream
 import encoding.json.JsonValue
@@ -41,6 +41,8 @@ public interface QueryResult <: Resource {
     func getFloat64(index: Int64): ?Float64
 
     func getDecimal(index: Int64): ?Decimal
+
+    func getBigInt(index: Int64): ?BigInt
 
     func getDate(index: Int64): ?Date
 
@@ -83,6 +85,8 @@ public interface QueryResult <: Resource {
     func getFloat64(name: String): ?Float64
 
     func getDecimal(name: String): ?Decimal
+
+    func getBigInt(name: String): ?BigInt
 
     func getDate(name: String): ?Date
 

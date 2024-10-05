@@ -60,3 +60,9 @@
 ## Bugfix
 
 - 修复了jdbc接口插入Null值失败的bug
+
+# [v0.3.4]
+
+## Feature
+
+- 添加了的BigInt的支持
