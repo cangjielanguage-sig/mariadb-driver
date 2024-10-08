@@ -8,4 +8,4 @@ build
 .vscode/
 output
 cov_output
-tmpFilea*
+tmpFile*

@@ -40,7 +40,8 @@ public class MySqlTest {
         attr.put(Params.Host, "localhost")
         attr.put(Params.Port, "3306")
         attr.put(Params.SSLMode, "disabled")
-        MySqlConnection.createAuthedConnection(attr)
+        var conn = MySqlConnection.createAuthedConnection(attr)
+        conn.close()
     }
 
     @TestCase
@@ -51,7 +52,8 @@ public class MySqlTest {
         attr.put(Params.Host, "localhost")
         attr.put(Params.Port, "3306")
         attr.put(Params.SSLMode, "disabled")
-        MySqlConnection.createAuthedConnection(attr)
+        var conn = MySqlConnection.createAuthedConnection(attr)
+        conn.close()
     }
 
     @TestCase
@@ -62,7 +64,8 @@ public class MySqlTest {
         attr.put(Params.Host, "localhost")
         attr.put(Params.Port, "3306")
         attr.put(Params.SSLMode, "disabled")
-        MySqlConnection.createAuthedConnection(attr)
+        var conn = MySqlConnection.createAuthedConnection(attr)
+        conn.close()
     }
 
     @TestCase
@@ -72,7 +75,8 @@ public class MySqlTest {
         attr.put(Params.Password, "MySql123!")
         attr.put(Params.Host, "localhost")
         attr.put(Params.Port, "3306")
-        MySqlConnection.createAuthedConnection(attr)
+        var conn = MySqlConnection.createAuthedConnection(attr)
+        conn.close()
     }
 
     @TestCase
@@ -82,7 +86,8 @@ public class MySqlTest {
         attr.put(Params.Password, "native_user")
         attr.put(Params.Host, "localhost")
         attr.put(Params.Port, "3306")
-        MySqlConnection.createAuthedConnection(attr)
+        var conn = MySqlConnection.createAuthedConnection(attr)
+        conn.close()
     }
 
     @TestCase
@@ -92,7 +97,8 @@ public class MySqlTest {
         attr.put(Params.Password, "sha256_user")
         attr.put(Params.Host, "localhost")
         attr.put(Params.Port, "3306")
-        MySqlConnection.createAuthedConnection(attr)
+        var conn = MySqlConnection.createAuthedConnection(attr)
+        conn.close()
     }
 
 }

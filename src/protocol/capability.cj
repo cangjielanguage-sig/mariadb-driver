@@ -8,6 +8,7 @@ protected package cjmd.protocol
 * referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/group__group__cs__capabilities__flags.html
 */
 protected enum Capability {
+    
     | LongPassword
     | FoundRows
     | LongFlags

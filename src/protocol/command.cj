@@ -53,9 +53,6 @@ protected class QueryCommand <: Command {
         return list.toArray()
     }
 
-    protected static func create(query: String): QueryCommand {
-        return QueryCommand(query)
-    }
 }
 
 /*
@@ -66,7 +63,7 @@ protected class PrepareCommand <: Command {
 
     private let _sql: String
 
-    internal init(sql: String) {
+    protected init(sql: String) {
         super(StmtPrepare)
         this._length += UInt32(sql.size)
         _sql = sql
@@ -79,9 +76,6 @@ protected class PrepareCommand <: Command {
         return list.toArray()
     }
 
-    protected static func create(sql: String): PrepareCommand {
-        return PrepareCommand(sql)
-    }
 }
 
 

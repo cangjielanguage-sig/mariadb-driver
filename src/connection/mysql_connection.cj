@@ -39,7 +39,9 @@ protected class MySqlConnection <: Resource {
     }
 
     public override func close() {
-        if (!channel.isClosed()) {
+        synchronized(connectionMutex){
+            checkResourceAvailability()
+            writeRequest(QuitCommand())
             channel.close()
         }
     }
@@ -54,7 +56,7 @@ protected class MySqlConnection <: Resource {
     */
     protected func sendCommand(sql: String): Unit {
         synchronized(connectionMutex) {
-            writeRequest(QueryCommand.create(sql))
+            writeRequest(QueryCommand(sql))
             readCommandResponse()
         }
     }
@@ -66,7 +68,7 @@ protected class MySqlConnection <: Resource {
     */
     protected func sendQuery(sql: String): ResultSet {
         synchronized(connectionMutex) {
-            writeRequest(QueryCommand.create(sql))
+            writeRequest(QueryCommand(sql))
             return readQueryResponse()
         }
     }
@@ -78,7 +80,7 @@ protected class MySqlConnection <: Resource {
     */
     protected func sendUpdate(sql: String): ChangeResult {
         synchronized(connectionMutex) {
-            writeRequest(QueryCommand.create(sql))
+            writeRequest(QueryCommand(sql))
             return readUpdateResponse()
         }
     }
@@ -90,7 +92,7 @@ protected class MySqlConnection <: Resource {
     */
     protected func sendPrepare(sql: String): PrepareResult {
         synchronized(connectionMutex) {
-            writeRequest(PrepareCommand.create(sql))
+            writeRequest(PrepareCommand(sql))
             return readPrepareResponse()
         }
     }
@@ -140,7 +142,7 @@ protected class MySqlConnection <: Resource {
             var param = params[i]
             match (param) {
                 case v:InputStream => writeRequest(SendLongDataCommand(statementId, UInt16(i), inputStreamToArray(v)))
-                case v:Array<Byte> => writeRequest(SendLongDataCommand(statementId,  UInt16(i), v))
+                case v:Array<Byte> => writeRequest(SendLongDataCommand(statementId, UInt16(i), v))
                 case v:?InputStream => if(!v.isNone()){writeRequest(SendLongDataCommand(statementId, UInt16(i), inputStreamToArray(v.getOrThrow())))}
                 case v:?Array<Byte> => if(!v.isNone()){writeRequest(SendLongDataCommand(statementId, UInt16(i), v.getOrThrow()))}
                 case _ => nothingTodo(0)
@@ -306,6 +308,12 @@ protected class MySqlConnection <: Resource {
         }
         var ok = OkResponse(stream)
         return ChangeResult(ok.effectRows, ok.index)
+    }
+
+    private func checkResourceAvailability() {
+        if (isClosed()) {
+            throw Exception("The database Connection has been closed")
+        }
     }
 
 

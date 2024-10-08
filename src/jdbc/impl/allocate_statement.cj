@@ -4,7 +4,7 @@
 package cjmd.jdbc.impl
 
 import std.time.DateTime
-import std.math.numeric.Decimal
+import std.math.numeric.{Decimal, BigInt}
 import std.io.InputStream
 import std.collection.ArrayList
 import encoding.json.JsonValue
@@ -86,6 +86,10 @@ public abstract class AllocateStatement <: Statement {
     }
 
     override public func setFloat64(paramIndex: Int64, value: Float16): Unit {
+        setParams(paramIndex, value)
+    }
+
+    override public func setBigInt(paramIndex: Int64, value: BigInt): Unit {
         setParams(paramIndex, value)
     }
 

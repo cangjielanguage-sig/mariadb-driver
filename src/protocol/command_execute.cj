@@ -140,6 +140,7 @@ protected class ExecuteCommand <: Command {
                         case v: Float16 => length += appendFloat16(i, list, v)
                         case v: Float32 => length += appendFloat32(i, list, v)
                         case v: Float64 => length += appendFloat64(i, list, v)
+                        case v: BigInt => length += appendBigInt(i, list, v)
                         case v: Decimal => length += appendDecimal(i, list, v)
                         case v: String => length += appendString(i, list, v)
                         case v: DateTime => length += appendDateTime(i, list, v)
@@ -487,6 +488,13 @@ protected class ExecuteCommand <: Command {
             }
         }
         return 0
+    }
+
+    private func appendBigInt(index: Int64, list: ArrayList<Byte>, value: ?BigInt): Int64 {
+        match (value) {
+            case None => 0
+            case Some(s) => appendString(index, list, s.toString(10))
+        }
     }
 
     private func appendDecimal(index: Int64, list: ArrayList<Byte>, value: ?Decimal): Int64 {

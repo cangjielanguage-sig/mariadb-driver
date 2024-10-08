@@ -16,7 +16,8 @@ public class TidbTest {
         attr.put(Params.Host, "gateway01.ap-northeast-1.prod.aws.tidbcloud.com")
         attr.put(Params.Port, "4000")
         //attr.put(Params.SSLMode, "disabled")
-        MySqlConnection.createAuthedConnection(attr)
+        var conn = MySqlConnection.createAuthedConnection(attr)
+        conn.close()
     }
 
 }

@@ -4,11 +4,13 @@
 package cjmd.jdbc.impl
 
 import std.sync.*
+import std.time.*
 import std.collection.*
 import std.regex.*
 import cjmd.protocol.nothingTodo
 import cjmd.result.*
 import cjmd.jdbc.*
+
 public class ServerPrepareStatement <: AllocateStatement {
 
     private var _id: UInt32
@@ -32,8 +34,8 @@ public class ServerPrepareStatement <: AllocateStatement {
         checkResourceAvailability()
         for(i in 0..params.size){
             match(params[i]){
-                case v: Date => params[i] = v.dateTime
-                case v: Time => params[i] = v.dateTime
+                case v: Date => params[i] = DateTime.of(year: v.year, month: v.month, dayOfMonth: v.dayOfMonth)
+                case v: Time => params[i] = DateTime.of(year: 1970, month: 1, dayOfMonth: 1, hour: v.hour, minute: v.minute, second: v.second)
                 case _ => nothingTodo(0)
             }
         }
@@ -45,8 +47,8 @@ public class ServerPrepareStatement <: AllocateStatement {
         checkResourceAvailability()
         for(i in 0..params.size){
             match(params[i]){
-                case v: Date => params[i] = v.dateTime
-                case v: Time => params[i] = v.dateTime
+                case v: Date => params[i] = DateTime.of(year: v.year, month: v.month, dayOfMonth: v.dayOfMonth)
+                case v: Time => params[i] = DateTime.of(year: 1970, month: 1, dayOfMonth: 1, hour: v.hour, minute: v.minute, second: v.second)
                 case _ => nothingTodo(0)
             }
         }

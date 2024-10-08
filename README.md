@@ -3,7 +3,7 @@
 </div>
 
 <p align="center">
-<img alt="" src="https://img.shields.io/badge/release-v0.3.4-brightgreen" style="display: inline-block;" />
+<img alt="" src="https://img.shields.io/badge/release-v0.3.5-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/cjc-v0.55.3-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/state-孵化-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/domain-HOS/Cloud-brightgreen" style="display: inline-block;" />
@@ -96,7 +96,7 @@ main(){
 
 ##### 插入数据
 
-```
+```cangjie
 import cjmd.cdbc.*
 import std.database.sql.*
 import std.time.DateTime
@@ -132,7 +132,7 @@ main(){
 
 ##### 查询数据
 
-```
+```cangjie
 import cjmd.cdbc.*
 import std.database.sql.*
 
@@ -165,7 +165,7 @@ main(){
 
 ##### 获取事务对象
 
-```
+```cangjie
 import cjmd.cdbc.*
 import std.database.sql.*
 
@@ -186,7 +186,7 @@ main(){
 
 ##### 插入数据
 
-```
+```cangjie
 import cjmd.jdbc.*
 import cjmd.jdbc.impl.*
 
@@ -319,7 +319,7 @@ main() {
 
 ##### 查询数据
 
-```
+```cangjie
 import cjmd.jdbc.*
 import cjmd.jdbc.impl.*
 

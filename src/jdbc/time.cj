@@ -3,60 +3,110 @@
  */
 package cjmd.jdbc
 
-import std.time.DateTime
-import std.convert.*
-public class Time <: ToString {
+import std.time.{DateTime, TimeZone}
 
-    private var _dateTime: DateTime
+public class Time <: ToString & Comparable<Time> & Hashable {
 
-    public prop dateTime: DateTime {
+    private var delegate: DateTime
+
+    public init(hour: Int64, minute: Int64, second: Int64, timeZone!: TimeZone = TimeZone.Local) {
+        delegate = DateTime.of(year: 1970, month: 1, dayOfMonth: 1, hour: hour, minute: minute, second: second, timeZone: timeZone)
+    }
+
+    public prop hour: Int64 {
         get() {
-            _dateTime
+            delegate.hour
         }
     }
 
-    /*
-    * 通过时分秒进行构造
-    */
-    public init(hour: Int64, minute: Int64, second: Int64) {
-        _dateTime = DateTime.of(year: 1970, month: 1, dayOfMonth: 1, hour: hour, minute: minute, second: second)
+    public prop minute: Int64 {
+        get() {
+            delegate.minute
+        }
     }
 
-
-    /*
-    * 通过DateTime实例构造
-    */
-    public init(dateTime: DateTime) {
-        _dateTime = dateTime
+    public prop second: Int64 {
+        get() {
+            delegate.second
+        }
     }
 
-    /*
-    * 通过Unix时间戳构造
-    */
-    public init(time: Int64) {
-        _dateTime = DateTime.fromUnixTimeStamp(time * Duration.second)
+    public prop zone: TimeZone {
+        get() {
+            delegate.zone
+        }
+    }
+
+    public prop zoneId: String {
+        get() {
+            delegate.zoneId
+        }
+    }
+
+    public prop zoneOffset: Duration {
+        get() {
+            delegate.zoneOffset
+        }
+    }
+
+    public func addHours(hours: Int64): Time {
+        return fromDateTime(delegate.addHours(hours))
+    }
+
+    public func addMinutes(minutes: Int64): Time {
+        return fromDateTime(delegate.addMinutes(minutes))
+    }
+
+    public func addSeconds(seconds: Int64): Time {
+        return fromDateTime(delegate.addSeconds(seconds))
+    }
+
+    public override func hashCode(): Int64 {
+        return delegate.hashCode()
+    }
+
+    public override func compare(time: Time): Ordering {
+        return delegate.compare(time.delegate)
+    }
+
+    public operator func != (time: Time): Bool {
+        return delegate != time.delegate
+    }
+
+    public operator func == (time: Time): Bool {
+        return delegate == time.delegate
+    }
+
+    public operator func > (time: Time): Bool {
+        return delegate > time.delegate
+    }
+
+    public operator func < (time: Time): Bool {
+        return delegate < time.delegate
+    }
+
+    public operator func <= (time: Time): Bool {
+        return delegate <= time.delegate
+    }
+
+    public operator func >= (time: Time): Bool {
+        return delegate >= time.delegate
     }
 
     public override func toString(): String {
-        _dateTime.toString("hh:mm:ss")
+        return delegate.toString("HH:mm:ss")
     }
 
     public func toString(foramt: String): String {
-        return _dateTime.toString(foramt)
+        return delegate.toString(foramt)
     }
 
+    public static func fromDateTime(dateTime: DateTime): Time {
+        return Time(dateTime.hour, dateTime.minute, dateTime.second, timeZone: dateTime.zone)
+    }
 
-    public static func valueOf(time: String): Time{
-        var firstColon = time.indexOf(':').getOrThrow({=>IllegalArgumentException()})
-        var secondColon = time.indexOf(':', firstColon + 1).getOrThrow({=>IllegalArgumentException()})
-        if(firstColon > 0 && secondColon > 0 && secondColon < time.size - 1) {
-            var hour = Int64.parse(time[0..firstColon])
-            var minute = Int64.parse(time[(firstColon + 1) .. secondColon])
-            var second = Int64.parse(time[(secondColon + 1) .. time.size])
-             return Time(hour, minute, second);
-        }else {
-            throw IllegalArgumentException()
-        }
+    public static func now(timeZone!: TimeZone = TimeZone.Local): Time {
+        return fromDateTime(DateTime.now(timeZone: timeZone))
     }
 
 }

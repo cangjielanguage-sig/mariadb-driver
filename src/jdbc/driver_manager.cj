@@ -8,7 +8,7 @@ import std.collection.concurrent.ConcurrentHashMap
 
 public class DriverManager {
 
-    private static let driversMap: ConcurrentHashMap<String, Driver> = ConcurrentHashMap<String, Driver>(3)
+    private static let driversMap: ConcurrentHashMap<String, Driver> = ConcurrentHashMap<String, Driver>()
 
     public static func deregister(driverName: String): Unit {
         driversMap.remove(driverName)

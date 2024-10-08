@@ -18,9 +18,7 @@ import encoding.json.*
 @Test
 public class OceanBaseTest{
 
-
     private var connection: Connection
-
 
     init() {
         var driver = MySqlDriver.instance

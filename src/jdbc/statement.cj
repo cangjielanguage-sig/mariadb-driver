@@ -4,7 +4,7 @@
 package cjmd.jdbc
 
 import std.time.DateTime
-import std.math.numeric.Decimal
+import std.math.numeric.{Decimal, BigInt}
 import std.io.InputStream
 import encoding.json.JsonValue
 import std.collection.ArrayList
@@ -46,6 +46,8 @@ public interface Statement <: Resource {
     func setFloat32(paramIndex: Int64, value: Float16): Unit
 
     func setFloat64(paramIndex: Int64, value: Float16): Unit
+
+    func setBigInt(paramIndex: Int64, value: BigInt): Unit
 
     func setDecimal(paramIndex: Int64, value: Decimal): Unit
 

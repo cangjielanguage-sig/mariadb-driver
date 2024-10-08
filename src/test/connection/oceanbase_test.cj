@@ -16,7 +16,8 @@ public class OceanBaseTest {
         attr.put(Params.Host, "obmtm94oeja8d1h0-mi.cn-hangzhou.oceanbase.aliyuncs.com")
         attr.put(Params.Port, "3306")
         attr.put(Params.SSLMode, "disabled")
-        MySqlConnection.createAuthedConnection(attr)
+        var conn = MySqlConnection.createAuthedConnection(attr)
+        conn.close()
     }
 
     @TestCase
@@ -26,7 +27,8 @@ public class OceanBaseTest {
         attr.put(Params.Password, "^ynAW@7W5Fdxi6f")
         attr.put(Params.Host, "obmtm94oeja8d1h0-mi.cn-hangzhou.oceanbase.aliyuncs.com")
         attr.put(Params.Port, "3306")
-        MySqlConnection.createAuthedConnection(attr)
+        var conn = MySqlConnection.createAuthedConnection(attr)
+        conn.close()
     }
 
 }

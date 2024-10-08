@@ -18,9 +18,7 @@ import encoding.json.*
 @Test
 public class MySqlTest{
 
-
     private var connection: Connection
-
 
     init() {
         var driver = MySqlDriver.instance
@@ -368,7 +366,7 @@ public class MySqlTest{
                                 tinyblob_col,
                                 blob_col,
                                 mediumblob_col,
-                                longblob_col) 
+                                longblob_col)
                                 values
                                 (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"###
         var prepare = connection.prepareStatement(sql)

@@ -93,14 +93,14 @@ public class QueryResultImpl <: QueryResult {
     override public func getDate(index: Int64): ?Date {
         match (resultSet.getDate(index)) {
             case None => None
-            case Some(v) => Date(v)
+            case Some(v) => Date.fromDateTime(v)
         }
     }
 
     override public func getTime(index: Int64): ?Time {
         match (resultSet.getTime(index)) {
             case None => None
-            case Some(v) => Time(v)
+            case Some(v) => Time.fromDateTime(v)
         }
     }
 
@@ -187,14 +187,14 @@ public class QueryResultImpl <: QueryResult {
     override public func getDate(name: String): ?Date {
         match (resultSet.getDate(getIndexByName(name))) {
             case None => None
-            case Some(v) => Date(v)
+            case Some(v) => Date.fromDateTime(v)
         }
     }
 
     override public func getTime(name: String): ?Time {
         match (resultSet.getTime(getIndexByName(name))) {
             case None => None
-            case Some(v) => Time(v)
+            case Some(v) => Time.fromDateTime(v)
         }
     }
 

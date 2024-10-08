@@ -66,3 +66,9 @@
 ## Feature
 
 - 添加了的BigInt的支持
+
+# [v0.3.5]
+
+## Feature
+
+- 完善了jdbc接口中的Date、Time类型

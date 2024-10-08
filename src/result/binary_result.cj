@@ -188,7 +188,7 @@ protected class BinaryResultSet <: ResultSet {
         if(dataOp.isNone()){
             return None
         }
-        var data = dataOp.getOrThrow()
+        //var data = dataOp.getOrThrow()
         match (columnType) {
             case Tiny => return BigInt(getInt8(index).getOrThrow())
             case Short | Year => return BigInt(getInt16(index).getOrThrow())

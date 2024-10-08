@@ -35,8 +35,13 @@ protected enum CommandType {
     | StmtSendLongData
     | StmtClose
     | StmtReset
-    | StmtOption
+    | SetOption
     | StmtFetch
+    | Daemon
+    | BingLongDumpGTID
+    | ResetConnection
+    | Clone 
+    | SubscribeGroupReplicationStream
 
     public func value(): Byte{
         match(this){
@@ -67,8 +72,14 @@ protected enum CommandType {
             case StmtSendLongData => 0x18
             case StmtClose => 0x19
             case StmtReset => 0x1A
-            case StmtOption => 0x1B
+            case SetOption => 0x1B
             case StmtFetch => 0x1C
+            //uncheck
+            case Daemon => 0x1D
+            case BingLongDumpGTID => 0x1E
+            case ResetConnection => 0x1F
+            case Clone => 0x20
+            case SubscribeGroupReplicationStream => 0x21
         }
     }
 
@@ -101,8 +112,13 @@ protected enum CommandType {
             case 0x18 => StmtSendLongData
             case 0x19 => StmtClose
             case 0x1A => StmtReset
-            case 0x1B => StmtOption
+            case 0x1B => SetOption
             case 0x1C => StmtFetch
+            case 0x1D => Daemon
+            case 0x1E => BingLongDumpGTID
+            case 0x1F => ResetConnection
+            case 0x20 => Clone
+            case 0x21 => SubscribeGroupReplicationStream
             case _ => throw Exception("Don't have this CommandType by value: ${value}")
         }
     }

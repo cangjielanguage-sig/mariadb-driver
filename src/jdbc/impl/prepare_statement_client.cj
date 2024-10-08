@@ -9,7 +9,7 @@ import std.time.*
 import std.io.*
 import std.sync.*
 import std.regex.*
-import std.math.numeric.Decimal
+import std.math.numeric.{Decimal, BigInt}
 import encoding.json.*
 import encoding.hex.*
 import cjmd.connection.*
@@ -106,6 +106,8 @@ public class ClientPrepareStatement <: AllocateStatement {
                     setParamWithoutQuotation(replacer, v.toString())
                 case v: Float64 => 
                     setParamWithoutQuotation(replacer, v.toString())
+                case v: BigInt =>
+                    setParamWithQuotation(replacer, v.toString())
                 case v: Decimal =>
                      setParamWithQuotation(replacer, v.toString())
                 case v: Date => 

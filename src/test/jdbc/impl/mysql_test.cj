@@ -99,9 +99,9 @@ public class MySqlTest{
         //decimal
         prepare.setDecimal(13, Decimal("1234.56789"))
         //date
-        prepare.setDate(14, Date(DateTime.now()))
+        prepare.setDate(14, Date.now())
         //time
-        prepare.setTime(15, Time(DateTime.now()))
+        prepare.setTime(15, Time.now())
         //datetime
         prepare.setDateTime(16, DateTime.now()) 
         //timestamp
