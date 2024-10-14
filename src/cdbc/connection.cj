@@ -1,15 +1,15 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-package cjmd.cdbc
+package mysqlclient4cj.cdbc
 
 import std.database.sql.*
-import cjmd.connection.*
 import std.collection.*
-import cjmd.result.*
-import cjmd.protocol.*
 import std.sync.*
 import std.convert.*
+import mysqlclient4cj.result.*
+import mysqlclient4cj.protocol.*
+import mysqlclient4cj.connection.*
 
 public class ConnectionImpl <: Connection{
     

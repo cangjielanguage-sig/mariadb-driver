@@ -1,16 +1,16 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-protected package cjmd.result
+protected package mysqlclient4cj.result
 
 import std.time.*
 import std.convert.*
 import std.io.*
-import encoding.json.*
-import cjmd.protocol.*
 import std.math.numeric.*
 import std.collection.Map
 import std.collection.HashMap
+import encoding.json.*
+import mysqlclient4cj.protocol.*
 
 protected class BinaryResultSet <: ResultSet {
 

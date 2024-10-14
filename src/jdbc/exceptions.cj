@@ -1,4 +1,4 @@
-package cjmd.jdbc
+package mysqlclient4cj.jdbc
 
 public class SqlException <: Exception {
 

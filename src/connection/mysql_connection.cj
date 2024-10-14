@@ -2,9 +2,8 @@
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  * @author Yesokim
  */
-protected package cjmd.connection
+protected package mysqlclient4cj.connection
 
-import cjmd.protocol.*
 import std.net.*
 import std.collection.*
 import std.convert.*
@@ -16,7 +15,8 @@ import crypto.x509.*
 import crypto.keys.*
 import std.time.*
 import std.sort.*
-import cjmd.result.*
+import mysqlclient4cj.result.*
+import mysqlclient4cj.protocol.*
 
 protected class MySqlConnection <: Resource {
 

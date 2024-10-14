@@ -1,7 +1,7 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-package cjmd.jdbc
+package mysqlclient4cj.jdbc
 
 import std.time.{DateTime, TimeZone, DayOfWeek, Month, DateTimeFormat}
 

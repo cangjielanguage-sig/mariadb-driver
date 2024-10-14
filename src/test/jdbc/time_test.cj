@@ -1,8 +1,8 @@
-protected package cjmd.test.jdbc
+protected package mysqlclient4cj.test.jdbc
 
 import std.unittest.*
 import std.unittest.testmacro.*
-import cjmd.jdbc.Time
+import mysqlclient4cj.jdbc.Time
 import std.time.*
 @Test
 public class Test {

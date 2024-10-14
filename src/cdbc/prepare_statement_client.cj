@@ -1,21 +1,20 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-package cjmd.cdbc
+package mysqlclient4cj.cdbc
 
 import std.database.sql.*
 import std.collection.*
 import std.convert.*
 import std.time.*
 import std.io.*
-import encoding.json.*
-import encoding.hex.*
-import cjmd.connection.*
-import cjmd.result.*
 import std.sync.*
 import std.regex.*
-import cjmd.protocol.*
-
+import encoding.json.*
+import encoding.hex.*
+import mysqlclient4cj.protocol.*
+import mysqlclient4cj.connection.*
+import mysqlclient4cj.result.*
 public class ClientPrepareStatement <: Statement {
 
     private static const PLACEHOLDER: String = "?"

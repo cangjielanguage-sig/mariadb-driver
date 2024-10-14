@@ -1,8 +1,8 @@
-protected package cjmd.test.connection
+protected package mysqlclient4cj.test.connection
 
 import std.unittest.*
 import std.unittest.testmacro.*
-import cjmd.connection.*
+import mysqlclient4cj.connection.*
 import std.collection.*
 
 /*

@@ -72,3 +72,7 @@
 ## Feature
 
 - 完善了jdbc接口中的Date、Time类型
+
+# [v0.4.0]
+
+项目更名为**mysqlclient4cj**

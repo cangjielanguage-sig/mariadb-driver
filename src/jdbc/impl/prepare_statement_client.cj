@@ -1,7 +1,7 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-package cjmd.jdbc.impl
+package mysqlclient4cj.jdbc.impl
 
 import std.collection.*
 import std.convert.*
@@ -12,10 +12,10 @@ import std.regex.*
 import std.math.numeric.{Decimal, BigInt}
 import encoding.json.*
 import encoding.hex.*
-import cjmd.connection.*
-import cjmd.result.*
-import cjmd.protocol.*
-import cjmd.jdbc.*
+import mysqlclient4cj.connection.*
+import mysqlclient4cj.result.*
+import mysqlclient4cj.protocol.*
+import mysqlclient4cj.jdbc.*
 
 public class ClientPrepareStatement <: AllocateStatement {
 

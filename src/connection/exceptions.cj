@@ -1,7 +1,7 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-protected package cjmd.connection
+protected package mysqlclient4cj.connection
 
 /*
 * 服务器响应Error异常,表示执行命令后服务器响应Error

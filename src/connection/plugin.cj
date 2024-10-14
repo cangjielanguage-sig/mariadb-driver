@@ -1,7 +1,7 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-protected package cjmd.connection
+protected package mysqlclient4cj.connection
 
 import crypto.digest.*
 import crypto.keys.*

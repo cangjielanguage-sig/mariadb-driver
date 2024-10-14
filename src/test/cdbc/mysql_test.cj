@@ -1,19 +1,19 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-protected package cjmd.test.cdbc
+protected package mysqlclient4cj.test.cdbc
 
 
 import std.unittest.*
 import std.unittest.testmacro.*
 import std.database.sql.*
-import cjmd.cdbc.*
+import mysqlclient4cj.cdbc.*
 import std.time.*
 import std.sync.*
 import std.fs.*
 import std.io.*
 import std.math.numeric.*
-import cjmd.protocol.*
+import mysqlclient4cj.protocol.*
 import encoding.json.*
 @Test
 public class MySqlTest{
@@ -134,7 +134,7 @@ public class MySqlTest{
         stream3.write([145,67,34,12,45,32,76,90,62,145,24,56,234,34,235,56,67,145,67,34,12,45,32,76,90,62,145,24,56,234,34,235,56,67,145,67,34,12,45,32,76,90,62,145,24,56,234,34,235,56,67,145,67,34,12,45,32,76,90,62,145,24,56,234,34,235,56,67])
         var p27 = SqlBlob(stream3)
         //longblob
-        var file = File("C:\\Users\\30247\\Desktop\\cjmd\\doc\\1.jpg",  OpenOption.Open(true, true))
+        var file = File("C:\\Users\\30247\\Desktop\\mysqlclient4cj\\doc\\1.jpg",  OpenOption.Open(true, true))
         var array = file.readToEnd()
         var stream4 = ByteArrayStream()
         stream4.write(array)

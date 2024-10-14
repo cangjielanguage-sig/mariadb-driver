@@ -1,18 +1,17 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-package cjmd.cdbc
+package mysqlclient4cj.cdbc
 
 import std.database.sql.DriverManager
 import std.database.sql.*
 import std.convert.*
-import encoding.url.*
 import std.log.*
 import std.console.*
 import std.collection.*
-import cjmd.connection.*
 import std.time.*
-
+import encoding.url.*
+import mysqlclient4cj.connection.*
 
 public class MySqlDriver <: Driver {
 

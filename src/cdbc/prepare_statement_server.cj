@@ -2,13 +2,13 @@
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
 
-package cjmd.cdbc
+package mysqlclient4cj.cdbc
 
 import std.database.sql.*
 import std.sync.*
 import std.collection.*
-import cjmd.result.*
 import std.regex.*
+import mysqlclient4cj.result.*
 
 public class ServerPrepareStatement <: Statement {
 

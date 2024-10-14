@@ -1,12 +1,12 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-package cjmd.cdbc
+package mysqlclient4cj.cdbc
 
 import std.database.sql.ColumnInfo
 import std.database.sql.*
-import cjmd.connection.*
-import cjmd.protocol.*
+import mysqlclient4cj.connection.*
+import mysqlclient4cj.protocol.*
 
 public class ColumnInfoImpl <: ColumnInfo {
 

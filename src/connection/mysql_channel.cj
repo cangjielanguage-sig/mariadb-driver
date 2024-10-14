@@ -1,9 +1,9 @@
-protected package cjmd.connection
+protected package mysqlclient4cj.connection
 
 import std.net.*
-import cjmd.protocol.littleEndianToUInt32
 import std.io.IOException
 import std.collection.ArrayList
+import mysqlclient4cj.protocol.littleEndianToUInt32
 
 protected class MySqlChannel <: Resource {
 

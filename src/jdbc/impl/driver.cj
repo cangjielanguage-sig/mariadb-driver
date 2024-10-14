@@ -1,11 +1,11 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-package cjmd.jdbc.impl
+package mysqlclient4cj.jdbc.impl
 
 import encoding.url.*
-import cjmd.connection.Params
-import cjmd.jdbc.*
+import mysqlclient4cj.connection.Params
+import mysqlclient4cj.jdbc.*
 
 public class MySqlDriver <: Driver {
  
@@ -20,7 +20,7 @@ public class MySqlDriver <: Driver {
     private init() {}
 
     public func open(url: String, opts: Array<(String, String)>): Datasource {
-         if (url.size == 0) {
+        if (url.size == 0) {
             throw IllegalArgumentException("empty url")
         }
         try {

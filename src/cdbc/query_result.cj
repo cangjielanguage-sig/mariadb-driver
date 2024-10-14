@@ -1,17 +1,17 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-package cjmd.cdbc
+package mysqlclient4cj.cdbc
 
 import std.database.sql.*
-import cjmd.connection.*
-import cjmd.result.*
 import std.convert.*
 import std.time.*
 import std.io.*
-import encoding.json.*
 import std.sync.*
 import std.collection.ArrayList
+import encoding.json.*
+import mysqlclient4cj.connection.*
+import mysqlclient4cj.result.*
 
 public class QueryResultImpl <: QueryResult {
     

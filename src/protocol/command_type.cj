@@ -1,7 +1,7 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-protected package cjmd.protocol
+protected package mysqlclient4cj.protocol
 
 /*
 * A list of all MySQL protocol commands.
