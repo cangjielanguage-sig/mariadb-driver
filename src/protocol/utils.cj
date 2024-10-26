@@ -148,7 +148,7 @@ protected  func littleEndianToFloat64(array: Array<Byte>): Float64 {
  * None 表示数据库Null值
  */
 protected func readLengthEncodedString(array: Array<Byte>): ?Array<Byte> {
-    var stream = ByteArrayStream()
+    var stream = ByteBuffer()
     stream.write(array)
     return readLengthEncodedString(stream)
 }
@@ -453,7 +453,7 @@ protected func inputStreamToArray(inputStream: InputStream): Array<Byte> {
  * Array转InputStream
  */
 protected func arrayToInputStream(array: Array<Byte>): InputStream {
-    var stream = ByteArrayStream(array.size)
+    var stream = ByteBuffer(array.size)
     stream.write(array)
     return stream
 }

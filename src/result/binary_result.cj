@@ -246,7 +246,7 @@ protected class BinaryResultSet <: ResultSet {
             return None
         }
         var data = dataOp.getOrThrow()
-        var stream = ByteArrayStream()
+        var stream = ByteBuffer()
         stream.write(data)
         return stream
     }

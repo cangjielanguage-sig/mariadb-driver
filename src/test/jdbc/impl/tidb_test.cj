@@ -120,20 +120,20 @@ public class TidbTest {
         //longtext
         prepare.setString(24, "这少年便是闰土。我认识他时，也不过十多岁，离现在将有三十年了；那时我的父亲还在世，家景也好，我正是一个少爷。那一年，我家是一件大祭祀的值年⑶。这祭祀，说是三十多年才能轮到一回，所以很郑重；正月里供祖像，供品很多，祭器很讲究，拜的人也很多，祭器也很要防偷去。我家只有一个忙月（我们这里给人做工的分三种：整年给一定人家做工的叫长工；按日给人做工的叫短工；自己也种地，只在过年过节以及收租时候来给一定人家做工的称忙月），忙不过来，他便对父亲说，可以叫他的儿子闰土来管祭器的。\r\n\r\n我的父亲允许了；我也很高兴，因为我早听到闰土这名字，而且知道他和我仿佛年纪，闰月生的，五行缺土⑷，所以他的父亲叫他闰土。他是能装〔弓京〕捉小鸟雀的。\r\n\r\n我于是日日盼望新年，新年到，闰土也就到了。好容易")
         //tinyblob
-        var stream = ByteArrayStream()
+        var stream = ByteBuffer()
         stream.write([])
         prepare.setInputStream(25, stream)
         //blob
         var bytes: Array<Byte> = [145,67,34,12,45,32,76,90,62,145,24,56,234,34,235,56,67,145,67,34,12,45,32,76,90,62,145,24,56,234,34,235,56,67,145,67,34,12,45,32,76,90,62,145,24,56,234,34,235,56,67,145,67,34,12,45,32,76,90,62,145,24,56,234,34,235,56,67]
         prepare.setArray(26, bytes)
         //mediumblob
-        stream = ByteArrayStream()
+        stream = ByteBuffer()
         stream.write([145,67,34,12,45,32,76,90,62,145,24,56,234,34,235,56,67,145,67,34,12,45,32,76,90,62,145,24,56,234,34,235,56,67,145,67,34,12,45,32,76,90,62,145,24,56,234,34,235,56,67,145,67,34,12,45,32,76,90,62,145,24,56,234,34,235,56,67])
         prepare.setInputStream(27, stream)
         //longblob
         var file = File("C:\\Users\\30247\\Desktop\\mysqlclient4cj\\doc\\1.jpg",  OpenOption.Open(true, true))
-        var array = file.readToEnd()
-        var image = ByteArrayStream()
+        var array = readToEnd(file)
+        var image = ByteBuffer()
         image.write(array)
         prepare.setInputStream(28, image)
         //json
