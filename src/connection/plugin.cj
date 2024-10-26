@@ -57,9 +57,9 @@ internal func performFullAuthentication(pubPem: String,password: Array<Byte>, sa
         x++
     }
     var publicKey = RSAPublicKey.decodeFromPem(pubPem)
-    var inStream = ByteArrayStream()
+    var inStream = ByteBuffer()
     inStream.write(pwd)
-    var outStream = ByteArrayStream()
+    var outStream = ByteBuffer()
     publicKey.encrypt(inStream, outStream,padType: PadOption.OAEP(OAEPOption(SHA1(), SHA1(), label: "")))
     return outStream.bytes()
 }
