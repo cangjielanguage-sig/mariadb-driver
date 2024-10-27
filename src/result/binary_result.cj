@@ -13,7 +13,7 @@ import encoding.json.*
 import mysqlclient4cj.protocol.*
 
 protected class BinaryResultSet <: ResultSet {
-
+    
     private var columns: Array<ColumnDefinition>
 
     private var rows: Array<BinaryResult>
@@ -27,11 +27,11 @@ protected class BinaryResultSet <: ResultSet {
         this.rows = rows
         this.currentRow = 0
         indexMap = HashMap<String, Int64>()
-        for(i in 0..columns.size){
+        for (i in 0..columns.size) {
             indexMap.put(columns[i].name, i + 1)
         }
     }
-    
+
     public override prop rowSize: Int64 {
         get() {
             rows.size
@@ -45,10 +45,10 @@ protected class BinaryResultSet <: ResultSet {
     }
 
     public func next(): Bool {
-        if(currentRow >= rowSize){
+        if (currentRow >= rowSize) {
             return false
-        }else {
-            currentRow ++
+        } else {
+            currentRow++
             return true
         }
     }
@@ -59,10 +59,14 @@ protected class BinaryResultSet <: ResultSet {
 
     public override func getBool(index: Int64): ?Bool {
         var val = getString(index)
-        if(val.isNone()){
+        if (val.isNone()) {
             return None
         }
-        if(val == "1"){return true}else {return false}
+        if (val == "1") {
+            return true
+        } else {
+            return false
+        }
     }
 
     @OverflowWrapping
@@ -76,7 +80,7 @@ protected class BinaryResultSet <: ResultSet {
     public override func getUInt8(index: Int64): ?UInt8 {
         match (getUInt64(index)) {
             case Some(v) => UInt8(v)
-            case None =>  None
+            case None => None
         }
     }
 
@@ -121,7 +125,7 @@ protected class BinaryResultSet <: ResultSet {
     public override func getUInt64(index: Int64): ?UInt64 {
         var columnType = getFieldType(index)
         var dataOp = getBinaryData(index)
-        if(dataOp.isNone()){
+        if (dataOp.isNone()) {
             return None
         }
         var data = dataOp.getOrThrow()
@@ -130,16 +134,15 @@ protected class BinaryResultSet <: ResultSet {
             case Short | Year => return UInt64(littleEndianToUInt16(data))
             case Long | Int24 => return UInt64(littleEndianToUInt32(data))
             case LongLong => return littleEndianToUInt64(data)
-            case Float => 
-                return UInt64(getFloat32(index).getOrThrow())
-            case Double => 
-                return UInt64(getFloat64(index).getOrThrow())
-            case String | VarString | NewDecimal => 
+            case Float => return UInt64(getFloat32(index).getOrThrow())
+            case Double => return UInt64(getFloat64(index).getOrThrow())
+            case String | VarString | NewDecimal =>
                 var str = getString(index).getOrThrow()
                 try {
                     return UInt64.parse(str)
-                }catch (e: IllegalArgumentException) {
-                    throw ValueConvertException("Parse to Integer failed: column name is '${getFieldName(index)}', raw value is ${str}")
+                } catch (e: IllegalArgumentException) {
+                    throw ValueConvertException(
+                        "Parse to Integer failed: column name is '${getFieldName(index)}', raw value is ${str}")
                 }
             case _ => throw ValueConvertException("Unsupported conversion from ${columnType} to Integer")
         }
@@ -155,7 +158,7 @@ protected class BinaryResultSet <: ResultSet {
     public override func getFloat32(index: Int64): ?Float32 {
         var columnType = getFieldType(index)
         var dataOp = getBinaryData(index)
-        if(dataOp.isNone()){
+        if (dataOp.isNone()) {
             return None
         }
         var data = dataOp.getOrThrow()
@@ -170,7 +173,7 @@ protected class BinaryResultSet <: ResultSet {
     public override func getFloat64(index: Int64): ?Float64 {
         var columnType = getFieldType(index)
         var dataOp = getBinaryData(index)
-        if(dataOp.isNone()){
+        if (dataOp.isNone()) {
             return None
         }
         var data = dataOp.getOrThrow()
@@ -185,7 +188,7 @@ protected class BinaryResultSet <: ResultSet {
     public override func getBigInt(index: Int64): ?BigInt {
         var columnType = getFieldType(index)
         var dataOp = getBinaryData(index)
-        if(dataOp.isNone()){
+        if (dataOp.isNone()) {
             return None
         }
         //var data = dataOp.getOrThrow()
@@ -202,7 +205,7 @@ protected class BinaryResultSet <: ResultSet {
     public func getDecimal(index: Int64): ?Decimal {
         var columnType = getFieldType(index)
         var dataOp = getBinaryData(index)
-        if(dataOp.isNone()){
+        if (dataOp.isNone()) {
             return None
         }
         match (columnType) {
@@ -216,7 +219,7 @@ protected class BinaryResultSet <: ResultSet {
     public override func getDate(index: Int64): ?DateTime {
         return getTimestamp(index)
     }
-    
+
     public override func getTime(index: Int64): ?DateTime {
         return getTimestamp(index)
     }
@@ -228,7 +231,7 @@ protected class BinaryResultSet <: ResultSet {
     public func getTimestamp(index: Int64): ?DateTime {
         var columnType = getFieldType(index)
         var dataOp = getBinaryData(index)
-        if(dataOp.isNone()){
+        if (dataOp.isNone()) {
             return None
         }
         var data = dataOp.getOrThrow()
@@ -241,14 +244,10 @@ protected class BinaryResultSet <: ResultSet {
     }
 
     public override func getInputStream(index: Int64): ?InputStream {
-        var dataOp = getBinaryData(index)
-        if(dataOp.isNone()){
-            return None
+        match (getBinaryData(index)) {
+            case None => return None
+            case Some(v) => return arrayToInputStream(v)
         }
-        var data = dataOp.getOrThrow()
-        var stream = ByteBuffer()
-        stream.write(data)
-        return stream
     }
 
     @OverflowWrapping
@@ -257,42 +256,39 @@ protected class BinaryResultSet <: ResultSet {
         var unsigned = getFieldIsUnsigned(index)
         //var charset = getFieldCharset(index)
         var dataOp = getBinaryData(index)
-        if(dataOp.isNone()){
+        if (dataOp.isNone()) {
             return None
         }
         var data = dataOp.getOrThrow()
         match (columnType) {
-            case Tiny => 
-                if(!unsigned){
+            case Tiny =>
+                if (!unsigned) {
                     return getInt8(index).getOrThrow().toString()
-                }else{
+                } else {
                     return getUInt8(index).getOrThrow().toString()
                 }
             case Short | Year =>
-                if(!unsigned){
+                if (!unsigned) {
                     return getInt16(index).getOrThrow().toString()
-                }else{
+                } else {
                     return getUInt16(index).getOrThrow().toString()
                 }
             case Long | Int24 =>
-                if(!unsigned){
+                if (!unsigned) {
                     return getInt32(index).getOrThrow().toString()
-                }else{
+                } else {
                     return getUInt32(index).getOrThrow().toString()
                 }
             case LongLong =>
-                if(!unsigned){
+                if (!unsigned) {
                     return getInt64(index).getOrThrow().toString()
-                }else{
+                } else {
                     return getUInt64(index).getOrThrow().toString()
                 }
-            case Float => 
-                return getFloat32(index).getOrThrow().toString()
-            case Double =>
-                return getFloat64(index).getOrThrow().toString()
-            case NewDecimal =>
-                return String.fromUtf8(data)
-            case String | Json | Enum | Set | TinyBlob | MediumBlob | LongBlob | Blob | VarString => 
+            case Float => return getFloat32(index).getOrThrow().toString()
+            case Double => return getFloat64(index).getOrThrow().toString()
+            case NewDecimal => return String.fromUtf8(data)
+            case String | Json | Enum | Set | TinyBlob | MediumBlob | LongBlob | Blob | VarString =>
                 // match (charset) {
                 //     case Binary => 
                 //         throw Exception("Unsupported Charset: Binary")
@@ -301,13 +297,11 @@ protected class BinaryResultSet <: ResultSet {
                 //     case Latin1SwedishCi => 
                 //         throw Exception("Unsupported Charset: Latin1SwedishCi")
                 // }
-                return String.fromUtf8(data)
-            case Date => 
-                return getDate(index).getOrThrow().toString(DB_DATE_FORMAT)
-            case DateTime | Timestamp => 
-                return getDateTime(index).getOrThrow().toString(DB_DATE_TIME_FORMAT)
-            case Time => 
-                return getTime(index).getOrThrow().toString(DB_TIME_FORMAT)
+                return String
+                .fromUtf8(data)
+            case Date => return getDate(index).getOrThrow().toString(DB_DATE_FORMAT)
+            case DateTime | Timestamp => return getDateTime(index).getOrThrow().toString(DB_DATE_TIME_FORMAT)
+            case Time => return getTime(index).getOrThrow().toString(DB_TIME_FORMAT)
             case _ => throw Exception("Unsupport MySQL binary type")
         }
     }
@@ -315,22 +309,21 @@ protected class BinaryResultSet <: ResultSet {
     public override func getArray(index: Int64): ?Array<Byte> {
         var columnType = getFieldType(index)
         var dataOp = getBinaryData(index)
-        if(dataOp.isNone()){
+        if (dataOp.isNone()) {
             return None
         }
         var data = dataOp.getOrThrow()
         match (columnType) {
-            case String | VarString | Json | Enum | Set | TinyBlob | Blob | MediumBlob | LongBlob =>
-                return data
+            case String | VarString | Json | Enum | Set | TinyBlob | Blob | MediumBlob | LongBlob => return data
             case _ => throw UnsupportedException("Unsupported database type ${columnType} convert to Array")
         }
     }
 
     public override func getJsonValue(index: Int64): ?JsonValue {
         var val = getString(index)
-        if(val.isNone()){
+        if (val.isNone()) {
             return None
-        }else {
+        } else {
             return JsonValue.fromStr(val.getOrThrow())
         }
     }

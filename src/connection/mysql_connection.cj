@@ -367,9 +367,9 @@ protected class MySqlConnection <: Resource {
                         if(sslEnabled){
                             return sendPassword(connection, toNullTerminated(originPassword), authSwitch.number)
                         }else{
-                            var publicKey: String
-                            var lastPacketNumber: UInt8
-                            (publicKey, lastPacketNumber) = requestPublicKey(connection, SHA256_REQUESET_KEY_CODE,authSwitch.number)
+                            // var publicKey: String
+                            // var lastPacketNumber: UInt8
+                            let (publicKey, lastPacketNumber) = requestPublicKey(connection, SHA256_REQUESET_KEY_CODE,authSwitch.number)
                             var encryptedPwd = performFullAuthentication(publicKey, originPassword.toArray(), authSwitch.salt)
                             return sendPassword(connection, encryptedPwd, lastPacketNumber)
                         }

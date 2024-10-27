@@ -76,3 +76,9 @@
 # [v0.4.0]
 
 项目更名为**mysqlclient4cj**
+
+# [v0.5.0]
+
+## Feature
+
+- Cangjie版本升级为0.56.4
