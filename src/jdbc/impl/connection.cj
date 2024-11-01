@@ -58,7 +58,7 @@ public class ConnectionImpl <: Connection {
     public ConnectionImpl(options: Map<String, String>) {
         this.options = options
         try {
-            connection = MySqlConnection.createAuthedConnection(options)
+            connection = MySqlConnectionFactory.createAuthedConnection(options)
             applyOptions()
         } catch (e: ConnectFailedException) {
             throw SqlException(e.message)

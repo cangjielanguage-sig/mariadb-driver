@@ -90,7 +90,7 @@ protected class FetchCommand <: Command {
     private var numRows: UInt32
 
     protected init(statemetnId: UInt32, numRows: UInt32){
-        super(StmtClose)
+        super(StmtFetch)
         this._length += 8
         this.statemetnId = statemetnId
         this.numRows = numRows

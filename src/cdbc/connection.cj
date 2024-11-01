@@ -33,7 +33,7 @@ public class ConnectionImpl <: Connection{
         _options = options
         _transaction = None
         try {
-             _connection = MySqlConnection.createAuthedConnection(options)
+             _connection = MySqlConnectionFactory.createAuthedConnection(options)
              applyOptions()
         }catch (e: ConnectFailedException) {
             _state = ConnectionState.Broken

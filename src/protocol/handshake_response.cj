@@ -223,6 +223,7 @@ protected class HandshakeResponse <: Request {
                             .setCapability(SessionTrack)
                             .setCapability(RememberOptions)
                             .setCapability(Reserved2)
+                            //.setCapability(FoundRows)
                             //.setCapability(QueryAttributes)
                             .setCharset(33)
                             .setMaxPacket(1073741824)

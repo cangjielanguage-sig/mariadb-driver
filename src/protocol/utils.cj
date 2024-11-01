@@ -237,6 +237,7 @@ protected  func readLengthEncodedInteger(stream: InputStream): Array<Byte> {
             stream.read(buffer)
             return buffer
         case 0xff => throw InvalidPacketException("This packet is Error packet")
+        //case 0xff => single
         case _ => return single
     }
 }
@@ -452,7 +453,7 @@ protected func inputStreamToArray(inputStream: InputStream): Array<Byte> {
 /*
  * Array转InputStream
  */
-protected func arrayToInputStream(array: Array<Byte>): InputStream {
+protected func arrayToInputStream(array: Array<Byte>): ByteBuffer {
     var stream = ByteBuffer(array.size)
     stream.write(array)
     return stream

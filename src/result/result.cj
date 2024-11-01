@@ -53,9 +53,15 @@ protected class PrepareResult {
         }
     }
 
-    protected prop parameterDefinition: Array<ColumnDefinition> {
+    protected prop parameterDefinitions: Array<ColumnDefinition> {
         get() {
             parameters
+        }
+    }
+
+    protected prop columnDefinitions: Array<ColumnDefinition> {
+        get() {
+            columns
         }
     }
 

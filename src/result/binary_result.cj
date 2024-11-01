@@ -16,13 +16,15 @@ protected class BinaryResultSet <: ResultSet {
     
     private var columns: Array<ColumnDefinition>
 
-    private var rows: Array<BinaryResult>
+    //private var rows: Array<BinaryResult>
+    private var rows: Array<Array<?Array<Byte>>>
 
     private var currentRow: Int64
 
     private var indexMap: Map<String, Int64>
 
-    protected BinaryResultSet(columns: Array<ColumnDefinition>, rows: Array<BinaryResult>) {
+    // rotected BinaryResultSet(columns: Array<ColumnDefinition>, rows: Array<BinaryResult>) {
+    protected BinaryResultSet(columns: Array<ColumnDefinition>, rows: Array<Array<?Array<Byte>>>) {
         this.columns = columns
         this.rows = rows
         this.currentRow = 0
@@ -357,6 +359,6 @@ protected class BinaryResultSet <: ResultSet {
     }
 
     private func getBinaryData(index: Int64): ?Array<Byte> {
-        return this.rows[currentRow - 1].binaryData[index - 1]
+        return this.rows[currentRow - 1][index - 1]
     }
 }

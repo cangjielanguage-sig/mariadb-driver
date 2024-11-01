@@ -26,8 +26,8 @@ public class MySqlTest {
         var property2= ("password","MySql123!")
         var property3 = ("database","driver_test")
         var property4 = ("ssl.mode","disabled")
-        var property5 = ("prepare.mode","client")
-        //var property5 = ("prepare.mode","server")
+        //var property5 = ("prepare.mode","client")
+        var property5 = ("prepare.mode","server")
         var dataSource = driver.open("mysql://localhost", [property1,property2,property3,property4,property5])
         connection =  dataSource.connect()
         println("MySqlTest init")
@@ -270,7 +270,6 @@ public class MySqlTest {
     */
     @TestCase
     public func queryTest(){
-
         var prepare = connection.prepareStatement("select * from full_test")
         var id = SqlInteger(-1)
         //tinyint
@@ -405,8 +404,6 @@ public class MySqlTest {
            print(col31.value)
            println()
         }
-
-
     }
 
     /*

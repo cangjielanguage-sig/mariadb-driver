@@ -4,7 +4,7 @@ import std.unittest.*
 import std.unittest.testmacro.*
 import mysqlclient4cj.connection.*
 import std.collection.*
-
+import std.time.*
 /*
 * 测试认证插件的兼容情况
 * default: caching_sha2_password -> use: caching_sha2_password ssl:close √
@@ -40,7 +40,7 @@ public class MySqlTest {
         attr.put(Params.Host, "localhost")
         attr.put(Params.Port, "3306")
         attr.put(Params.SSLMode, "disabled")
-        var conn = MySqlConnection.createAuthedConnection(attr)
+        var conn = MySqlConnectionFactory.createAuthedConnection(attr)
         conn.close()
     }
 
@@ -52,7 +52,7 @@ public class MySqlTest {
         attr.put(Params.Host, "localhost")
         attr.put(Params.Port, "3306")
         attr.put(Params.SSLMode, "disabled")
-        var conn = MySqlConnection.createAuthedConnection(attr)
+        var conn = MySqlConnectionFactory.createAuthedConnection(attr)
         conn.close()
     }
 
@@ -64,7 +64,7 @@ public class MySqlTest {
         attr.put(Params.Host, "localhost")
         attr.put(Params.Port, "3306")
         attr.put(Params.SSLMode, "disabled")
-        var conn = MySqlConnection.createAuthedConnection(attr)
+        var conn = MySqlConnectionFactory.createAuthedConnection(attr)
         conn.close()
     }
 
@@ -75,7 +75,7 @@ public class MySqlTest {
         attr.put(Params.Password, "MySql123!")
         attr.put(Params.Host, "localhost")
         attr.put(Params.Port, "3306")
-        var conn = MySqlConnection.createAuthedConnection(attr)
+        var conn = MySqlConnectionFactory.createAuthedConnection(attr)
         conn.close()
     }
 
@@ -86,7 +86,7 @@ public class MySqlTest {
         attr.put(Params.Password, "native_user")
         attr.put(Params.Host, "localhost")
         attr.put(Params.Port, "3306")
-        var conn = MySqlConnection.createAuthedConnection(attr)
+        var conn = MySqlConnectionFactory.createAuthedConnection(attr)
         conn.close()
     }
 
@@ -97,8 +97,26 @@ public class MySqlTest {
         attr.put(Params.Password, "sha256_user")
         attr.put(Params.Host, "localhost")
         attr.put(Params.Port, "3306")
-        var conn = MySqlConnection.createAuthedConnection(attr)
+        var conn = MySqlConnectionFactory.createAuthedConnection(attr)
         conn.close()
+    }
+
+    @TestCase
+    public func case7(): Unit {
+        var attr = HashMap<String, String>()
+        attr.put(Params.Username, "root")
+        attr.put(Params.Password, "MySql123!")
+        attr.put(Params.Host, "localhost")
+        attr.put(Params.Port, "3306")
+        attr.put(Params.Database, "driver_test")
+        attr.put(Params.SSLMode, "disabled")
+        var conn = MySqlConnectionFactory.createAuthedConnection(attr)
+        var result = conn.sendPrepare("select * from full_test")
+        var resultSet = conn.executeQueryPrepareWithCurosr(result, [])
+        while (resultSet.next()) {
+            //sleep(1000 * Duration.millisecond)
+            println(resultSet.getInt64(1))
+        }
     }
 
 }

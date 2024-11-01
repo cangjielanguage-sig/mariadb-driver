@@ -62,6 +62,10 @@ protected class ExecuteCommand <: Command {
         return ExecuteCommand(id, ParameterCountAvailable, 1, UInt64(paramDefinition.size), 1, paramDefinition,values)
     }
 
+    public static func withReadOnly(id: UInt32, paramDefinition: Array<ColumnDefinition>, values: Array<Any>): ExecuteCommand {
+        return ExecuteCommand(id, ReadOnly , 1, UInt64(paramDefinition.size), 1, paramDefinition,values)
+    }
+
     public override func toByteArray(): Array<Byte> {
         var list = ArrayList<Byte>()
         list.appendAll(super.toByteArray())

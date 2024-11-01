@@ -65,7 +65,8 @@ protected class OkResponse <: Response {
         }
     }
 
-    protected init(stream: InputStream){
+
+    protected init(stream: ByteBuffer){
         super(stream)
         var effectRows = readLengthEncodedInteger(stream)
         if(effectRows.size == 0){
@@ -89,12 +90,8 @@ protected class OkResponse <: Response {
             throw InvalidPacketException("This packet is not a Ok Repsposne packet: read waring count failed")
         }
         _waringCount = littleEndianToUInt16(waringCount)
-
         var message = Array<Byte>(Int64(_length - 5), repeat: 0)
-        // if(stream.read(message) == 0){
-        //     throw InvalidpacketException("This packet is not a Ok Repsposne packet: read message failed")
-        // }
-        _message = String.fromUtf8(message)
+        _message = String.fromUtf8(message.toArray())
     }
 }
 
@@ -135,7 +132,16 @@ protected class ErrorResponse <: Response{
         if(stream.read(message) == 0){
             throw InvalidPacketException("This packet is not a Error Repsposne packet: read message failed")
         }
-        _message = String.fromUtf8(message)
+        // var message = ArrayList<Byte>()
+        // do {
+        //     if(stream.read(single) == 0) {
+        //         throw InvalidPacketException("This packet is not a Error Repsposne packet: read message failed")
+        //     }
+        //     if(single[0] != 0) {
+        //         message.appendAll(single)
+        //     }
+        // }while(single[0] != 0)
+        _message = String.fromUtf8(message.toArray())
     }
 
     protected prop message: String {
