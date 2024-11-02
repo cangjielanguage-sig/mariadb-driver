@@ -83,7 +83,7 @@ main(): Unit {
     var connection = dataSource.connect()
 
     var statemnt = connection.prepareStatement("select * from simple")
-	//statemnt.setOption("fetchSize", "10") //支持设置fetchSize, 使用改选项时需要确保prepare.mode设置为server
+	//statemnt.setOption("fetchSize", "10") //支持设置fetchSize, 使用该选项时需要确保prepare.mode设置为server
     var id = SqlBigInt(0)
     var varchar = SqlNullableChar(None)
     var int = SqlNullableInteger(None)
