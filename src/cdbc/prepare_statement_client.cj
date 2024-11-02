@@ -17,8 +17,7 @@ import mysqlclient4cj.connection.*
 import mysqlclient4cj.result.*
 
 public class ClientPrepareStatement <: Statement {
-    private static const PLACEHOLDER: String = "?"
-
+    
     private var _parameterColumnInfos: Array<ColumnInfo> = Array<ColumnInfo>()
 
     private var _connection: ConnectionImpl
@@ -78,7 +77,7 @@ public class ClientPrepareStatement <: Statement {
         if (params.size != _originSql.count("?")) {
             throw SqlException("The number of placeholders does not match the number of parameters")
         }
-        var replacer = Matcher(Regex(PLACEHOLDER), _originSql)
+        var replacer = Matcher(Regex("?"), _originSql)
         for (i in 0..params.size) {
             match (params[i]) {
                 case v: SqlBool => setParamWithoutQuotation(replacer, v.value.toString())
@@ -180,7 +179,7 @@ public class ClientPrepareStatement <: Statement {
                 case _ => throw UnsupportedException("An unsupported input type")
             }
         }
-        return replacer.replace(PLACEHOLDER)
+        return replacer.replace("?")
     }
 
     private func setParamWithQuotation(replacer: Matcher, value: String): String {

@@ -7,6 +7,7 @@ protected package mysqlclient4cj.connection
 import std.collection.*
 import std.io.*
 import std.sync.*
+import std.net.*
 import mysqlclient4cj.result.*
 import mysqlclient4cj.protocol.*
 
@@ -17,16 +18,37 @@ protected class MySqlConnection <: Resource {
     
     private let connectionMutex: ReentrantMutex = ReentrantMutex()
 
-    internal var channel: MySqlChannel
+    private var channel: MySqlChannel
 
-    internal MySqlConnection(channel: MySqlChannel) {
-        this.channel = channel
+    internal init(socket: TcpSocket) {
+        this.channel = MySqlChannel(socket)
     }
 
     protected prop mutex: ReentrantMutex {
         get() {
             connectionMutex
         }
+    }
+
+    protected mut prop socket: StreamingSocket {
+        get() {
+            channel.getSocket()
+        }
+        set(value) {
+            channel.setSocket(value)
+        }
+    }
+
+    protected func read(): Array<Byte> {
+        return channel.read()
+    }
+
+    protected func write(data: Array<Byte>): Unit {
+        return channel.write(data)
+    }
+
+    protected func flush(): Unit {
+        return channel.flush()
     }
 
     public override func close() {
@@ -110,11 +132,11 @@ protected class MySqlConnection <: Resource {
     * @result ResultSet 
     * @throws ResponseErrorException
     */
-    protected func executeQueryPrepareWithCurosr(prepare: PrepareResult, params: Array<Any>): ResultSet {
+    protected func executeQueryPrepareWithCurosr(prepare: PrepareResult, params: Array<Any>, fetchSize: UInt32): ResultSet {
         synchronized(connectionMutex) {
             handleLongData(prepare.id, params)
             writeRequest(ExecuteCommand.withReadOnly(prepare.id, prepare.parameterDefinitions, params))
-            return readQueryPrepareResponseWithCursor(prepare.id)
+            return readQueryPrepareResponseWithCursor(prepare.id, fetchSize)
         }
     }
 
@@ -178,7 +200,7 @@ protected class MySqlConnection <: Resource {
      * read response of prepare statemnt
      */
     private func readPrepareResponse(): PrepareResult {
-        var array = channel.read()
+        var array = read()
         var stream = arrayToInputStream(array)
         if (array[4] == ResponseCode.Error.value()) {
             var error = ErrorResponse(stream)
@@ -190,7 +212,7 @@ protected class MySqlConnection <: Resource {
             for (_ in 0..prepareResponse.numParams) {
                 parameters.append(ColumnDefinition(arrayToInputStream(channel.read())))
             }
-            channel.read()
+            read()
         }
         
         var columns = ArrayList<ColumnDefinition>(Int64(prepareResponse.numColumns))
@@ -198,7 +220,7 @@ protected class MySqlConnection <: Resource {
             for (_ in 0..prepareResponse.numColumns) {
             columns.append(ColumnDefinition(arrayToInputStream(channel.read())))
             }
-            channel.read()
+            read()
         }
         return PrepareResult(prepareResponse, parameters.toArray(), columns.toArray())
     }
@@ -207,7 +229,7 @@ protected class MySqlConnection <: Resource {
     * read response of execute query prepare statemnt
     */
     private func readQueryPrepareResponse(): ResultSet {
-        var array = channel.read()
+        var array = read()
         var stream = arrayToInputStream(array)
         if (array[4] == ResponseCode.Error.value()) {
             var error = ErrorResponse(stream)
@@ -220,13 +242,13 @@ protected class MySqlConnection <: Resource {
             fields.append(field)
         }
         //丢弃Eof包
-        channel.read()
-        array = channel.read()
+        read()
+        array = read()
         var rows = ArrayList<Array<?Array<Byte>>>()
         while (array[4] != ResponseCode.Eof.value() || array.size > 9) {
             var row = BinaryResult(arrayToInputStream(array), fields.toArray())
             rows.append(row.binaryData)
-            array = channel.read()
+            array = read()
         }
         return BinaryResultSet(fields.toArray(), rows.toArray())
     }
@@ -235,7 +257,7 @@ protected class MySqlConnection <: Resource {
     * read response of fetch result set
     */
     private func readFetchResponse(columnInfos: Array<ColumnDefinition>): ResultSet {
-        var array = channel.read()
+        var array = read()
         var stream = arrayToInputStream(array)
         if (array[4] == ResponseCode.Error.value()) {
             var error = ErrorResponse(stream)
@@ -245,7 +267,7 @@ protected class MySqlConnection <: Resource {
         while (array[4] != ResponseCode.Eof.value() || array.size > 9) {
             var row = BinaryResult(arrayToInputStream(array), columnInfos)
             rows.append(row.binaryData)
-            array = channel.read()
+            array = read()
         }
         return BinaryResultSet(columnInfos, rows.toArray())
     }
@@ -253,8 +275,8 @@ protected class MySqlConnection <: Resource {
     /*
     * read response of execute query prepare with cursor
     */
-    private func readQueryPrepareResponseWithCursor(prepareId: UInt32): ResultSet {
-        var array = channel.read()
+    private func readQueryPrepareResponseWithCursor(prepareId: UInt32, fetchSize: UInt32): ResultSet {
+        var array = read()
         var stream = arrayToInputStream(array)
         if (array[4] == ResponseCode.Error.value()) {
             var error = ErrorResponse(stream)
@@ -267,8 +289,8 @@ protected class MySqlConnection <: Resource {
             fields.append(field)
         }
         //drop eof package
-        channel.read()
-        return CursorResultSet(prepareId, fields.toArray(), this)
+        read()
+        return CursorResultSet(prepareId, fields.toArray(), fetchSize ,this)
     }
 
 
@@ -276,14 +298,14 @@ protected class MySqlConnection <: Resource {
      * read handshake package
      */
     internal func readHandhake(): Handshake {
-        return Handshake(arrayToInputStream(channel.read()))
+        return Handshake(arrayToInputStream(read()))
     }
 
     /*
      * read a response, maybe OkResponse,ErrorResponse,AbstructEof,AuthStateResponse or it's subclass
      */
     internal func readResponse(): Response {
-        var array = channel.read()
+        var array = read()
         var code = ResponseCode.get(array[4])
         match (code) {
             case ResponseCode.Ok =>
@@ -315,7 +337,7 @@ protected class MySqlConnection <: Resource {
     }
 
     internal func writeRequest(req: Request): Unit {
-        channel.write(req.toByteArray())
+        write(req.toByteArray())
     }
 
 
@@ -334,7 +356,7 @@ protected class MySqlConnection <: Resource {
      * handler response of execute query
      */
     private func readQueryResponse(): ResultSet {
-        var array = channel.read()
+        var array = read()
         var stream = arrayToInputStream(array)
         if (array[4] == ResponseCode.Error.value()) {
             var error = ErrorResponse(stream)
@@ -347,8 +369,8 @@ protected class MySqlConnection <: Resource {
             fields.append(field)
         }
         //丢弃Eof包
-        channel.read()
-        array = channel.read()
+        read()
+        array = read()
         var rowPackets = ArrayList<TextResult>()
         while (array[4] != ResponseCode.Eof.value() || array.size > 9) {
             var row: TextResult
@@ -363,7 +385,7 @@ protected class MySqlConnection <: Resource {
      * handler response of execute update
      */
     private func readUpdateResponse(): ChangeResult {
-        var array = channel.read()
+        var array = read()
         var stream = arrayToInputStream(array)
         if (array[4] == ResponseCode.Error.value()) {
             var error = ErrorResponse(stream)

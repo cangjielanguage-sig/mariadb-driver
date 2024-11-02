@@ -5,6 +5,9 @@ import std.io.IOException
 import std.collection.ArrayList
 import mysqlclient4cj.protocol.littleEndianToUInt32
 
+/*
+* mysql channl reads complete mysql packages from the socket
+*/
 protected class MySqlChannel <: Resource {
 
     private static let BUFFER_SIZE = 1024

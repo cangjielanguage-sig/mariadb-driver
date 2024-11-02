@@ -101,22 +101,22 @@ public class MySqlTest {
         conn.close()
     }
 
-    @TestCase
-    public func case7(): Unit {
-        var attr = HashMap<String, String>()
-        attr.put(Params.Username, "root")
-        attr.put(Params.Password, "MySql123!")
-        attr.put(Params.Host, "localhost")
-        attr.put(Params.Port, "3306")
-        attr.put(Params.Database, "driver_test")
-        attr.put(Params.SSLMode, "disabled")
-        var conn = MySqlConnectionFactory.createAuthedConnection(attr)
-        var result = conn.sendPrepare("select * from full_test")
-        var resultSet = conn.executeQueryPrepareWithCurosr(result, [])
-        while (resultSet.next()) {
-            //sleep(1000 * Duration.millisecond)
-            println(resultSet.getInt64(1))
-        }
-    }
+    // @TestCase
+    // public func case7(): Unit {
+    //     var attr = HashMap<String, String>()
+    //     attr.put(Params.Username, "root")
+    //     attr.put(Params.Password, "MySql123!")
+    //     attr.put(Params.Host, "localhost")
+    //     attr.put(Params.Port, "3306")
+    //     attr.put(Params.Database, "driver_test")
+    //     attr.put(Params.SSLMode, "disabled")
+    //     var conn = MySqlConnectionFactory.createAuthedConnection(attr)
+    //     var result = conn.sendPrepare("select * from full_test")
+    //     var resultSet = conn.executeQueryPrepareWithCurosr(result, [])
+    //     while (resultSet.next()) {
+    //         //sleep(1000 * Duration.millisecond)
+    //         println(resultSet.getInt64(1))
+    //     }
+    // }
 
 }

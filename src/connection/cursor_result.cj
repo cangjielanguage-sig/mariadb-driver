@@ -12,19 +12,22 @@ import mysqlclient4cj.result.*
 
 protected class CursorResultSet <: ResultSet {
 
-    private var prepareId: UInt32
+    private let prepareId: UInt32
 
-    private var columnInfos: Array<ColumnDefinition>
+    private let columnInfos: Array<ColumnDefinition>
 
-    private var connection: MySqlConnection
+    private let connection: MySqlConnection
+
+    private let fetchSize: UInt32
 
     private var resultSet: ResultSet
 
-    protected CursorResultSet(prepareId: UInt32, columnInfos: Array<ColumnDefinition>, connection: MySqlConnection) {
+    protected CursorResultSet(prepareId: UInt32, columnInfos: Array<ColumnDefinition>, fetchSize: UInt32, connection: MySqlConnection) {
         this.prepareId = prepareId
         this.columnInfos = columnInfos
         this.connection = connection
-        this.resultSet = connection.fetchRows(prepareId, columnInfos, 10u32)
+        this.fetchSize = fetchSize
+        this.resultSet = connection.fetchRows(prepareId, columnInfos, fetchSize)
     }
 
     public override prop rowSize: Int64 {
@@ -42,7 +45,7 @@ protected class CursorResultSet <: ResultSet {
     public override func next(): Bool {
         if(!resultSet.next()) {
             //如果当前拉取的结果集被读完, 尝试拉取下一个结果集
-            resultSet = connection.fetchRows(prepareId, columnInfos, 10u32)
+            resultSet = connection.fetchRows(prepareId, columnInfos, fetchSize)
             return resultSet.next()
         }
         return true

@@ -4,6 +4,7 @@
 
 package mysqlclient4cj.cdbc
 
+import std.convert.Parsable
 import std.database.sql.*
 import std.sync.*
 import std.collection.*
@@ -44,7 +45,13 @@ public class ServerPrepareStatement <: Statement {
 
     public override func query(params: Array<SqlDbType>): QueryResult {
         var parameters = getParams(params)
-        var result = _connection.executeQueryPrepare(_prepareResult, parameters)
+        let result = match (_option.get("fetchSize")) {
+            case None => 
+                _connection.executeQueryPrepare(_prepareResult, parameters)
+            case Some(v) => 
+                let fetchSize = UInt32.parse(v)
+                _connection.executeQueryPrepareWithCurosr(_prepareResult, parameters, fetchSize)
+        }
         return QueryResultImpl(result)
     }
 

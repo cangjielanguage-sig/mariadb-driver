@@ -513,6 +513,149 @@ public class MySqlTest {
         println("last insert id: ${result.lastInsertId}")
     }
 
+
+    /*
+    * 测试fetch流程
+    */
+    @TestCase
+    public func fetchData(): Unit {
+        var prepare = connection.prepareStatement("select * from full_test")
+        prepare.setOption("fetchSize", "10")
+        var id = SqlInteger(-1)
+        //tinyint
+        var col1 = SqlNullableByte(None)
+        //utinyint
+        var col2 = SqlNullableSmallInt(None)
+        //smallint
+        var col3 = SqlNullableSmallInt(None)
+        //usmallint
+        var col4 = SqlNullableInteger(None)
+        //mediumint
+        var col5 = SqlNullableInteger(None)
+        //umediumint
+        var col6 = SqlNullableByte(None)
+        //int
+        var col7 = SqlNullableInteger(None)
+        //uint
+        var col8 = SqlNullableBigInt(None)
+        //bigint
+        var col9 = SqlNullableBigInt(None)
+        //ubigint ?
+        var col10 = SqlNullableBigInt(None)
+        //float
+        var col11 = SqlNullableReal(None)
+        //double
+        var col12 = SqlNullableDouble(None)
+        //decimal
+        var col13 = SqlNullableDecimal(None)
+        //date
+        var col14 = SqlNullableDate(None)
+        //time
+        var col15 = SqlNullableTime(None)
+        //datetime
+        var col16 = SqlNullableTimestamp(None)
+        //timestamp
+        var col17 = SqlNullableTimestamp(None)
+        //year
+        var col18 = SqlNullableSmallInt(None)
+        //char
+        var col19 = SqlNullableChar(None)
+        //varchar
+        var col20 = SqlNullableVarchar(None)
+        //tinytext
+        var col21 = SqlNullableVarchar(None)
+        //text
+        var col22 = SqlNullableVarchar(None)
+        //mediumtext
+        var col23 = SqlNullableVarchar(None)
+        //longtext
+        var col24 = SqlNullableVarchar(None)
+        //tinyblob
+        var col25 = SqlNullableBinary(None)
+        //blob 
+        var col26 = SqlNullableBlob(None)
+        //meidum blob
+        var col27 = SqlNullableBlob(None)
+        //long blob
+        var col28 = SqlNullableBlob(None)
+        //json
+        var col29 = SqlNullableJson(None)
+        //set
+        var col30 = SqlNullableVarchar(None)
+        //enum
+        var col31 = SqlNullableVarchar(None)
+        var result = prepare.query()
+
+        var row: Array<SqlDbType> = [id,col1,col2,col3,col4,col5,col6,col7,col8,col9,col10,col11,col12,col13,col14,col15,col16,col17,col18,col19,col20,col21,col22,col23,col24,col25,col26,col27,col28,col29,col30,col31]
+        
+        while (result.next(row)) {
+           print(id.value)
+           print(" ")
+           print(col1.value)
+           print(" ")
+           print(col2.value)
+           print(" ")
+           print(col3.value)
+           print(" ")
+           print(col4.value)
+           print(" ")
+           print(col5.value)
+           print(" ")
+           print(col6.value)
+           print(" ")
+           print(col7.value)
+           print(" ")
+           print(col8.value)
+           print(" ")
+           print(col9.value)
+           print(" ")
+           print(col10.value)
+           print(" ")
+           print(col11.value)
+           print(" ")
+           print(col12.value)
+           print(" ")
+           print(col13.value)
+           print(" ")
+           print(col14.value)
+           print(" ")
+           print(col15.value)
+           print(" ")
+           print(col16.value)
+           print(" ")
+           print(col17.value)
+           print(" ")
+           print(col18.value)
+           print(" ")
+           print(col19.value)
+           print(" ")
+           print(col20.value)
+           print(" ")
+           print(col21.value)
+           print(" ")
+           print(col22.value)
+           print(" ")
+           print(col23.value)
+           print(" ")
+           print(col24.value)
+           print(" ")
+           print(col25.value)
+           print(" ")
+           print(inputStreamToArray(col26.value.getOrDefault({=>ByteBuffer()})).size)
+           print(" ")
+           print(inputStreamToArray(col27.value.getOrDefault({=>ByteBuffer()})).size)
+           print(" ")
+           print(inputStreamToArray(col28.value.getOrDefault({=>ByteBuffer()})).size)
+           print(" ")
+           print(col29.value)
+           print(" ")
+           print(col30.value)
+           print(" ")
+           print(col31.value)
+           println()
+        }
+    }
+
 }
 
    
