@@ -7,13 +7,13 @@
 <img alt="" src="https://img.shields.io/badge/cjc-v0.56.4-brightgreen" style="display: inline-block;" />
 </p>
 
-## `<img alt="" src="./doc/readme-image/readme-icon-introduction.png" style="display: inline-block;" width=3%/>` 1 介绍
+## <img alt="" src="./doc/readme-image/readme-icon-introduction.png" style="display: inline-block;" width=3%/> 1 介绍
 
 ### 1.1 项目特性
 
 mysqlclient4cj是为Cangjie编程语言提供MySql原生驱动程序,基于MySql协议. 同时适配TIDB等国产数据库
 
-## `<img alt="" src="./doc/readme-image/readme-icon-framework.png" style="display: inline-block;" width=3%/>` 2 架构
+## <img alt="" src="./doc/readme-image/readme-icon-framework.png" style="display: inline-block;" width=3%/> 2 架构
 
 ### 2.1 项目结构
 
@@ -37,7 +37,7 @@ mysqlclient4cj是为Cangjie编程语言提供MySql原生驱动程序,基于MySql
 
 ### 2.2 接口说明
 
-## `<img alt="" src="./doc/readme-image/readme-icon-compile.png" style="display: inline-block;" width=3%/>` 3 使用说明
+## <img alt="" src="./doc/readme-image/readme-icon-compile.png" style="display: inline-block;" width=3%/> 3 使用说明
 
 > 仓颉提供的摘要算法和加密算法依赖 OpenSSL 3 的 crypto 动态库文件,因此使用本驱动时需要确保当前环境的OpenSSL版本为3.x
 
@@ -253,7 +253,7 @@ main(): Unit {
 
 - 使用该驱动操作TIDB以及OceanBase暂不支持使用服务端预编译(prepare.mode=server)
 
-## `<img alt="" src="./doc/readme-image/readme-icon-contribute.png" style="display: inline-block;" width=3%/>` 4 参与贡献
+## <img alt="" src="./doc/readme-image/readme-icon-contribute.png" style="display: inline-block;" width=3%/> 4 参与贡献
 
 本项目由Yesokim实现并维护。技术支持和意见反馈请提Issue。
 
