@@ -4,7 +4,7 @@
 
 package mysqlclient4cj.cdbc
 
-import std.convert.Parsable
+import std.convert.*
 import std.database.sql.*
 import std.sync.*
 import std.collection.*
@@ -17,7 +17,7 @@ public class ServerPrepareStatement <: Statement {
 
     private var _option: Map<String, String>
 
-    private var _parameterColumnInfos: Array<ColumnInfo>
+    private var _paramsInfo: Array<ColumnInfo>
 
     private var _prepareResult: PrepareResult
 
@@ -33,13 +33,14 @@ public class ServerPrepareStatement <: Statement {
         _option = HashMap<String, String>()
         _id = _prepareResult.id
         _originSql = originSql
-        _parameterColumnInfos = []
         _closed = AtomicBool(false)
+        _paramsInfo = []
+        _paramsInfo = paramsInfo()
     }
 
     public override prop parameterColumnInfos: Array<ColumnInfo> {
         get() {
-            return _parameterColumnInfos
+            return _paramsInfo
         }
     }
 
@@ -214,5 +215,17 @@ public class ServerPrepareStatement <: Statement {
     private func getInsertCount(): Int64 {
         var matcher = Matcher(Regex("\\((.*?)\\)"), _originSql.split("values")[1])
         return matcher.findAll().getOrThrow().size
+    }
+
+    private func paramsInfo(): Array<ColumnInfo> {
+        let defines = _prepareResult.paramDefinitions
+        let size = defines.size
+        let infos = ArrayList<ColumnInfo>(size)
+        for(i in defines) {
+            let nullable = i.hasFlag(NotNull)
+            let info = ColumnInfoImpl(i.name, toSqlType(i.columnType, nullable), Int64(i.columnLength), Int64(i.columnLength), Int64(i.decimals), nullable)
+            infos.append(info)
+        }
+        return infos.toArray()
     }
 }

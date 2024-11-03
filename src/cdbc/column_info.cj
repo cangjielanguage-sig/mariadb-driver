@@ -3,7 +3,6 @@
  */
 package mysqlclient4cj.cdbc
 
-import std.database.sql.ColumnInfo
 import std.database.sql.*
 import mysqlclient4cj.connection.*
 import mysqlclient4cj.protocol.*
@@ -73,76 +72,56 @@ public class ColumnInfoImpl <: ColumnInfo {
     }
 }
 
-// protected func getSqlType(filedType: ColumnType, isNotNull: Bool): String {
-//     if (isNotNull) {
-//         match (filedType) {
-//             //case Decimal => "SqlDouble"
-//             case Tiny => "SqlByte"
-//             case Short => "SqlSmallInt"
-//             case Long => "SqlInteger"
-//             case Float => "SqlReal"
-//             case Double => "SqlDouble"
-//             case Null => "SqlNullableDbType"
-//             case Timestamp => "SqlTimestamp"
-//             case LongLong => "SqlBigInt"
-//             case Int24 => "SqlInteger"
-//             case Date => "SqlDate"
-//             case Time => "SqlTime"
-//             case DateTime => "SqlTimestamp"
-//             case Year => "SqlSmallInt"
-//             //case NewDate => "SqlDate"
-//             //case Varchar => "SqlVarchar"
-//             //case Bit => "SqlBinary"
-//             //case Timestamp2 => "SqlTimestamp"
-//             //case DateTime2 => "SqlTime"
-//             //case _Bool => "SqlBool"
-//             case NewDecimal => "SqlDouble"
-//             case Enum => "SqlChar"
-//             case Set => "SqlChar"
-//             case TinyBlob => "SqlBlob"
-//             case MediumBlob => "SqlBlob"
-//             case LongBlob => "SqlBlob"
-//             case Blob => "SqlBlob"
-//             case VarString => "SqlVarchar"
-//             case String => "SqlChar"
-//             //case Geometry => "SqlVarchar"
-//             //case Time2 => "SqlTime"
-//             case Json => "SqlJson"
-//         }
-//     } else {
-//         match (filedType) {
-//             //case Decimal => "SqlNullableDouble"
-//             case Tiny => "SqlNullableByte"
-//             case Short => "SqlNullableSmallInt"
-//             case Long => "SqlNullableInteger"
-//             case Float => "SqlNullableReal"
-//             case Double => "SqlNullableDouble"
-//             case Timestamp => "SqlNullableTimestamp"
-//             case LongLong => "SqlNullableBigInt"
-//             case Int24 => "SqlNullableInteger"
-//             case Date => "SqlNullableVarchar"
-//             case Time => "SqlNullableVarchar"
-//             case DateTime => "SqlNullableTimestamp"
-//             case Year => "SqlNullableSmallInt"
-//             //case NewDate => "SqlNullableVarchar"
-//             //case Varchar => "SqlNullableVarchar"
-//             //case Bit => "SqlNullableBinary"
-//             //case Timestamp2 => "SqlNullableTimestamp"
-//             //case DateTime2 => "SqlNullableTimestamp"
-//             //case _Bool => "SqlNullableBool"
-//             case NewDecimal => "SqlNullableDouble"
-//             case Enum => "SqlNullableChar"
-//             case Set => "SqlNullableChar"
-//             case TinyBlob => "SqlNullableBlob"
-//             case MediumBlob => "SqlNullableBlob"
-//             case LongBlob => "SqlNullableBlob"
-//             case Blob => "SqlNullableBlob"
-//             case VarString => "SqlNullableVarchar"
-//             case String => "SqlNullableChar"
-//             case Null => "SqlNullableDbType"
-//             //case Geometry => "SqlNullableVarchar"
-//             //case Time2 => "SqlNullableVarchar"
-//             case Json => "SqlNullableJson"
-//         }
-//     }
-// }
+protected func toSqlType(filedType: ColumnType, isNotNull: Bool): String {
+    if (isNotNull) {
+        match (filedType) {
+            case Tiny => "SqlByte"
+            case Short => "SqlSmallInt"
+            case Int24 => "SqlInteger"
+            case Long => "SqlInteger"
+            case LongLong => "SqlBigInt"
+            case Float => "SqlReal"
+            case Double => "SqlDouble"
+            case NewDecimal => "SqlDecimal"
+            case Date => "SqlDate"
+            case Time => "SqlTime"
+            case DateTime => "SqlTimestamp"
+            case Timestamp => "SqlTimestamp"
+            case Year => "SqlSmallInt"
+            case TinyBlob => "SqlBlob"
+            case Blob => "SqlBlob"
+            case MediumBlob => "SqlBlob"
+            case LongBlob => "SqlBlob"
+            case String => "SqlChar"
+            case VarString => "SqlVarchar"
+            case Enum => "SqlChar"
+            case Set => "SqlChar"
+            case Json => "SqlJson"
+        }
+    } else {
+        match (filedType) {
+            case Tiny => "SqlNullableByte"
+            case Short => "SqlNullableSmallInt"
+            case Int24 => "SqlNullableInteger"
+            case Long => "SqlNullableInteger"
+            case LongLong => "SqlNullableBigInt"
+            case Float => "SqlNullableReal"
+            case Double => "SqlNullableDouble"
+            case NewDecimal => "SqlNullableDecimal"
+            case Date => "SqlNullableData"
+            case Time => "SqlNullableTime"
+            case DateTime => "SqlNullableTimestamp"
+            case Timestamp => "SqlNullableTimestamp"
+            case Year => "SqlNullableSmallInt"
+            case TinyBlob => "SqlNullableBlob"
+            case Blob => "SqlNullableBlob"
+            case MediumBlob => "SqlNullableBlob"
+            case LongBlob => "SqlNullableBlob"
+            case String => "SqlNullableChar"
+            case VarString => "SqlNullableVarchar"
+            case Enum => "SqlNullableChar"
+            case Set => "SqlNullableChar"
+            case Json => "SqlNullableJson"
+        }
+    }
+}

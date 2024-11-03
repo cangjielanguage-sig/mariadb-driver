@@ -17,8 +17,6 @@ import mysqlclient4cj.connection.*
 import mysqlclient4cj.result.*
 
 public class ClientPrepareStatement <: Statement {
-    
-    private var _parameterColumnInfos: Array<ColumnInfo> = Array<ColumnInfo>()
 
     private var _connection: ConnectionImpl
 
@@ -29,7 +27,6 @@ public class ClientPrepareStatement <: Statement {
     private var _closed: AtomicBool
 
     public ClientPrepareStatement(originSql: String, connection: ConnectionImpl) {
-        _parameterColumnInfos = Array<ColumnInfo>()
         _connection = connection
         _originSql = originSql
         _closed = AtomicBool(false)
@@ -38,8 +35,7 @@ public class ClientPrepareStatement <: Statement {
 
     public override prop parameterColumnInfos: Array<ColumnInfo> {
         get() {
-            checkResourceAvailability()
-            return _parameterColumnInfos
+            throw UnsupportedException("get parameters info must set prepare.mode=server in connection")
         }
     }
 

@@ -13,7 +13,7 @@ import encoding.json.*
 /*
  * Bool转整数 true -> 1 false -> 0
  */
-protected  func boolToInteger(value: Bool): Int8 {
+protected  func boolToInteger(value: Bool): UInt8 {
     if (value) {
         return 1
     } else {
@@ -152,6 +152,7 @@ protected func readLengthEncodedString(array: Array<Byte>): ?Array<Byte> {
     stream.write(array)
     return readLengthEncodedString(stream)
 }
+
 protected func readLengthEncodedString(stream: InputStream): ?Array<Byte> {
     var single = Array<Byte>(1, repeat: 0)
     stream.read(single)

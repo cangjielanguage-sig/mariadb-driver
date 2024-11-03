@@ -131,7 +131,7 @@ protected class ColumnDefinition <: CommonPacket {
         }
     }
 
-    protected prop fieldLength: UInt32 {
+    protected prop columnLength: UInt32 {
         get() {
             _columnLength
         }
@@ -248,7 +248,7 @@ protected class BinaryResult <: Response {
                         list.appendAll(single)
                         list.appendAll(buffer)
                         _binaryData[i] = list.toArray()
-                    case _ => throw Exception("Unsupport MySQL binary type")
+                    //case _ => throw Exception("Unsupport MySQL binary type")
                 }
             }
         }

@@ -232,7 +232,7 @@ protected class TextResultSet <: ResultSet {
     }
 
     public override func getFieldLength(index: Int64): UInt32 {
-        return _columns[index - 1].fieldLength
+        return _columns[index - 1].columnLength
     }
 
     private func stringParseToBool(str: String): Bool {
@@ -351,7 +351,7 @@ protected class TextResultSet <: ResultSet {
         try {
             return DateTime.parse(str, DB_DATE_FORMAT)
         } catch (e: TimeParseException) {
-            throw ValueConvertException("Parse to Date failed: column name is '${getFieldName(index)}', raw value is ${str}.")
+            throw ValueConvertException("Parse to Date failed: column name is '${getFieldName(index)}', raw value is ${str}")
         }
     }
 
@@ -359,7 +359,7 @@ protected class TextResultSet <: ResultSet {
         try {
             return DateTime.parse(DB_TIME_PREFIX + str, DB_DATE_TIME_FORMAT)
         } catch (e: TimeParseException) {
-            throw ValueConvertException("Parse to Time failed: column name is '${getFieldName(index)}', raw value is ${str}.")
+            throw ValueConvertException("Parse to Time failed: column name is '${getFieldName(index)}', raw value is ${str}")
         }
     }
 
@@ -367,7 +367,7 @@ protected class TextResultSet <: ResultSet {
         try {
             return DateTime.parse(str, DB_DATE_TIME_FORMAT)
         } catch (e: TimeParseException) {
-            throw ValueConvertException("Parse to DateTime failed: column name is '${getFieldName(index)}', raw value is ${str}.")
+            throw ValueConvertException("Parse to DateTime failed: column name is '${getFieldName(index)}', raw value is ${str}")
         }
     } 
 }

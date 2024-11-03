@@ -9,6 +9,9 @@ import std.io.*
 import encoding.json.*
 import mysqlclient4cj.protocol.*
 
+/*
+* 
+*/
 protected class ChangeResult {
     
     private var _effectRow: UInt64
@@ -35,33 +38,33 @@ protected class ChangeResult {
 
 protected class PrepareResult {
 
-    private var info: PrepareResposne
+    private var _info: PrepareResposne
 
-    private var parameters: Array<ColumnDefinition>
+    private var _parames: Array<ColumnDefinition>
 
-    private var columns: Array<ColumnDefinition>
+    private var _columns: Array<ColumnDefinition>
 
     protected PrepareResult(info: PrepareResposne, parameters: Array<ColumnDefinition>, columns: Array<ColumnDefinition>){
-        this.info = info
-        this.parameters = parameters
-        this.columns = columns
+        _info = info
+        _parames = parameters
+        _columns = columns
     }
 
     protected prop id: UInt32{
         get() {
-            info.statementId
+            _info.statementId
         }
     }
 
-    protected prop parameterDefinitions: Array<ColumnDefinition> {
+    protected prop paramDefinitions: Array<ColumnDefinition> {
         get() {
-            parameters
+            _parames
         }
     }
 
     protected prop columnDefinitions: Array<ColumnDefinition> {
         get() {
-            columns
+            _columns
         }
     }
 

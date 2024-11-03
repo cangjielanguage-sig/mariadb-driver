@@ -304,7 +304,7 @@ protected class BinaryResultSet <: ResultSet {
             case Date => return getDate(index).getOrThrow().toString(DB_DATE_FORMAT)
             case DateTime | Timestamp => return getDateTime(index).getOrThrow().toString(DB_DATE_TIME_FORMAT)
             case Time => return getTime(index).getOrThrow().toString(DB_TIME_FORMAT)
-            case _ => throw Exception("Unsupport MySQL binary type")
+            //case _ => throw Exception("Unsupport MySQL binary type")
         }
     }
 
@@ -351,7 +351,7 @@ protected class BinaryResultSet <: ResultSet {
     }
 
     public override func getFieldLength(index: Int64): UInt32 {
-        return columns[index - 1].fieldLength
+        return columns[index - 1].columnLength
     }
 
     public override func getFieldCharset(index: Int64): Charset {
