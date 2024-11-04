@@ -64,9 +64,8 @@ protected class ExecuteCommand <: Command {
         return ExecuteCommand(id, ReadOnly , 1, UInt64(paramDefinition.size), 1, paramDefinition, params)
     }
 
-    public override func toByteArray(): Array<Byte> {
-        let buf = ArrayList<Byte>()
-        buf.appendAll(super.toByteArray())
+    public override func pack(): Unit {
+        super.pack()
         var len = 0
         // id
         buf.appendAll(uInt32ToLittleEndian(_statementId))
@@ -156,11 +155,7 @@ protected class ExecuteCommand <: Command {
             }
         }
         var subLen = _length + UInt32(len)
-        var arr = uInt32ToLittleEndian(subLen)
-        buf[0] = arr[0]
-        buf[1] = arr[1]
-        buf[2] = arr[2]
-        return buf.toArray()
+        reset(subLen)
     }
 
     private func appendBool(index: Int64, buf: ArrayList<Byte>, value: Bool): Int64 {

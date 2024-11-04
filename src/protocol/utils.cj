@@ -21,6 +21,13 @@ protected  func boolToInteger(value: Bool): UInt8 {
     }
 }
 
+protected func toNullTerminated(val: String): (Array<Byte>, Int64) {
+    let buf = ArrayList<Byte>(val.size + 1)
+    buf.appendAll(val.toArray())
+    buf.append(0)
+    return (buf.toArray(), buf.size)
+}
+
 /*
  * 小端序字节数组转UInt64
  */

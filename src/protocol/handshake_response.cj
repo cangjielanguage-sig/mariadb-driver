@@ -89,120 +89,108 @@ protected class HandshakeResponse <: Request {
         return (_capabilities & capability.value()) != 0
     }
 
-    public override func toByteArray(): Array<Byte> {
-        var arrayList = ArrayList<Byte>()
-        var length: UInt32 = UInt32(HEADER_SIZE)
+    public override func pack(): Unit {
+        var length: Int64 = HEADER_SIZE
         //put packet length and number placeholer
-        arrayList.appendAll(super.toByteArray())
+        super.pack()
         //put client Capabilities
-        arrayList.appendAll(uInt32ToLittleEndian(_capabilities))
+        buf.appendAll(uInt32ToLittleEndian(_capabilities))
         length += 4
         //put max packet
-        arrayList.appendAll(uInt32ToLittleEndian(_maxPacket))
+        buf.appendAll(uInt32ToLittleEndian(_maxPacket))
         length += 4
         //put charset
-        arrayList.append(_charset)
+        buf.append(_charset)
         length += 1
         //put unused
-        arrayList.appendAll(_unused)
+        buf.appendAll(_unused)
         length += 23
         //put username
-        var unameArray: Array<Byte> = _username.toArray()
-        arrayList.appendAll(unameArray)
-        arrayList.append(0x00)
-        length += UInt32(unameArray.size)
-        length += 1
+        let (uname, size) = toNullTerminated(_username)
+        buf.appendAll(uname)
+        length += size
         //put auth response
         if(hasCapability(PluginAuthLenencClientData)){
-            arrayList.append(UInt8(_authResponse.size))
+            buf.append(UInt8(_authResponse.size))
             length += 1
-            arrayList.appendAll(_authResponse)
-            length += UInt32(_authResponse.size)
+            buf.appendAll(_authResponse)
+            length += _authResponse.size
         }else{
-            arrayList.appendAll(_authResponse)
-            length += UInt32(_authResponse.size)
+            buf.appendAll(_authResponse)
+            length += _authResponse.size
         }
         // put schema if 'Connect With DB' are set
         if(hasCapability(ConnectWithDB)){
-            var schema = _schema.toArray()
-            arrayList.appendAll(schema)
-            length += UInt32(schema.size)
-            arrayList.append(0x00)
+            let schema = _schema.toArray()
+            buf.appendAll(schema)
+            length += schema.size
+            buf.append(0x00)
             length += 1
         }
         //put client auth plguin
         if(hasCapability(PluginAuth)){
-            var pluginArray: Array<Byte> = _clientAuthPlugin.toArray()
-            arrayList.appendAll(pluginArray)
-            length += UInt32(pluginArray.size)
-            arrayList.append(0x00)
+            let pluginArray: Array<Byte> = _clientAuthPlugin.toArray()
+            buf.appendAll(pluginArray)
+            length += pluginArray.size
+            buf.append(0x00)
             length += 1
         }
         //put attributes length placeholder
         if(hasCapability(ConnectAttrs)) {
-            arrayList.append(0x00)
-            var attrLenIndex: UInt32  = length
+            buf.append(0x00)
+            var attrLenIndex: Int = length
             length += 1
-            var attrLen: UInt8 = 0
+            var attrLen: Int = 0
             for((k,v) in _attribute){
                 //put attr name length
                 var name = k.toArray()
-                arrayList.append(UInt8(name.size))
+                buf.append(UInt8(name.size))
                 attrLen++
                 //put attr name
-                arrayList.appendAll(name)
-                attrLen += UInt8(name.size)
+                buf.appendAll(name)
+                attrLen += name.size
                 //put attr value length
-                arrayList.append(UInt8(v.toArray().size))
+                buf.append(UInt8(v.toArray().size))
                 attrLen++
                 //put attr value
                 var valueArr = v.toArray()
-                arrayList.appendAll(valueArr)
-                attrLen += UInt8(valueArr.size)
+                buf.appendAll(valueArr)
+                attrLen += valueArr.size
             }
-            length += UInt32(attrLen)
+            length += attrLen
             // set attribiters length
-            arrayList.set(Int64(attrLenIndex), attrLen)
+            buf.set(Int64(attrLenIndex), UInt8(attrLen))
         }
 
         if(hasCapability(ZSTDCompressionAlgorithm)) {
-            arrayList.append(_zstdCompressionLevel)
+            buf.append(_zstdCompressionLevel)
             length += 1
         }
         // set packet length
-        var array: Array<Byte> = uInt32ToLittleEndian(UInt32(length) - UInt32(HEADER_SIZE))
-        arrayList.set(0, array[0])
-        arrayList.set(1, array[1])
-        arrayList.set(2, array[2])
-        return arrayList.toArray()
+        reset(UInt32(length) - UInt32(HEADER_SIZE))
     }
 
     /*
     * SSL Connection Request Packet.
     * referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_connection_phase_packets_protocol_ssl_request.html
     */
-    protected func sslRequest(): Array<Byte>{
-        var arrayList = ArrayList<Byte>()
-        var length: UInt32 = UInt32(HEADER_SIZE)
-        //put packet length and number placeholer
-        arrayList.appendAll(super.toByteArray())
+    protected func sslRequest(): Array<Byte> {
+        var length: Int = 0
+        super.pack()
         //put client Capabilities
-        arrayList.appendAll(uInt32ToLittleEndian(_capabilities))
+        buf.appendAll(uInt32ToLittleEndian(_capabilities))
         length += 4
         //put max packet
-        arrayList.appendAll(uInt32ToLittleEndian(_maxPacket))
+        buf.appendAll(uInt32ToLittleEndian(_maxPacket))
         length += 4
         //put charset
-        arrayList.append(_charset)
+        buf.append(_charset)
         length += 1
         //put unused
-        arrayList.appendAll(_unused)
+        buf.appendAll(_unused)
         length += 23
-        var array: Array<Byte> = uInt32ToLittleEndian(UInt32(length) - UInt32(HEADER_SIZE))
-        arrayList.set(0, array[0])
-        arrayList.set(1, array[1])
-        arrayList.set(2, array[2])
-        return arrayList.toArray()
+        reset(UInt32(length))
+        return buf.toArray()
     }
 
     protected static func getDefault(number: UInt8): HandshakeResponse{
@@ -248,11 +236,9 @@ protected class RequestPublicKey <: Request{
         }
     }
 
-    protected override func toByteArray(): Array<Byte>{
-        var appender = ArrayList<Byte>()
-        appender.appendAll(super.toByteArray())
-        appender.append(_code)
-        return appender.toArray()
+    protected override func pack(): Unit {
+        super.pack()
+        buf.append(_code)
     }
 
 }
@@ -269,12 +255,11 @@ protected class SendPassword <: Request{
         this._authResponse = password
     }
 
-    protected override func toByteArray(): Array<Byte>{
-        var appender = ArrayList<Byte>()
-        appender.appendAll(super.toByteArray())
-        appender.appendAll(_authResponse)
-        return appender.toArray()
+    protected override func pack(): Unit {
+        super.pack()
+        buf.appendAll(_authResponse)
     }
+
 
 }
 

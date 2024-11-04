@@ -24,12 +24,11 @@ protected abstract class Command <: Request {
         _commandType = command
     }
 
-    protected open override func toByteArray(): Array<Byte> {
-        let buf = ArrayList<Byte>()
-        buf.appendAll(super.toByteArray())
+    protected open override func pack(): Unit {
+        super.pack()
         buf.append(_commandType.value())
-        return buf.toArray()
     }
+
 }
 
 /*
@@ -46,11 +45,9 @@ protected class QueryCommand <: Command {
         _query = query
     }
 
-    protected override func toByteArray(): Array<Byte> {
-        let buf = ArrayList<Byte>()
-        buf.appendAll(super.toByteArray())
+    protected override func pack(): Unit {
+        super.pack()
         buf.appendAll(_query.toArray())
-        return buf.toArray()
     }
 
 }
@@ -69,11 +66,9 @@ protected class PrepareCommand <: Command {
         _sql = sql
     }
 
-    public override func toByteArray(): Array<Byte> {
-        let buf = ArrayList<Byte>()
-        buf.appendAll(super.toByteArray())
+    public override func pack(): Unit{
+        super.pack()
         buf.appendAll(_sql.toArray())
-        return buf.toArray()
     }
 
 }
@@ -85,23 +80,21 @@ protected class PrepareCommand <: Command {
  */
 protected class FetchCommand <: Command {
     
-    private let statemetnId: UInt32
+    private let _statemetnId: UInt32
 
-    private let numRows: UInt32
+    private let _numRows: UInt32
 
     protected init(statemetnId: UInt32, numRows: UInt32){
         super(StmtFetch)
-        this._length += 8
-        this.statemetnId = statemetnId
-        this.numRows = numRows
+        _length += 8
+        _statemetnId = statemetnId
+        _numRows = numRows
     }
 
-    protected override func toByteArray(): Array<Byte> {
-        let buf = ArrayList<Byte>()
-        buf.appendAll(super.toByteArray())
-        buf.appendAll(uInt32ToLittleEndian(statemetnId))
-        buf.appendAll(uInt32ToLittleEndian(numRows))
-        return buf.toArray()
+    protected override func pack(): Unit {
+        super.pack()
+        buf.appendAll(uInt32ToLittleEndian(_statemetnId))
+        buf.appendAll(uInt32ToLittleEndian(_numRows))
     }
 
 }
@@ -120,11 +113,9 @@ protected class CloseCommand <: Command {
         _statementId = id
     }
 
-    protected override func toByteArray(): Array<Byte> {
-        let buf = ArrayList<Byte>()
-        buf.appendAll(super.toByteArray())
+    protected override func pack(): Unit {
+        super.pack()
         buf.appendAll(uInt32ToLittleEndian(_statementId))
-        return buf.toArray()
     }
 }
 
@@ -142,11 +133,9 @@ protected class ResetCommand <: Command {
         _statementId = statementId
     }
 
-    public override func toByteArray(): Array<Byte> {
-        let buf = ArrayList<Byte>()
-        buf.appendAll(super.toByteArray())
+    public override func pack(): Unit {
+        super.pack()
         buf.appendAll(uInt32ToLittleEndian(_statementId))
-        return buf.toArray()
     }
 }
 
@@ -162,7 +151,7 @@ protected class SendLongDataCommand <: Command {
 
     private let _data: Array<Byte>
 
-    protected init(statemetnId: UInt32, parameterId: UInt16, data: Array<Byte>){
+    protected init(statemetnId: UInt32, parameterId: UInt16, data: Array<Byte>) {
         super(StmtSendLongData)
         _length += UInt32(data.size + 6)
         _statemetnId = statemetnId
@@ -170,13 +159,11 @@ protected class SendLongDataCommand <: Command {
         _data = data
     }
 
-    public override func toByteArray(): Array<Byte> {
-        let buf = ArrayList<Byte>()
-        buf.appendAll(super.toByteArray())
+    public override func pack(): Unit {
+        super.pack()
         buf.appendAll(uInt32ToLittleEndian(_statemetnId))
         buf.appendAll(uInt16ToLittleEndian(_parameterId))
         buf.appendAll(_data)
-        return buf.toArray()
     }
 
 }

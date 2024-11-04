@@ -337,6 +337,7 @@ protected class MySqlConnection <: Resource {
     }
 
     internal func writeRequest(req: Request): Unit {
+        req.pack()
         write(req.toByteArray())
     }
 

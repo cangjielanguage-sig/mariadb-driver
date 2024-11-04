@@ -47,6 +47,7 @@ public class MySqlConnectionFactory {
         if (sslEnabled) {
             connection.write(authReq.setCapability(SSL).sslRequest())
             sslHandshake(connection, option)
+            authReq.clear()
             authReq.setNumber(authReq.number + 1)
         }
             
@@ -72,7 +73,8 @@ public class MySqlConnectionFactory {
                         return checkCachingSha2PasswordAuthStatus(connection, response, originPassword, authSwitch.salt, sslEnabled)
                     case "sha256_password" => 
                         if(sslEnabled){
-                            return sendPassword(connection, toNullTerminated(originPassword), authSwitch.number)
+                            let (pwd, _) = toNullTerminated(originPassword)
+                            return sendPassword(connection, pwd , authSwitch.number)
                         }else{
                             let (publicKey, lastPacketNumber) = requestPublicKey(connection, SHA256_REQUESET_KEY_CODE,authSwitch.number)
                             let encryptedPwd = performFullAuthentication(publicKey, originPassword.toArray(), authSwitch.salt)
@@ -115,8 +117,12 @@ public class MySqlConnectionFactory {
     }
 
     private static func prepareAuthRequest(handshake: Handshake, option: Map<String, String>, sslEnabled: Bool): HandshakeResponse {
-        let username = option.get(Params.Username).getOrThrow({=> IllegalArgumentException("Required connection parameters: username")})
-        let originPassword = option.get(Params.Password).getOrThrow({=> IllegalArgumentException("Required connection parameters: password")})
+        let username = option.get(Params.Username).getOrThrow() { 
+            => IllegalArgumentException("Required connection parameters: username")
+        }
+        let originPassword = option.get(Params.Password).getOrThrow() {
+            => IllegalArgumentException("Required connection parameters: password")
+        }
         let database = option.get(Params.Database).getOrDefault({=> ""})
         let authReq = HandshakeResponse.getDefault(handshake.number + 1)
         let encryptedPassword: Array<Byte>
@@ -125,7 +131,7 @@ public class MySqlConnectionFactory {
                 encryptedPassword = cachingSha2Password(originPassword.toArray(),handshake.salt)
             case "sha256_password" => 
                 if(sslEnabled){
-                    encryptedPassword = toNullTerminated(originPassword)
+                    (encryptedPassword, _) = toNullTerminated(originPassword)
                 }else {
                     encryptedPassword =  [1]
                 }
@@ -133,7 +139,9 @@ public class MySqlConnectionFactory {
                 encryptedPassword = mysqlNativePassword(originPassword.toArray(),handshake.salt)
             case _ => throw ConnectFailedException("Unknow authentication plugin")
         }
-        authReq.setUsername(username).setAuthResponse(encryptedPassword).setClientAuthPlugin(handshake.authPlugin)
+        authReq.setUsername(username)
+               .setAuthResponse(encryptedPassword)
+               .setClientAuthPlugin(handshake.authPlugin)
         if (database != "") {
             authReq.setCapability(ConnectWithDB).setDatabase(database)
         }
@@ -174,8 +182,10 @@ public class MySqlConnectionFactory {
         match (response) {
             case r: OkResponse =>
                 return connection
-            case r: ErrorResponse => throw ConnectFailedException(r.message)
-            case _ => throw ConnectFailedException("Out expect connection response")
+            case r: ErrorResponse => 
+                throw ConnectFailedException(r.message)
+            case _ => 
+                throw ConnectFailedException("Out expect connection response")
         }
     }
 
@@ -183,7 +193,8 @@ public class MySqlConnectionFactory {
         let authState = (response as AuthStatus).getOrThrow()
         if (authState.state == AuthState.PerformFullAuthentication) {
             if (sslEnabled) {
-                return sendPassword(connection, toNullTerminated(originPassword), authState.number)    
+                let (pwd, _) = toNullTerminated(originPassword)
+                return sendPassword(connection, pwd, authState.number)    
             } else {
                 let (publicKey, lastPacketNumber) = requestPublicKey(connection, CACHING_SHA2_REQUEST_KEY_CODE,authState.number)
                 let encryptedPwd = performFullAuthentication(publicKey, originPassword.toArray(), salt)
@@ -210,13 +221,6 @@ public class MySqlConnectionFactory {
         }
         let publicKey = (response as PublicKeyResponse).getOrThrow().publicKey
         return (publicKey, response.number)
-    }
-
-    private static func toNullTerminated(val: String): Array<Byte> {
-        let list = ArrayList<Byte>()
-        list.appendAll(val.toArray())
-        list.append(0)
-        return list.toArray()
     }
 
     // private static func getMinAndMaxTlsVersion(val: ?String): (TlsVersion, TlsVersion) {

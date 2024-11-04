@@ -37,11 +37,9 @@ protected class InitDbCommand <: Command {
         _database = database
     }
 
-    protected override func toByteArray(): Array<Byte> {
-        var list = ArrayList<Byte>()
-        list.appendAll(super.toByteArray())
-        list.appendAll(_database.toArray())
-        return list.toArray()
+    protected override func pack(): Unit {
+        super.pack()
+        buf.appendAll(_database.toArray())
     }
 }
 
@@ -101,11 +99,9 @@ protected class SetOptionCommand <: Command {
         _operation = option
     }
 
-    protected override func toByteArray(): Array<Byte> {
-        var list = ArrayList<Byte>()
-        list.appendAll(super.toByteArray())
-        list.appendAll(uInt16ToLittleEndian(_operation.value()))
-        return list.toArray()
+    protected override func pack(): Unit {
+        super.pack()
+        buf.appendAll(uInt16ToLittleEndian(_operation.value()))
     }
 
 }
