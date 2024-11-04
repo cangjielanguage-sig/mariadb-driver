@@ -13,7 +13,7 @@ import encoding.json.*
 
 import mysqlclient4cj.jdbc.*
 import mysqlclient4cj.jdbc.impl.*
-import mysqlclient4cj.protocol.inputStreamToArray
+import mysqlclient4cj.protocol.*
 
 @Test
 public class OceanBaseTest {

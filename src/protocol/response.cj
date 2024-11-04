@@ -66,30 +66,30 @@ protected class OkResponse <: Response {
     }
 
 
-    protected init(stream: ByteBuffer){
+    protected init(stream: InputStream){
         super(stream)
         var effectRows = readLengthEncodedInteger(stream)
         if(effectRows.size == 0){
             throw InvalidPacketException("This packet is not a Ok Repsposne packet: read effect rows failed")
         }
-        _effectRows = littleEndianToUInt64(effectRows)
+        _effectRows = UInt64.fromLittleEndian(effectRows)
 
         var index = readLengthEncodedInteger(stream)
         if(index.size == 0){
             throw InvalidPacketException("This packet is not a Ok Repsposne packet: read index failed")
         }
-        _index = littleEndianToUInt64(index)
+        _index = UInt64.fromLittleEndian(index)
         var serverStatus = Array<Byte>(2, repeat: 0)
         if(stream.read(serverStatus) == 0){
             throw InvalidPacketException("This packet is not a Ok Repsposne packet: read server status failed")
         }
-        _serverStatus = littleEndianToUInt16(serverStatus)
+        _serverStatus = UInt16.fromLittleEndian(serverStatus)
 
         var waringCount = Array<Byte>(2, repeat: 0)
         if(stream.read(waringCount) == 0){
             throw InvalidPacketException("This packet is not a Ok Repsposne packet: read waring count failed")
         }
-        _waringCount = littleEndianToUInt16(waringCount)
+        _waringCount = UInt16.fromLittleEndian(waringCount)
         var message = Array<Byte>(Int64(_length - 5), repeat: 0)
         _message = String.fromUtf8(message.toArray())
     }
@@ -117,7 +117,7 @@ protected class ErrorResponse <: Response{
         if(stream.read(errorCode) == 0){
             throw InvalidPacketException("This packet is not a Error Repsposne packet: read error code failed")
         }
-        _errorCode = littleEndianToUInt16(errorCode)
+        _errorCode = UInt16.fromLittleEndian(errorCode)
         var single = Array<Byte>(1,repeat: 0)
         if(stream.read(single) == 0){
             throw InvalidPacketException("This packet is not a Error Repsposne packet: read server status flag failed")
@@ -226,12 +226,12 @@ protected class EofResponse <: AbstractEOF{
         if(stream.read(waringCount) == 0){
             throw InvalidPacketException("This packet is not a Eof Resposne packet: read effect rows failed")
         }
-        _waringCount = littleEndianToUInt16(waringCount)
+        _waringCount = UInt16.fromLittleEndian(waringCount)
         var status = Array<Byte>(2, repeat: 0)
         if(stream.read(status) == 0){
             throw InvalidPacketException("This packet is not a Eof Repsposne packet: read effect rows failed")
         }
-        _status = littleEndianToUInt16(status)
+        _status = UInt16.fromLittleEndian(status)
     }
 
 }
@@ -258,23 +258,23 @@ protected class PrepareResposne <: Response{
         if(stream.read(statementId) == 0){
             throw InvalidPacketException("This packet is not a PrepareOkResposnePacket: read statementId failed")
         }
-        _statementId = littleEndianToUInt32(statementId)
+        _statementId = UInt32.fromLittleEndian(statementId)
         var numColumns = Array<Byte>(2, repeat: 0)
         if(stream.read(numColumns) == 0){
             throw InvalidPacketException("This packet is not a PrepareOkResposnePacket: read numColumns failed")
         }
-        _numColumns = littleEndianToUInt16(numColumns)
+        _numColumns = UInt16.fromLittleEndian(numColumns)
         var numParams = Array<Byte>(2, repeat: 0)
         if(stream.read(numParams) == 0){
             throw InvalidPacketException("This packet is not a PrepareOkResposnePacket: read numParams failed")
         }
-        _numParams = littleEndianToUInt16(numParams)
+        _numParams = UInt16.fromLittleEndian(numParams)
         _reserved = 0x00
         var warningCount = Array<Byte>(2, repeat: 0)
         if(stream.read(warningCount) == 0){
             throw InvalidPacketException("This packet is not a PrepareOkResposnePacket: read waringCount failed")
         }
-        _warningCount = littleEndianToUInt16(warningCount)
+        _warningCount = UInt16.fromLittleEndian(warningCount)
     }
 
     protected prop statementId: UInt32{

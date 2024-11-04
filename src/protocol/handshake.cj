@@ -42,7 +42,7 @@ protected class Handshake <: CommonPacket {
             _serverCapabilities.writeLittleEndian(part1)
             var part2 = Array<Byte>(2, repeat: 0)
             _extendedServerCapabilities.writeLittleEndian(part2)
-            return littleEndianToUInt32([part1[0], part1[1], part2[0], part2[1]])
+            return UInt32.fromLittleEndian([part1[0], part1[1], part2[0], part2[1]])
         }
     }
 
@@ -90,7 +90,7 @@ protected class Handshake <: CommonPacket {
         if(stream.read(threadId) == 0){
             throw InvalidPacketException("This packet is not a Handshake packet: read threadId failed")
         }
-        this._threadId = littleEndianToUInt32(threadId)
+        this._threadId = UInt32.fromLittleEndian(threadId)
         // 随机盐: n byte,以空字符结束
         var salt1 = ArrayList<Byte>()
         do {
@@ -107,7 +107,7 @@ protected class Handshake <: CommonPacket {
         if(stream.read(serverCapabilities) == 0){
             throw InvalidPacketException("This packet is not a Handshake packet: read server capabilities failed")
         }
-        this._serverCapabilities = littleEndianToUInt16(serverCapabilities)
+        this._serverCapabilities = UInt16.fromLittleEndian(serverCapabilities)
         // 服务字符编码集: 1 byte
         var serverLanguage = Array<Byte>(1, repeat: 0)
         if(stream.read(serverLanguage) == 0){
@@ -119,13 +119,13 @@ protected class Handshake <: CommonPacket {
         if(stream.read(serverStatus) == 0){
             throw InvalidPacketException("This packet is not a Handshake packet: read server status failed")
         }
-        this._serverStatus = littleEndianToUInt16(serverStatus)
+        this._serverStatus = UInt16.fromLittleEndian(serverStatus)
         // 服务器权能标志扩展: 2 byte
         var extendedServerCapabilities = Array<Byte>(2, repeat: 0)
         if(stream.read(extendedServerCapabilities) == 0){
             throw InvalidPacketException("This packet is not a Handshake packet: read extended server capabilities failed")
         }
-        this._extendedServerCapabilities = littleEndianToUInt16(extendedServerCapabilities)
+        this._extendedServerCapabilities = UInt16.fromLittleEndian(extendedServerCapabilities)
         // 认证插件长度: 1 byte
         if(hasCapability(PluginAuth)){
             var authenticationDataLength = Array<Byte>(1, repeat: 0)

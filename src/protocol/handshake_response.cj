@@ -90,14 +90,14 @@ protected class HandshakeResponse <: Request {
     }
 
     public override func pack(): Unit {
-        var length: Int64 = HEADER_SIZE
+        var length: Int64 = 0
         //put packet length and number placeholer
         super.pack()
         //put client Capabilities
-        buf.appendAll(uInt32ToLittleEndian(_capabilities))
+        buf.appendAll(_capabilities.toLittleEndian())
         length += 4
         //put max packet
-        buf.appendAll(uInt32ToLittleEndian(_maxPacket))
+        buf.appendAll(_maxPacket.toLittleEndian())
         length += 4
         //put charset
         buf.append(_charset)
@@ -138,7 +138,7 @@ protected class HandshakeResponse <: Request {
         //put attributes length placeholder
         if(hasCapability(ConnectAttrs)) {
             buf.append(0x00)
-            var attrLenIndex: Int = length
+            var attrLenIndex: Int = length + HeaderSize
             length += 1
             var attrLen: Int = 0
             for((k,v) in _attribute){
@@ -167,7 +167,7 @@ protected class HandshakeResponse <: Request {
             length += 1
         }
         // set packet length
-        reset(UInt32(length) - UInt32(HEADER_SIZE))
+        reset(UInt32(length))
     }
 
     /*
@@ -178,10 +178,10 @@ protected class HandshakeResponse <: Request {
         var length: Int = 0
         super.pack()
         //put client Capabilities
-        buf.appendAll(uInt32ToLittleEndian(_capabilities))
+        buf.appendAll(_capabilities.toLittleEndian())
         length += 4
         //put max packet
-        buf.appendAll(uInt32ToLittleEndian(_maxPacket))
+        buf.appendAll(_maxPacket.toLittleEndian())
         length += 4
         //put charset
         buf.append(_charset)

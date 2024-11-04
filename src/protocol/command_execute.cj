@@ -68,18 +68,18 @@ protected class ExecuteCommand <: Command {
         super.pack()
         var len = 0
         // id
-        buf.appendAll(uInt32ToLittleEndian(_statementId))
+        buf.appendAll(_statementId.toLittleEndian())
         len += 4
         // flag
         buf.append(_flags.value())
         len += 1
         // iteration_count
-        buf.appendAll(uInt32ToLittleEndian(_iterationCount))
+        buf.appendAll(_iterationCount.toLittleEndian())
         len += 4
         if (_parameterCount > 0 || _flags == ParameterCountAvailable) {
             if (HandshakeResponse.getDefault(0).hasCapability(QueryAttributes)) {
                 //parameter_count
-                var array = integerToLengthEncoded(_parameterCount)
+                var array = toLengthEncoded(_parameterCount)
                 buf.appendAll(array)
                 len += array.size
             }
@@ -159,7 +159,7 @@ protected class ExecuteCommand <: Command {
     }
 
     private func appendBool(index: Int64, buf: ArrayList<Byte>, value: Bool): Int64 {
-        return appendUInt8(index, buf, boolToInteger(value));
+        return appendUInt8(index, buf, toInteger(value))
     }
 
     @OverflowWrapping
@@ -237,7 +237,7 @@ protected class ExecuteCommand <: Command {
             case Tiny => 
                 return appendUInt8(index, buf, UInt8(value)) // possible overflow
             case Short => 
-                buf.appendAll(uInt16ToLittleEndian(value))
+                buf.appendAll(value.toLittleEndian())
                 return 2
             case Long | Int24 | Year => 
                 return appendUInt32(index, buf, UInt32(value))
@@ -285,7 +285,7 @@ protected class ExecuteCommand <: Command {
             case Short =>
                 return appendUInt16(index, buf, UInt16(value)) // possible overflow
             case Int24 | Long | Year => 
-                buf.appendAll(uInt32ToLittleEndian(value))
+                buf.appendAll(value.toLittleEndian())
                 return 4
             case LongLong => 
                 return appendUInt64(index, buf, UInt64(value))
@@ -333,7 +333,7 @@ protected class ExecuteCommand <: Command {
             case Int24 | Long | Year => 
                 return appendUInt32(index, buf, UInt32(value)) // possible overflow
             case LongLong => 
-                buf.appendAll(uInt64ToLittleEndian(value))
+                buf.appendAll(value.toLittleEndian())
                 return 8
             case Float => 
                 return appendFloat32(index, buf, Float32(value))
@@ -360,7 +360,7 @@ protected class ExecuteCommand <: Command {
             case Float =>
                 return appendFloat32(index, buf, Float32(value)) //possible loss of precision
             case Double => 
-                buf.appendAll(float64ToLittleEndian(value))
+                buf.appendAll(value.toLittleEndian())
                 return 8
             case Tiny => 
                 return appendInt8(index, buf, Int8(value))
@@ -389,7 +389,7 @@ protected class ExecuteCommand <: Command {
         let paramType = _paramDefinition[index].columnType
         match (paramType) {
             case String | VarString | NewDecimal | Json | TinyBlob | Blob | MediumBlob | LongBlob =>
-                let array = stringToLengthEncoded(value)
+                let array = toLengthEncoded(value)
                 buf.appendAll(array)
                 return array.size
             case Tiny | Short | Year | Int24 | Long | LongLong => 
@@ -431,15 +431,15 @@ protected class ExecuteCommand <: Command {
         let paramType = _paramDefinition[index].columnType
         match (paramType) {
             case Timestamp | DateTime => 
-                let array = dateTimeToProtocolBinaryDateTime(value)
+                let array = toBinaryDateTime(value)
                 buf.appendAll(array)
                 return array.size
             case Date => 
-                let array = dateTimeToProtocolBinaryDate(value)
+                let array = toBinaryDate(value)
                 buf.appendAll(array)
                 return array.size
             case Time =>
-                let array = dateTimeToProtocolBinaryTime(value)
+                let array = toBinaryTime(value)
                 buf.appendAll(array)
                 return array.size
             case Year =>

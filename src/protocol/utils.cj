@@ -10,137 +10,35 @@ import std.io.*
 import encoding.hex.*
 import std.math.numeric.*
 import encoding.json.*
+
+
 /*
- * Bool to Integer true -> 1 false -> 0
+ * true -> 1, false -> 0
  */
-protected  func boolToInteger(value: Bool): UInt8 {
-    if (value) {
-        return 1
-    } else {
-        return 0
+protected func toInteger(value: Bool): UInt8 {
+    match (value) {
+        case true => 1
+        case false => 0
     }
 }
 
+protected func toBool(value: String): Bool {
+    match (value) {
+        case "1" => return true
+        case "0" => return false
+        case _ => throw IllegalArgumentException("parse string to bool faild")
+    }
+}
+
+/*
+* 将字符串转换为以0字节结尾的数组
+*/
 protected func toNullTerminated(val: String): (Array<Byte>, Int64) {
     let buf = ArrayList<Byte>(val.size + 1)
     buf.appendAll(val.toArray())
     buf.append(0)
     return (buf.toArray(), buf.size)
 }
-
-/*
- * 小端序字节数组转UInt64
- */
-protected func littleEndianToUInt64(array: Array<Byte>): UInt64 {
-    if (array.size < 1 || array.size > 8) {
-        throw IllegalArgumentException("array szie must between 1 and 8")
-    }
-    var arr: Array<Byte> = Array<Byte>(8, repeat: 0x00)
-    var result: UInt64 = 0;
-    var i = 0;
-    while (i < array.size) {
-        arr[i] = array[i]
-        result |= UInt64(arr[i]) << 8 * i
-        i++
-    }
-    return result
-}
-/*
- * 小端序字节数组转UInt32
- */
-protected func littleEndianToUInt32(array: Array<Byte>): UInt32 {
-    if (array.size < 1 || array.size > 4) {
-        throw IllegalArgumentException("Array size must between 1 and 4")
-    }
-    var arr: Array<Byte> = Array<Byte>(4, repeat: 0x00)
-    var result: UInt32 = 0;
-    var i = 0;
-    while (i < array.size) {
-        arr[i] = array[i]
-        result |= UInt32(arr[i]) << 8 * i
-        i++
-    }
-    return result
-}
-
-/*
- * 小端序字节数组转UInt16
- */
-protected func littleEndianToUInt16(array: Array<Byte>): UInt16 {
-    if (array.size < 1 || array.size > 2) {
-        throw IllegalArgumentException("array szie must between 1 and 2")
-    }
-    var arr: Array<Byte> = [0x00, 0x00]
-    var result: UInt16 = 0x00;
-    var i = 0;
-    while (i < array.size) {
-        arr[i] = array[i]
-        result |= UInt16(arr[i]) << 8 * i
-        i++
-    }
-    return result
-}
-
-/*
- * UInt64转小端字节数组
- */
-protected  func uInt64ToLittleEndian(number: UInt64): Array<Byte> {
-    var buffer = Array<Byte>(8, repeat: 0)
-    number.writeLittleEndian(buffer)
-    return buffer
-}
-
-
-/*
- * UInt32转小端序字节数组
- */
-protected func uInt32ToLittleEndian(number: UInt32): Array<Byte> {
-    var buffer = Array<Byte>(4, repeat: 0)
-    number.writeLittleEndian(buffer)
-    return buffer
-}
-
-/*
- * UInt16转小端序字节数组
- */
-protected  func uInt16ToLittleEndian(number: UInt16): Array<Byte> {
-    var buffer = Array<Byte>(2, repeat: 0)
-    number.writeLittleEndian(buffer)
-    return buffer
-}
-
-/*
- * Float16转大端字节数组
- */
-protected  func float32ToLittleEndian(number: Float32): Array<Byte> {
-    var array = Array<Byte>(4, repeat: 0)
-    number.writeLittleEndian(array)
-    return array
-}
-
-/*
- * Float16转大端字节数组
- */
-protected  func float64ToLittleEndian(number: Float64): Array<Byte> {
-    var array = Array<Byte>(8, repeat: 0)
-    number.writeLittleEndian(array)
-    return array
-}
-
-/*
- * 小端字节数组转Float32
- */
-protected  func littleEndianToFloat32(array: Array<Byte>): Float32 {
-    return Float32.readLittleEndian(array)
-}
-
-/*
- * 小端字节数组转Float64
- */
-protected  func littleEndianToFloat64(array: Array<Byte>): Float64 {
-    return Float64.readLittleEndian(array)
-}
-
 
 /*
  * 从流的当前位置读取一个长度编码的二进制字符串
@@ -154,17 +52,18 @@ protected  func littleEndianToFloat64(array: Array<Byte>): Float64 {
  * return:
  * None 表示数据库Null值
  */
-protected func readLengthEncodedString(array: Array<Byte>): ?Array<Byte> {
-    var stream = ByteBuffer()
-    stream.write(array)
-    return readLengthEncodedString(stream)
+protected func readLengthEncodedString(stream: InputStream): ?String {
+    match(readLengthEncodedStringRaw(stream)) {
+        case None => return None
+        case Some(v) => return String.fromUtf8(v)
+    }
 }
 
-protected func readLengthEncodedString(stream: InputStream): ?Array<Byte> {
-    var single = Array<Byte>(1, repeat: 0)
+protected func readLengthEncodedStringRaw(stream: InputStream): ?Array<Byte> {
+    let single = Array<Byte>(1, repeat: 0)
     stream.read(single)
-    var lengthFlag = single[0]
-    match (lengthFlag) {
+    let flag = single[0]
+    match (flag) {
         case 0x00 => return []
         case 0xFB => return None
         case 0xFC => return readString(stream, 2)
@@ -172,17 +71,17 @@ protected func readLengthEncodedString(stream: InputStream): ?Array<Byte> {
         case 0xFE => return readString(stream, 8)
         case 0xFF => throw InvalidPacketException("This packet is Error packet")
         case _ =>
-            var buf = Array<Byte>(Int64(single[0]), repeat: 0)
+            let buf = Array<Byte>(Int64(single[0]), repeat: 0)
             stream.read(buf)
             return buf
     }
 }
 
-protected  func readString(stream: InputStream, len: Int64): Array<Byte> {
-    var buf = Array<Byte>(Int64(len), repeat: 0)
+private func readString(stream: InputStream, len: Int64): Array<Byte> {
+    let buf = Array<Byte>(len, repeat: 0)
     stream.read(buf)
-    var dataLen = littleEndianToUInt64(buf)
-    var data = Array<Byte>(Int64(dataLen), repeat: 0)
+    let length = UInt64.fromLittleEndian(buf)
+    let data = Array<Byte>(Int64(length), repeat: 0)
     stream.read(data)
     return data
 }
@@ -190,30 +89,29 @@ protected  func readString(stream: InputStream, len: Int64): Array<Byte> {
 /*
  * 字符串转LengthEncodedString
  */
-protected  func stringToLengthEncoded(str: ?String): Array<Byte> {
-    var list = ArrayList<Byte>()
-    if (str.isNone()) {
-        list.append(0xFB)
-    } else {
-        var value = str.getOrThrow()
-        if (value.size <= 0xFA) {
-            list.append(UInt8(value.size))
-            list.appendAll(value.toArray())
-        } else if (value.size <= (2 ** 16)) {
-            list.append(0xFC)
-            list.appendAll(uInt16ToLittleEndian(UInt16(value.size)))
-            list.appendAll(value.toArray())
-        } else if (value.size <= 2 ** 24) {
-            list.append(0xFD)
-            list.appendAll(uInt32ToLittleEndian(UInt32(value.size)).slice(0, 3))
-            list.appendAll(value.toArray())
-        } else {
-            list.append(0xFE)
-            list.appendAll(uInt64ToLittleEndian(UInt64(value.size)))
-            list.appendAll(value.toArray())
-        }
+protected func toLengthEncoded(value: ?String): Array<Byte> {
+    match (value) {
+        case None => return [0xFB]
+        case Some(v) =>
+            let buf = ArrayList<Byte>()
+            if (v.size <= 0xFA) {
+                buf.append(UInt8(v.size))
+                buf.appendAll(v.toArray())
+            } else if (v.size <= (2 ** 16)) {
+                buf.append(0xFC)
+                buf.appendAll(UInt16(v.size).toLittleEndian())
+                buf.appendAll(v.toArray())
+            } else if (v.size <= 2 ** 24) {
+                buf.append(0xFD)
+                buf.appendAll(UInt32(v.size).toLittleEndian().slice(0, 3))
+                buf.appendAll(v.toArray())
+            } else {
+                buf.append(0xFE)
+                buf.appendAll(UInt64(v.size).toLittleEndian())
+                buf.appendAll(v.toArray())
+            }
+            buf.toArray()
     }
-    return list.toArray()
 }
 
 /*
@@ -225,23 +123,23 @@ protected  func stringToLengthEncoded(str: ?String): Array<Byte> {
  * x = 0xfe: 后续额外8个字节为实际数据
  * x = 0xff: 表示该数据包为 1 个 ERR_Packet
  */
-protected  func readLengthEncodedInteger(stream: InputStream): Array<Byte> {
-    var single = Array<Byte>(1, repeat: 0)
+protected func readLengthEncodedInteger(stream: InputStream): Array<Byte> {
+    let single = Array<Byte>(1, repeat: 0)
     if (stream.read(single) == 0) {
         return []
     }
-    var lengthFlag = single[0]
-    match (lengthFlag) {
-        case 0xfc =>
-            var buffer = Array<Byte>(2, repeat: 0)
+    let flag = single[0]
+    match (flag) {
+        case 0xFC =>
+            let buffer = Array<Byte>(2, repeat: 0)
             stream.read(buffer)
             return buffer
-        case 0xfd =>
-            var buffer = Array<Byte>(3, repeat: 0)
+        case 0xFD =>
+            let buffer = Array<Byte>(3, repeat: 0)
             stream.read(buffer)
             return buffer
-        case 0xfe =>
-            var buffer = Array<Byte>(8, repeat: 0)
+        case 0xFE =>
+            let buffer = Array<Byte>(8, repeat: 0)
             stream.read(buffer)
             return buffer
         case 0xff => throw InvalidPacketException("This packet is Error packet")
@@ -253,121 +151,121 @@ protected  func readLengthEncodedInteger(stream: InputStream): Array<Byte> {
 /*
  * 整数转LengthEncodedInteger
  */
-protected  func integerToLengthEncoded(value: UInt64): Array<Byte> {
-    var list = ArrayList<Byte>()
+protected func toLengthEncoded(value: UInt64): Array<Byte> {
+    let buf = ArrayList<Byte>()
     if (value < 0xFB) {
-        list.append(UInt8(value))
+        buf.append(UInt8(value))
     } else if (value < UInt64(2 ** 16)) {
-        list.append(0xFC)
-        list.appendAll(uInt16ToLittleEndian(UInt16(value)))
+        buf.append(0xFC)
+        buf.appendAll(UInt16(value).toLittleEndian())
     } else if (value < UInt64(2 ** 24)) {
-        list.append(0xFD)
-        list.appendAll(uInt32ToLittleEndian(UInt32(value)).slice(0, 3))
+        buf.append(0xFD)
+        buf.appendAll(UInt32(value).toLittleEndian().slice(0, 3))
     } else {
-        list.append(0xFE)
-        list.appendAll(uInt64ToLittleEndian(value))
+        buf.append(0xFE)
+        buf.appendAll(value.toLittleEndian())
     }
-    return list.toArray()
+    return buf.toArray()
 }
 
 /*
  * DateTime转二进制协议Date
  */
-protected  func dateTimeToProtocolBinaryDate(dateTime: DateTime): Array<Byte> {
-    var list = ArrayList<Byte>(5)
-    list.append(4)
-    list.appendAll(uInt16ToLittleEndian(UInt16(dateTime.year)))
-    list.append(UInt8(dateTime.month.value()))
-    list.append(UInt8(dateTime.dayOfMonth))
-    return list.toArray()
-}
-
-/*
- * DateTime转二进制协议DateTime或Timestamp
- */
-@OverflowWrapping
-protected  func dateTimeToProtocolBinaryDateTime(dateTime: DateTime): Array<Byte> {
-    var list = ArrayList<Byte>(8)
-    list.append(7)
-    list.appendAll(uInt16ToLittleEndian(UInt16(dateTime.year)))
-    list.append(UInt8(dateTime.month.value()))
-    list.append(UInt8(dateTime.dayOfMonth))
-    list.append(UInt8(dateTime.hour))
-    list.append(UInt8(dateTime.minute))
-    list.append(UInt8(dateTime.second))
-    return list.toArray()
+protected func toBinaryDate(dateTime: DateTime): Array<Byte> {
+    let buf = ArrayList<Byte>(5)
+    buf.append(4)
+    buf.appendAll(UInt16(dateTime.year).toLittleEndian())
+    buf.append(UInt8(dateTime.month.value()))
+    buf.append(UInt8(dateTime.dayOfMonth))
+    return buf.toArray()
 }
 
 /*
  * DateTime转二进制协议Time
  */
 @OverflowWrapping
-protected func dateTimeToProtocolBinaryTime(dateTime: DateTime): Array<Byte> {
-    var list = ArrayList<Byte>(9)
-    list.append(8)
-    list.append(0x00)
-    //list.appendAll(uInt32ToLittleEndian(UInt32(dateTime.dayOfYear)))
-    list.appendAll([0x00,0x00,0x00,0x00])
-    list.append(UInt8(dateTime.hour))
-    list.append(UInt8(dateTime.minute))
-    list.append(UInt8(dateTime.second))
-    return list.toArray()
+protected func toBinaryTime(dateTime: DateTime): Array<Byte> {
+    let buf = ArrayList<Byte>(9)
+    buf.append(8)
+    buf.append(0x00)
+    buf.appendAll([0x00,0x00,0x00,0x00])
+    buf.append(UInt8(dateTime.hour))
+    buf.append(UInt8(dateTime.minute))
+    buf.append(UInt8(dateTime.second))
+    return buf.toArray()
 }
+
+/*
+ * DateTime转二进制协议DateTime或Timestamp
+ */
+@OverflowWrapping
+protected  func toBinaryDateTime(dateTime: DateTime): Array<Byte> {
+    var buf = ArrayList<Byte>(8)
+    buf.append(7)
+    buf.appendAll(UInt16(dateTime.year).toLittleEndian())
+    buf.append(UInt8(dateTime.month.value()))
+    buf.append(UInt8(dateTime.dayOfMonth))
+    buf.append(UInt8(dateTime.hour))
+    buf.append(UInt8(dateTime.minute))
+    buf.append(UInt8(dateTime.second))
+    return buf.toArray()
+}
+
 
 /*
  * MySql二进制转DateTime
  */
-protected  func binaryDateTimeToDateTime(data: Array<Byte>): ?DateTime {
-    var stream = arrayToInputStream(data)
-    var single = Array<Byte>(1, repeat: 0)
+protected func dateTimeToDateTime(data: Array<Byte>): ?DateTime {
+    let stream = toInputStream(data)
+    let single = Array<Byte>(1, repeat: 0)
     stream.read(single)
-    var yearArray = Array<Byte>(2, repeat: 0)
-    var monthArray = Array<Byte>(1, repeat: 0)
-    var dayArray = Array<Byte>(1, repeat: 0)
-    var hourArray = Array<Byte>(1, repeat: 0)
-    var minuteArray = Array<Byte>(1, repeat: 0)
-    var secondArray = Array<Byte>(1, repeat: 0)
-    var micorSecondArray = Array<Byte>(4, repeat: 0)
+    let year = Array<Byte>(2, repeat: 0)
+    let month = Array<Byte>(1, repeat: 0)
+    let day = Array<Byte>(1, repeat: 0)
+    let hour = Array<Byte>(1, repeat: 0)
+    let minute = Array<Byte>(1, repeat: 0)
+    let second = Array<Byte>(1, repeat: 0)
+    let micorSecond = Array<Byte>(4, repeat: 0)
     match (single[0]) {
         case 0 => return None
         case 4 =>
-            stream.read(yearArray)
-            stream.read(monthArray)
-            stream.read(dayArray)
-            var year = littleEndianToUInt64(yearArray)
-            var month = littleEndianToUInt64(monthArray)
-            var day = littleEndianToUInt64(dayArray)
+            stream.read(year)
+            stream.read(month)
+            stream.read(day)
+            let year = UInt16.fromLittleEndian(year)
+            let month = UInt8.fromLittleEndian(month)
+            let day = UInt8.fromLittleEndian(day)
             return DateTime.of(year: Int64(year), month: Int64(month), dayOfMonth: Int64(day), timeZone: TimeZone.UTC)
         case 7 =>
-            stream.read(yearArray)
-            stream.read(monthArray)
-            stream.read(dayArray)
-            stream.read(hourArray)
-            stream.read(minuteArray)
-            stream.read(secondArray)
-            var year = littleEndianToUInt64(yearArray)
-            var month = littleEndianToUInt64(monthArray)
-            var day = littleEndianToUInt64(dayArray)
-            var hour = littleEndianToUInt64(hourArray)
-            var minute = littleEndianToUInt64(minuteArray)
-            var second = littleEndianToUInt64(secondArray)
+            stream.read(year)
+            stream.read(month)
+            stream.read(day)
+            stream.read(hour)
+            stream.read(minute)
+            stream.read(second)
+            let year = UInt16.fromLittleEndian(year)
+            let month = UInt8.fromLittleEndian(month)
+            let day = UInt8.fromLittleEndian(day)
+            let hour = UInt8.fromLittleEndian(hour)
+            let minute = UInt8.fromLittleEndian(minute)
+            let second = UInt8.fromLittleEndian(second)
             return DateTime.of(year: Int64(year), month: Int64(month), dayOfMonth: Int64(day), hour: Int64(hour),
                 minute: Int64(minute), second: Int64(second), timeZone: TimeZone.Local)
         case 11 =>
-            stream.read(yearArray)
-            stream.read(monthArray)
-            stream.read(dayArray)
-            stream.read(hourArray)
-            stream.read(minuteArray)
-            stream.read(secondArray)
-            stream.read(micorSecondArray)
-            var year = littleEndianToUInt64(yearArray)
-            var month = littleEndianToUInt64(monthArray)
-            var day = littleEndianToUInt64(dayArray)
-            var hour = littleEndianToUInt64(hourArray)
-            var minute = littleEndianToUInt64(minuteArray)
-            var second = littleEndianToUInt64(secondArray)
-            var micorSecond = littleEndianToUInt64(micorSecondArray)
+            stream.read(year)
+            stream.read(month)
+            stream.read(day)
+            stream.read(hour)
+            stream.read(minute)
+            stream.read(second)
+            stream.read(micorSecond)
+            let year = UInt16.fromLittleEndian(year)
+            let month = UInt8.fromLittleEndian(month)
+            let day = UInt8.fromLittleEndian(day)
+            let hour = UInt8.fromLittleEndian(hour)
+            let minute = UInt8.fromLittleEndian(minute)
+            let second = UInt8.fromLittleEndian(second)
+            let micorSecond = UInt32.fromLittleEndian(micorSecond)
             return DateTime.of(
                 year: Int64(year),
                 month: Int64(month),
@@ -385,29 +283,29 @@ protected  func binaryDateTimeToDateTime(data: Array<Byte>): ?DateTime {
 /*
  * MySql二进制转DateTime
  */
-protected func binaryTimeToDateTime(data: Array<Byte>): ?DateTime {
-    var stream = arrayToInputStream(data)
-    var single = Array<Byte>(1, repeat: 0)
+protected func timeToDateTime(data: Array<Byte>): ?DateTime {
+    let stream = toInputStream(data)
+    let single = Array<Byte>(1, repeat: 0)
     stream.read(single)
-    var negativeArray = Array<Byte>(1, repeat: 0)
-    var dayArray = Array<Byte>(4, repeat: 0)
-    var hourArray = Array<Byte>(1, repeat: 0)
-    var minuteArray = Array<Byte>(1, repeat: 0)
-    var secondArray = Array<Byte>(1, repeat: 0)
-    var micorSecondArray = Array<Byte>(4, repeat: 0)
+    let negative = Array<Byte>(1, repeat: 0)
+    let day = Array<Byte>(4, repeat: 0)
+    let hour = Array<Byte>(1, repeat: 0)
+    let minute = Array<Byte>(1, repeat: 0)
+    let second = Array<Byte>(1, repeat: 0)
+    let micorSecond = Array<Byte>(4, repeat: 0)
     match (single[0]) {
         case 0 => return None
         case 8 =>
-            stream.read(negativeArray)
-            stream.read(dayArray)
-            stream.read(hourArray)
-            stream.read(minuteArray)
-            stream.read(secondArray)
+            stream.read(negative)
+            stream.read(day)
+            stream.read(hour)
+            stream.read(minute)
+            stream.read(second)
             //var negative = littleEndianToUInt64(negativeArray)
             //var day = littleEndianToUInt64(dayArray)
-            var hour = littleEndianToUInt64(hourArray)
-            var minute = littleEndianToUInt64(minuteArray)
-            var second = littleEndianToUInt64(secondArray)
+            let hour = UInt8.fromLittleEndian(hour)
+            let minute = UInt8.fromLittleEndian(minute)
+            let second = UInt8.fromLittleEndian(second)
             return DateTime.of(
                 year: 1970,
                 month: 1,
@@ -418,18 +316,18 @@ protected func binaryTimeToDateTime(data: Array<Byte>): ?DateTime {
                 timeZone: TimeZone.UTC
             )
         case 12 =>
-            stream.read(negativeArray)
-            stream.read(dayArray)
-            stream.read(hourArray)
-            stream.read(minuteArray)
-            stream.read(secondArray)
-            stream.read(micorSecondArray)
+            stream.read(negative)
+            stream.read(day)
+            stream.read(hour)
+            stream.read(minute)
+            stream.read(second)
+            stream.read(micorSecond)
             //var negative = littleEndianToUInt64(negativeArray)
             //var day = littleEndianToUInt64(dayArray)
-            var hour = littleEndianToUInt64(hourArray)
-            var minute = littleEndianToUInt64(minuteArray)
-            var second = littleEndianToUInt64(secondArray)
-            var micorSecond = littleEndianToUInt32(micorSecondArray)
+            let hour = UInt8.fromLittleEndian(hour)
+            let minute = UInt8.fromLittleEndian(minute)
+            let second = UInt8.fromLittleEndian(second)
+            let micorSecond = UInt32.fromLittleEndian(micorSecond)
             return DateTime.of(
                 year: 1970,
                 month: 1,
@@ -447,37 +345,34 @@ protected func binaryTimeToDateTime(data: Array<Byte>): ?DateTime {
 /*
  * InputStream转Array
  */
-protected func inputStreamToArray(inputStream: InputStream): Array<Byte> {
+protected func toArray(inputStream: InputStream): Array<Byte> {
     var buffer = Array<Byte>(1024, repeat: 0)
     var len = inputStream.read(buffer)
-    var list = ArrayList<Byte>()
+    var buf = ArrayList<Byte>()
     do {
-        list.appendAll(buffer.slice(0,len))
+        buf.appendAll(buffer.slice(0,len))
         len = inputStream.read(buffer)
     } while (len != 0)
-    return list.toArray()
+    return buf.toArray()
 }
 
 /*
  * Array转InputStream
  */
-protected func arrayToInputStream(array: Array<Byte>): ByteBuffer {
-    var stream = ByteBuffer(array.size)
-    stream.write(array)
+protected func toInputStream(buffer: Array<Byte>): InputStream{
+    var stream = ByteBuffer(buffer.size)
+    stream.write(buffer)
     return stream
 }
 
 /*
  * Array转二进制字符串，以0x开头
  */
-protected func arrayToHexString(array: Array<Byte>): String {
-    if(array.size == 0){
+protected func to0xString(buffer: Array<Byte>): String {
+    if(buffer.size == 0) {
         return "''"
     }
-    var builder = StringBuilder()
-    builder.append("0x")
-    builder.append(toHexString(array))
-    return builder.toString()
+    return "0x${toHexString(buffer)}"
 }
 
 /*

@@ -185,7 +185,7 @@ protected class TextResultSet <: ResultSet {
     public override func getInputStream(index: Int64): ?InputStream {
         match (getArray(index)) {
             case None => None
-            case Some(v) => arrayToInputStream(v)
+            case Some(v) => toInputStream(v)
         }
     }
 

@@ -27,7 +27,7 @@ protected class ColumnCount <: CommonPacket {
         if (count.size == 0) {
             throw InvalidPacketException("This packet is not a Column Count packet: read fields count failed")
         }
-        _count = littleEndianToUInt32(count)
+        _count = UInt32.fromLittleEndian(count)
     }
 }
 
@@ -63,56 +63,48 @@ protected class ColumnDefinition <: CommonPacket {
 
     protected init(stream: InputStream) {
         super(stream)
-        var buf: ?Array<Byte>
-        buf = readLengthEncodedString(stream)
-        this._catalog = String.fromUtf8(
-            buf.getOrThrow({=> InvalidPacketException("This packet is not a Field packet: read catalog failed")}))
-
-        buf = readLengthEncodedString(stream)
-        this._database = String.fromUtf8(
-            buf.getOrThrow({=> InvalidPacketException("This packet is not a Field packet: read database failed")}))
-
-        buf = readLengthEncodedString(stream)
-        this._table = String.fromUtf8(
-            buf.getOrThrow({=> InvalidPacketException("This packet is not a Field packet: read table failed")}))
-
-        buf = readLengthEncodedString(stream)
-        this._originalTable = String.fromUtf8(
-            buf.getOrThrow({=> InvalidPacketException("This packet is not a Field packet: read original table failed")})
-        )
-
-        buf = readLengthEncodedString(stream)
-        this._name = String.fromUtf8(
-            buf.getOrThrow({=> InvalidPacketException("This packet is not a Field packet: read name failed")}))
-
-        buf = readLengthEncodedString(stream)
-        this._originalName = String.fromUtf8(
-            buf.getOrThrow({=> InvalidPacketException("This packet is not a Field packet: read original name failed")}))
-
-        var single = Array<Byte>(1, repeat: 0)
+        _catalog = readLengthEncodedString(stream).getOrThrow() {
+            => InvalidPacketException("This packet is not a Field packet: read catalog failed")
+        }
+        _database = readLengthEncodedString(stream).getOrThrow() {
+            => InvalidPacketException("This packet is not a Field packet: read database failed")
+        }
+        _table = readLengthEncodedString(stream).getOrThrow() {
+            => InvalidPacketException("This packet is not a Field packet: read table failed")
+        }
+        _originalTable = readLengthEncodedString(stream).getOrThrow() {
+            => InvalidPacketException("This packet is not a Field packet: read original table failed")
+        }
+        _name = readLengthEncodedString(stream).getOrThrow() {
+            => InvalidPacketException("This packet is not a Field packet: read name failed")
+        }
+        _originalName = readLengthEncodedString(stream).getOrThrow() {
+            => InvalidPacketException("This packet is not a Field packet: read original name failed")
+        }
+        let single = Array<Byte>(1, repeat: 0)
         if (stream.read(single) == 0) {
             throw InvalidPacketException("This packet is not a Field packet: read padding failed")
         }
         this._padding = single[0]
-        var charset = Array<Byte>(2, repeat: 0)
+        let charset = Array<Byte>(2, repeat: 0)
         if (stream.read(charset) == 0) {
             throw InvalidPacketException("This packet is not a Field packet: read charset failed")
         }
-        _charset = Charset.of(littleEndianToUInt16(charset))
-        var fieldLength = Array<Byte>(4, repeat: 0)
+        _charset = Charset.of(UInt16.fromLittleEndian(charset))
+        let fieldLength = Array<Byte>(4, repeat: 0)
         if (stream.read(fieldLength) == 0) {
             throw InvalidPacketException("This packet is not a Field packet: read field length failed")
         }
-        this._columnLength = littleEndianToUInt32(fieldLength)
+        this._columnLength = UInt32.fromLittleEndian(fieldLength)
         if (stream.read(single) == 0) {
             throw InvalidPacketException("This packet is not a Field packet: read field type failed")
         }
         this._columnType = ColumnType.of(single[0])
-        var flags = Array<Byte>(2, repeat: 0)
+        let flags = Array<Byte>(2, repeat: 0)
         if (stream.read(flags) == 0) {
             throw InvalidPacketException("This packet is not a Field packet: read flags failed")
         }
-        this._flags = littleEndianToUInt16(flags)
+        this._flags = UInt16.fromLittleEndian(flags)
         if (stream.read(single) == 0) {
             throw InvalidPacketException("This packet is not a Field packet: read decimals failed")
         }
@@ -173,7 +165,7 @@ protected class TextResult <: CommonPacket {
         var list = ArrayList<?Array<Byte>>(columnCount)
         var buffer: ?Array<Byte>
         for (_ in 0..columnCount) {
-            buffer = readLengthEncodedString(stream)
+            buffer = readLengthEncodedStringRaw(stream)
             if (buffer.isNone()) {
                 list.append(None)
             } else {
@@ -238,7 +230,7 @@ protected class BinaryResult <: Response {
                         stream.read(array)
                         _binaryData[i] = array
                     case String | NewDecimal | Json | Enum | Set | TinyBlob | MediumBlob | LongBlob | Blob | VarString =>
-                         _binaryData[i] = readLengthEncodedString(stream)
+                         _binaryData[i] = readLengthEncodedStringRaw(stream)
                     case Date | DateTime | Timestamp | Time =>
                         var single = Array<Byte>(1, repeat: 0)
                         stream.read(single)

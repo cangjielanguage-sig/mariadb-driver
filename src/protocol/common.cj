@@ -14,11 +14,11 @@ import std.io.*
 */
 protected open class CommonPacket {
 
-    internal static const LENGTH_SIZE: Int = 3
+    internal static const LengthSize: Int = 3
 
-    internal static const NUMBER_SIZE: Int = 1
+    internal static const NumberSize: Int = 1
 
-    internal static const HEADER_SIZE: Int = LENGTH_SIZE + NUMBER_SIZE;
+    internal static const HeaderSize: Int = LengthSize + NumberSize;
 
     internal var _length: UInt32
 
@@ -30,7 +30,7 @@ protected open class CommonPacket {
         if (stream.read(length) == 0) {
             throw InvalidPacketException("This package is not a mysql package: read length failed")
         }
-        _length = littleEndianToUInt32(length)
+        _length = UInt32.fromLittleEndian(length)
         var single = Array<Byte>(1, repeat: 0)
         if (stream.read(single) == 0) {
             throw InvalidPacketException("This package is not a mysql package: read number failed")
@@ -57,32 +57,3 @@ protected open class CommonPacket {
     }
 }
 
-protected open class Request <: CommonPacket {
-
-    protected let buf: ArrayList<Byte> = ArrayList<Byte>()
-
-    protected init(length: UInt32, number: UInt8) {
-        super(length, number)
-    }
-
-    protected func reset(size: UInt32): Unit {
-        var array: Array<Byte> = uInt32ToLittleEndian(size)
-        buf.set(0, array[0])
-        buf.set(1, array[1])
-        buf.set(2, array[2])
-    }
-    
-    protected func clear(): Unit {
-        buf.clear()
-    }
-    
-    protected open func pack(): Unit {
-        buf.appendAll(uInt32ToLittleEndian(_length).slice(0, 3))
-        buf.append(_number)
-    }
-
-    protected open func toByteArray(): Array<Byte> {
-        return buf.toArray()
-    }
-    
-}

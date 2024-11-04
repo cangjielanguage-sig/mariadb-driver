@@ -3,7 +3,7 @@ protected package mysqlclient4cj.connection
 import std.net.*
 import std.io.IOException
 import std.collection.ArrayList
-import mysqlclient4cj.protocol.littleEndianToUInt32
+import mysqlclient4cj.protocol.*
 
 /*
 * mysql channl reads complete mysql packages from the socket
@@ -45,8 +45,8 @@ protected class MySqlChannel <: Resource {
         //上一次读取有数据剩余
         if (this.lastRemaining.size > 3) {
             //尝试从上一次剩余的数据读取一个完整的数据包
-            var subPacketLength = littleEndianToUInt32(lastRemaining.slice(0, 3))
-            var fullPacketLength = Int64(subPacketLength) + 4
+            let subPacketLength = UInt32.fromLittleEndian(lastRemaining.slice(0, 3))
+            let fullPacketLength = Int64(subPacketLength) + 4
             if (lastRemaining.size >= fullPacketLength) {
                 var data = lastRemaining.slice(0, fullPacketLength)
                 var remainingSize = lastRemaining.size - fullPacketLength
@@ -63,9 +63,8 @@ protected class MySqlChannel <: Resource {
         if(len == 0){
             throw IOException("Read bytes from socket failed")
         }
-
         store.appendAll(buffer.slice(0, len))
-        var subPacketLength = littleEndianToUInt32(store.toArray().slice(0, 3))
+        var subPacketLength = UInt32.fromLittleEndian(store[0..3].toArray())
         var fullPacketLength = Int64(subPacketLength) + 4
         if (store.size < fullPacketLength) {
             // 发生拆包的情况
@@ -79,7 +78,7 @@ protected class MySqlChannel <: Resource {
         //存储剩余数据
         var remainingSize = store.size - fullPacketLength
         lastRemaining = store.toArray().slice(fullPacketLength, remainingSize)
-        return store.toArray().slice(0, fullPacketLength)
+        return store[0..fullPacketLength].toArray()
     }
 
     /*

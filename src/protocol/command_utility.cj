@@ -101,7 +101,7 @@ protected class SetOptionCommand <: Command {
 
     protected override func pack(): Unit {
         super.pack()
-        buf.appendAll(uInt16ToLittleEndian(_operation.value()))
+        buf.appendAll(_operation.value().toLittleEndian())
     }
 
 }

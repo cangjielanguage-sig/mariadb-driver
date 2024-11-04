@@ -11,7 +11,7 @@ import encoding.json.*
 
 import mysqlclient4cj.jdbc.*
 import mysqlclient4cj.jdbc.impl.*
-import mysqlclient4cj.protocol.inputStreamToArray
+import mysqlclient4cj.protocol.*
 
 @Test
 public class MySqlTest{
@@ -187,7 +187,7 @@ public class MySqlTest{
             println(result.getArray(26))
             println(result.getArray(27))
             println(result.getArray(28))
-            println(inputStreamToArray(result.getInputStream(29).getOrThrow()).size)
+            println(toArray(result.getInputStream(29).getOrThrow()).size)
             println(result.getJsonValue(30))
             println(result.getString(31))
             println(result.getString(32))
@@ -231,7 +231,7 @@ public class MySqlTest{
             println(result.getArray("tinyblob_col"))
             println(result.getArray("blob_col"))
             println(result.getArray("mediumblob_col"))
-            println(inputStreamToArray(result.getInputStream("longblob_col").getOrThrow()).size)
+            println(toArray(result.getInputStream("longblob_col").getOrThrow()).size)
             println(result.getJsonValue("json_col"))
             println(result.getString("set_col"))
             println(result.getString("enum_col"))

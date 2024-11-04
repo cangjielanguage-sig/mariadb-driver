@@ -93,8 +93,8 @@ protected class FetchCommand <: Command {
 
     protected override func pack(): Unit {
         super.pack()
-        buf.appendAll(uInt32ToLittleEndian(_statemetnId))
-        buf.appendAll(uInt32ToLittleEndian(_numRows))
+        buf.appendAll(_statemetnId.toLittleEndian())
+        buf.appendAll(_numRows.toLittleEndian())
     }
 
 }
@@ -115,7 +115,7 @@ protected class CloseCommand <: Command {
 
     protected override func pack(): Unit {
         super.pack()
-        buf.appendAll(uInt32ToLittleEndian(_statementId))
+        buf.appendAll(_statementId.toLittleEndian())
     }
 }
 
@@ -135,7 +135,7 @@ protected class ResetCommand <: Command {
 
     public override func pack(): Unit {
         super.pack()
-        buf.appendAll(uInt32ToLittleEndian(_statementId))
+        buf.appendAll(_statementId.toLittleEndian())
     }
 }
 
@@ -161,8 +161,8 @@ protected class SendLongDataCommand <: Command {
 
     public override func pack(): Unit {
         super.pack()
-        buf.appendAll(uInt32ToLittleEndian(_statemetnId))
-        buf.appendAll(uInt16ToLittleEndian(_parameterId))
+        buf.appendAll(_statemetnId.toLittleEndian())
+        buf.appendAll(_parameterId.toLittleEndian())
         buf.appendAll(_data)
     }
 

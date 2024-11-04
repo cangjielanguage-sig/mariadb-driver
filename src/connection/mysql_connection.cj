@@ -186,9 +186,9 @@ protected class MySqlConnection <: Resource {
         for(i in 0..params.size){
             var param = params[i]
             match (param) {
-                case v:InputStream => writeRequest(SendLongDataCommand(statementId, UInt16(i), inputStreamToArray(v)))
+                case v:InputStream => writeRequest(SendLongDataCommand(statementId, UInt16(i), (toArray(v))))
                 case v:Array<Byte> => writeRequest(SendLongDataCommand(statementId, UInt16(i), v))
-                case v:?InputStream => if(!v.isNone()){writeRequest(SendLongDataCommand(statementId, UInt16(i), inputStreamToArray(v.getOrThrow())))}
+                case v:?InputStream => if(!v.isNone()){writeRequest(SendLongDataCommand(statementId, UInt16(i), toArray(v.getOrThrow())))}
                 case v:?Array<Byte> => if(!v.isNone()){writeRequest(SendLongDataCommand(statementId, UInt16(i), v.getOrThrow()))}
                 case _ => nothingTodo(0)
             }
@@ -201,7 +201,7 @@ protected class MySqlConnection <: Resource {
      */
     private func readPrepareResponse(): PrepareResult {
         var array = read()
-        var stream = arrayToInputStream(array)
+        var stream = toInputStream(array)
         if (array[4] == ResponseCode.Error.value()) {
             var error = ErrorResponse(stream)
             throw ResponseErrorException(error.message)
@@ -210,7 +210,7 @@ protected class MySqlConnection <: Resource {
         var parameters = ArrayList<ColumnDefinition>(Int64(prepareResponse.numParams))
         if(prepareResponse.numParams > 0){
             for (_ in 0..prepareResponse.numParams) {
-                parameters.append(ColumnDefinition(arrayToInputStream(channel.read())))
+                parameters.append(ColumnDefinition(toInputStream(channel.read())))
             }
             read()
         }
@@ -218,7 +218,7 @@ protected class MySqlConnection <: Resource {
         var columns = ArrayList<ColumnDefinition>(Int64(prepareResponse.numColumns))
         if(prepareResponse.numColumns > 0){
             for (_ in 0..prepareResponse.numColumns) {
-            columns.append(ColumnDefinition(arrayToInputStream(channel.read())))
+            columns.append(ColumnDefinition(toInputStream(channel.read())))
             }
             read()
         }
@@ -230,7 +230,7 @@ protected class MySqlConnection <: Resource {
     */
     private func readQueryPrepareResponse(): ResultSet {
         var array = read()
-        var stream = arrayToInputStream(array)
+        var stream = toInputStream(array)
         if (array[4] == ResponseCode.Error.value()) {
             var error = ErrorResponse(stream)
             throw ResponseErrorException(error.message)
@@ -238,7 +238,7 @@ protected class MySqlConnection <: Resource {
         var filedsCount = ColumnCount(stream)
         var fields = ArrayList<ColumnDefinition>()
         for (_ in 0..filedsCount.count) {
-            var field = ColumnDefinition(arrayToInputStream(channel.read()))
+            var field = ColumnDefinition(toInputStream(channel.read()))
             fields.append(field)
         }
         //丢弃Eof包
@@ -246,7 +246,7 @@ protected class MySqlConnection <: Resource {
         array = read()
         var rows = ArrayList<Array<?Array<Byte>>>()
         while (array[4] != ResponseCode.Eof.value() || array.size > 9) {
-            var row = BinaryResult(arrayToInputStream(array), fields.toArray())
+            var row = BinaryResult(toInputStream(array), fields.toArray())
             rows.append(row.binaryData)
             array = read()
         }
@@ -258,14 +258,14 @@ protected class MySqlConnection <: Resource {
     */
     private func readFetchResponse(columnInfos: Array<ColumnDefinition>): ResultSet {
         var array = read()
-        var stream = arrayToInputStream(array)
+        var stream = toInputStream(array)
         if (array[4] == ResponseCode.Error.value()) {
             var error = ErrorResponse(stream)
             throw ResponseErrorException(error.message)
         }
         var rows = ArrayList<Array<?Array<Byte>>>()
         while (array[4] != ResponseCode.Eof.value() || array.size > 9) {
-            var row = BinaryResult(arrayToInputStream(array), columnInfos)
+            var row = BinaryResult(toInputStream(array), columnInfos)
             rows.append(row.binaryData)
             array = read()
         }
@@ -277,7 +277,7 @@ protected class MySqlConnection <: Resource {
     */
     private func readQueryPrepareResponseWithCursor(prepareId: UInt32, fetchSize: UInt32): ResultSet {
         var array = read()
-        var stream = arrayToInputStream(array)
+        var stream = toInputStream(array)
         if (array[4] == ResponseCode.Error.value()) {
             var error = ErrorResponse(stream)
             throw ResponseErrorException(error.message)
@@ -285,7 +285,7 @@ protected class MySqlConnection <: Resource {
         var filedsCount = ColumnCount(stream)
         var fields = ArrayList<ColumnDefinition>()
         for (_ in 0..filedsCount.count) {
-            var field = ColumnDefinition(arrayToInputStream(channel.read()))
+            var field = ColumnDefinition(toInputStream(channel.read()))
             fields.append(field)
         }
         //drop eof package
@@ -298,7 +298,7 @@ protected class MySqlConnection <: Resource {
      * read handshake package
      */
     internal func readHandhake(): Handshake {
-        return Handshake(arrayToInputStream(read()))
+        return Handshake(toInputStream(read()))
     }
 
     /*
@@ -309,16 +309,16 @@ protected class MySqlConnection <: Resource {
         var code = ResponseCode.get(array[4])
         match (code) {
             case ResponseCode.Ok =>
-                return OkResponse(arrayToInputStream(array))
+                return OkResponse(toInputStream(array))
             case ResponseCode.Error =>
-                return ErrorResponse(arrayToInputStream(array))
+                return ErrorResponse(toInputStream(array))
             case ResponseCode.Eof => return getEofResponse(array)
             case ResponseCode.AuthMoreData => return getAuthMoreData(array)
         }
     }
 
     private func getEofResponse(array: Array<Byte>): AbstractEOF {
-        var stream = arrayToInputStream(array)
+        var stream = toInputStream(array)
         if (array.size > 9) {
             return AuthSwitch(stream)
         } else {
@@ -328,7 +328,7 @@ protected class MySqlConnection <: Resource {
 
     private func getAuthMoreData(array: Array<Byte>): AuthMoreData {
         var authCode = array[5]
-        var stream = arrayToInputStream(array)
+        var stream = toInputStream(array)
         if (array.size == 6 && (authCode == AuthState.FastAuthSuccess.value() || authCode == AuthState.PerformFullAuthentication.value())) {
             return AuthStatus(stream)
         } else {
@@ -358,7 +358,7 @@ protected class MySqlConnection <: Resource {
      */
     private func readQueryResponse(): ResultSet {
         var array = read()
-        var stream = arrayToInputStream(array)
+        var stream = toInputStream(array)
         if (array[4] == ResponseCode.Error.value()) {
             var error = ErrorResponse(stream)
             throw ResponseErrorException(error.message)
@@ -366,7 +366,7 @@ protected class MySqlConnection <: Resource {
         var columnCount = ColumnCount(stream)
         var fields = ArrayList<ColumnDefinition>()
         for (_ in 0..columnCount.count) {
-            var field = ColumnDefinition(arrayToInputStream(channel.read()))
+            var field = ColumnDefinition(toInputStream(channel.read()))
             fields.append(field)
         }
         //丢弃Eof包
@@ -375,7 +375,7 @@ protected class MySqlConnection <: Resource {
         var rowPackets = ArrayList<TextResult>()
         while (array[4] != ResponseCode.Eof.value() || array.size > 9) {
             var row: TextResult
-            row = TextResult(arrayToInputStream(array), Int64(columnCount.count))
+            row = TextResult(toInputStream(array), Int64(columnCount.count))
             rowPackets.append(row)
             array = channel.read()
         }
@@ -387,7 +387,7 @@ protected class MySqlConnection <: Resource {
      */
     private func readUpdateResponse(): ChangeResult {
         var array = read()
-        var stream = arrayToInputStream(array)
+        var stream = toInputStream(array)
         if (array[4] == ResponseCode.Error.value()) {
             var error = ErrorResponse(stream)
             throw ResponseErrorException(error.message)

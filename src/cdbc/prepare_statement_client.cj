@@ -86,14 +86,14 @@ public class ClientPrepareStatement <: Statement {
                 case v: SqlDecimal => setParamWithQuotation(replacer, v.value.toString())
                 case v: SqlChar => setParamWithQuotation(replacer, v.value.toString())
                 case v: SqlVarchar => setParamWithQuotation(replacer, v.value.toString())
-                case v: SqlClob => setParamWithoutQuotation(replacer, arrayToHexString(inputStreamToArray(v.value)))
-                case v: SqlBlob => setParamWithoutQuotation(replacer, arrayToHexString(inputStreamToArray(v.value)))
+                case v: SqlClob => setParamWithoutQuotation(replacer, to0xString(toArray(v.value)))
+                case v: SqlBlob => setParamWithoutQuotation(replacer, to0xString(toArray(v.value)))
                 case v: SqlDate => setParamWithQuotation(replacer, v.value.toString(DB_DATE_FORMAT))
                 case v: SqlTime => setParamWithQuotation(replacer, v.value.toString(DB_TIME_FORMAT))
                 case v: SqlTimeTz => setParamWithQuotation(replacer, v.value.toString(DB_TIME_FORMAT))
                 case v: SqlTimestamp => setParamWithQuotation(replacer, v.value.toString(DB_DATE_TIME_FORMAT))
-                case v: SqlBinary => setParamWithoutQuotation(replacer, arrayToHexString(v.value))
-                case v: SqlVarBinary => setParamWithoutQuotation(replacer, arrayToHexString(v.value))
+                case v: SqlBinary => setParamWithoutQuotation(replacer, to0xString(v.value))
+                case v: SqlVarBinary => setParamWithoutQuotation(replacer, to0xString(v.value))
                 case v: SqlJson => setParamWithQuotation(replacer, v.value.toJsonString())
 
                 case v: SqlNullableBool => match (v.value) {
@@ -138,11 +138,11 @@ public class ClientPrepareStatement <: Statement {
                 }
                 case v: SqlNullableClob => match (v.value) {
                     case None => setParamWithoutQuotation(replacer, "NULL")
-                    case Some(s) => setParamWithoutQuotation(replacer, arrayToHexString(inputStreamToArray(s)))
+                    case Some(s) => setParamWithoutQuotation(replacer, to0xString(toArray(s)))
                 }
                 case v: SqlNullableBlob => match (v.value) {
                     case None => setParamWithoutQuotation(replacer, "NULL")
-                    case Some(s) => setParamWithoutQuotation(replacer, arrayToHexString(inputStreamToArray(s)))
+                    case Some(s) => setParamWithoutQuotation(replacer, to0xString(toArray(s)))
                 }
                 case v: SqlNullableDate => match (v.value) {
                     case None => setParamWithoutQuotation(replacer, "NULL")
@@ -162,11 +162,11 @@ public class ClientPrepareStatement <: Statement {
                 }
                 case v: SqlNullableBinary => match (v.value) {
                     case None => setParamWithoutQuotation(replacer, "NULL")
-                    case Some(s) => setParamWithoutQuotation(replacer, arrayToHexString(s))
+                    case Some(s) => setParamWithoutQuotation(replacer, to0xString(s))
                 }
                 case v: SqlNullableVarBinary => match (v.value) {
                     case None => setParamWithoutQuotation(replacer, "NULL")
-                    case Some(s) => setParamWithoutQuotation(replacer, arrayToHexString(s))
+                    case Some(s) => setParamWithoutQuotation(replacer, to0xString(s))
                 }
                 case v: SqlNullableJson => match (v.value) {
                     case None => setParamWithoutQuotation(replacer, "NULL")

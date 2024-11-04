@@ -60,14 +60,9 @@ protected class BinaryResultSet <: ResultSet {
     }
 
     public override func getBool(index: Int64): ?Bool {
-        var val = getString(index)
-        if (val.isNone()) {
-            return None
-        }
-        if (val == "1") {
-            return true
-        } else {
-            return false
+        match (getString(index)) {
+            case None => return None
+            case Some(v) => return toBool(v)
         }
     }
 
@@ -125,30 +120,35 @@ protected class BinaryResultSet <: ResultSet {
     }
 
     public override func getUInt64(index: Int64): ?UInt64 {
-        var columnType = getFieldType(index)
-        var dataOp = getBinaryData(index)
-        if (dataOp.isNone()) {
-            return None
-        }
-        var data = dataOp.getOrThrow()
-        match (columnType) {
-            case Tiny => return UInt64(data[0])
-            case Short | Year => return UInt64(littleEndianToUInt16(data))
-            case Long | Int24 => return UInt64(littleEndianToUInt32(data))
-            case LongLong => return littleEndianToUInt64(data)
-            case Float => return UInt64(getFloat32(index).getOrThrow())
-            case Double => return UInt64(getFloat64(index).getOrThrow())
-            case String | VarString | NewDecimal =>
-                var str = getString(index).getOrThrow()
-                try {
-                    return UInt64.parse(str)
-                } catch (e: IllegalArgumentException) {
-                    throw ValueConvertException(
-                        "Parse to Integer failed: column name is '${getFieldName(index)}', raw value is ${str}")
+        match (getBinaryData(index)) {
+            case None => return None
+            case Some(v) => 
+                let columnType = getFieldType(index)
+                match (columnType) {
+                    case Tiny => 
+                        return UInt64(v[0])
+                    case Short | Year => 
+                        return UInt64(UInt16.fromLittleEndian(v))
+                    case Long | Int24 => 
+                        return UInt64(UInt32.fromLittleEndian(v))
+                    case LongLong => 
+                        return UInt64.fromLittleEndian(v)
+                    case Float => 
+                        return UInt64(getFloat32(index).getOrThrow())
+                    case Double => 
+                        return UInt64(getFloat64(index).getOrThrow())
+                    case String | VarString | NewDecimal =>
+                        var str = getString(index).getOrThrow()
+                        try {
+                            return UInt64.parse(str)
+                        } catch (e: IllegalArgumentException) {
+                            throw ValueConvertException("Parse to Integer failed: column name is '${getFieldName(index)}', raw value is ${str}")
+                        }
+                    case _ => throw ValueConvertException("Unsupported conversion from ${columnType} to Integer")
                 }
-            case _ => throw ValueConvertException("Unsupported conversion from ${columnType} to Integer")
         }
     }
+
 
     public override func getFloat16(index: Int64): ?Float16 {
         match (getFloat32(index)) {
@@ -158,64 +158,80 @@ protected class BinaryResultSet <: ResultSet {
     }
 
     public override func getFloat32(index: Int64): ?Float32 {
-        var columnType = getFieldType(index)
-        var dataOp = getBinaryData(index)
-        if (dataOp.isNone()) {
-            return None
-        }
-        var data = dataOp.getOrThrow()
-        match (columnType) {
-            case Float => return littleEndianToFloat32(data)
-            case Double => return Float32(getFloat64(index).getOrThrow())
-            case String | VarString => return Float32.parse(getString(index).getOrThrow())
-            case _ => throw ValueConvertException("Unsupported conversion from ${columnType} to Integer")
+        match (getBinaryData(index)) {
+            case None => return None
+            case Some(v) => 
+                let columnType = getFieldType(index)
+                match (columnType) {
+                    case Float => 
+                        return Float32.fromLittleEndian(v)
+                    case Double => 
+                        return Float32(getFloat64(index).getOrThrow())
+                    case String | VarString => 
+                        return Float32.parse(getString(index).getOrThrow())
+                    case _ => 
+                        throw ValueConvertException("Unsupported conversion from ${columnType} to Float32")
+                }   
         }
     }
 
     public override func getFloat64(index: Int64): ?Float64 {
-        var columnType = getFieldType(index)
-        var dataOp = getBinaryData(index)
-        if (dataOp.isNone()) {
-            return None
-        }
-        var data = dataOp.getOrThrow()
-        match (columnType) {
-            case Float => return Float64(getFloat32(index).getOrThrow())
-            case Double => return littleEndianToFloat64(data)
-            case String | VarString | NewDecimal => return Float64.parse(getString(index).getOrThrow())
-            case _ => throw ValueConvertException("Unsupported conversion from ${columnType} to Integer")
+        match(getBinaryData(index)) {
+            case None => return None
+            case Some(v) => 
+                let columnType = getFieldType(index)
+                match (columnType) {
+                    case Float => 
+                        return Float64(getFloat32(index).getOrThrow())
+                    case Double => 
+                        return Float64.fromLittleEndian(v)
+                    case String | VarString | NewDecimal => 
+                        return Float64.parse(getString(index).getOrThrow())
+                    case _ => 
+                        throw ValueConvertException("Unsupported conversion from ${columnType} to Float64")
+                }
         }
     }
 
     public override func getBigInt(index: Int64): ?BigInt {
-        var columnType = getFieldType(index)
-        var dataOp = getBinaryData(index)
-        if (dataOp.isNone()) {
-            return None
-        }
-        //var data = dataOp.getOrThrow()
-        match (columnType) {
-            case Tiny => return BigInt(getInt8(index).getOrThrow())
-            case Short | Year => return BigInt(getInt16(index).getOrThrow())
-            case Int24 | Long => return BigInt(getInt32(index).getOrThrow())
-            case LongLong => return BigInt(getInt64(index).getOrThrow())
-            case String | VarString => return BigInt(getString(index).getOrThrow())
-            case _ => throw ValueConvertException("Unsupported conversion from ${columnType} to BigInt")
+        match (getBinaryData(index)) {
+            case None => return None
+            case Some(v) => 
+                let columnType = getFieldType(index)
+                match (columnType) {
+                    case Tiny => 
+                        return BigInt(getInt8(index).getOrThrow())
+                    case Short | Year => 
+                        return BigInt(getInt16(index).getOrThrow())
+                    case Int24 | Long => 
+                        return BigInt(getInt32(index).getOrThrow())
+                    case LongLong => 
+                        return BigInt(getInt64(index).getOrThrow())
+                case String | VarString => 
+                    return BigInt(getString(index).getOrThrow())
+                case _ => 
+                    throw ValueConvertException("Unsupported conversion from ${columnType} to BigInt")
+                }
         }
     }
 
-    public func getDecimal(index: Int64): ?Decimal {
-        var columnType = getFieldType(index)
-        var dataOp = getBinaryData(index)
-        if (dataOp.isNone()) {
-            return None
+    public override func getDecimal(index: Int64): ?Decimal {
+        match (getBinaryData(index)) {
+            case None => return None
+            case Some(v) => 
+                let columnType = getFieldType(index)
+                match (columnType) {
+                    case Float => 
+                        return Decimal(getFloat32(index).getOrThrow())
+                    case Double => 
+                        return Decimal(getFloat64(index).getOrThrow())
+                    case String | VarString | NewDecimal => 
+                        Decimal(getString(index).getOrThrow())
+                    case _ => 
+                        throw ValueConvertException("Unsupported conversion from ${columnType} to Integer")
         }
-        match (columnType) {
-            case Float => return Decimal(getFloat32(index).getOrThrow())
-            case Double => return Decimal(getFloat64(index).getOrThrow())
-            case String | VarString | NewDecimal => Decimal(getString(index).getOrThrow())
-            case _ => throw ValueConvertException("Unsupported conversion from ${columnType} to Integer")
         }
+
     }
 
     public override func getDate(index: Int64): ?DateTime {
@@ -231,102 +247,108 @@ protected class BinaryResultSet <: ResultSet {
     }
 
     public func getTimestamp(index: Int64): ?DateTime {
-        var columnType = getFieldType(index)
-        var dataOp = getBinaryData(index)
-        if (dataOp.isNone()) {
-            return None
+        match(getBinaryData(index)) {
+            case None => return None
+            case Some(v) => 
+                let columnType = getFieldType(index)
+                match (columnType) {
+                    case Date => 
+                        return dateTimeToDateTime(v)
+                    case DateTime | Timestamp => 
+                        return dateTimeToDateTime(v)
+                    case Time => 
+                        return timeToDateTime(v)
+                    case _ => 
+                        throw ValueConvertException("Unsupported conversion from ${columnType} to DateTime")
         }
-        var data = dataOp.getOrThrow()
-        match (columnType) {
-            case Date => return binaryDateTimeToDateTime(data)
-            case DateTime | Timestamp => return binaryDateTimeToDateTime(data)
-            case Time => return binaryTimeToDateTime(data)
-            case _ => throw ValueConvertException("Unsupported conversion from ${columnType} to DateTime")
         }
+    
+
     }
 
     public override func getInputStream(index: Int64): ?InputStream {
         match (getBinaryData(index)) {
             case None => return None
-            case Some(v) => return arrayToInputStream(v)
+            case Some(v) => return toInputStream(v)
         }
     }
 
     @OverflowWrapping
     public override func getString(index: Int64): ?String {
-        var columnType = getFieldType(index)
-        var unsigned = getFieldIsUnsigned(index)
-        //var charset = getFieldCharset(index)
-        var dataOp = getBinaryData(index)
-        if (dataOp.isNone()) {
-            return None
+        match (getBinaryData(index)) {
+            case None => return None
+            case Some(v) => 
+                let columnType = getFieldType(index)
+                let unsigned = getFieldIsUnsigned(index)
+                match (columnType) {
+                    case Tiny =>
+                        if (!unsigned) {
+                            return getInt8(index).getOrThrow().toString()
+                        } else {
+                            return getUInt8(index).getOrThrow().toString()
+                        }
+                    case Short | Year =>
+                        if (!unsigned) {
+                            return getInt16(index).getOrThrow().toString()
+                        } else {
+                         return getUInt16(index).getOrThrow().toString()
+                        }
+                    case Long | Int24 =>
+                        if (!unsigned) {
+                            return getInt32(index).getOrThrow().toString()
+                        } else {
+                            return getUInt32(index).getOrThrow().toString()
+                        }
+                    case LongLong =>
+                        if (!unsigned) {
+                            return getInt64(index).getOrThrow().toString()
+                        } else {
+                        return getUInt64(index).getOrThrow().toString()
+                        }
+                    case Float => 
+                        return getFloat32(index).getOrThrow().toString()
+                    case Double => 
+                        return getFloat64(index).getOrThrow().toString()
+                    case VarString | String | Json | Enum | Set | TinyBlob | MediumBlob | LongBlob | Blob | NewDecimal =>
+                        return String.fromUtf8(v)
+                        // match (charset) {
+                        //     case Binary => 
+                        //         throw Exception("Unsupported Charset: Binary")
+                        //     case Utf8mb3GeneralCi => 
+                        //         return String.fromUtf8(data)
+                        //     case Latin1SwedishCi => 
+                        //         throw Exception("Unsupported Charset: Latin1SwedishCi")
+                        // }
+                    case Date => 
+                        return getDate(index).getOrThrow().toString(DB_DATE_FORMAT)
+                    case DateTime | Timestamp => 
+                        return getDateTime(index).getOrThrow().toString(DB_DATE_TIME_FORMAT)
+                    case Time => 
+                        return getTime(index).getOrThrow().toString(DB_TIME_FORMAT)
+                        //case _ => throw Exception("Unsupport MySQL binary type")
+                    }
         }
-        var data = dataOp.getOrThrow()
-        match (columnType) {
-            case Tiny =>
-                if (!unsigned) {
-                    return getInt8(index).getOrThrow().toString()
-                } else {
-                    return getUInt8(index).getOrThrow().toString()
-                }
-            case Short | Year =>
-                if (!unsigned) {
-                    return getInt16(index).getOrThrow().toString()
-                } else {
-                    return getUInt16(index).getOrThrow().toString()
-                }
-            case Long | Int24 =>
-                if (!unsigned) {
-                    return getInt32(index).getOrThrow().toString()
-                } else {
-                    return getUInt32(index).getOrThrow().toString()
-                }
-            case LongLong =>
-                if (!unsigned) {
-                    return getInt64(index).getOrThrow().toString()
-                } else {
-                    return getUInt64(index).getOrThrow().toString()
-                }
-            case Float => return getFloat32(index).getOrThrow().toString()
-            case Double => return getFloat64(index).getOrThrow().toString()
-            case NewDecimal => return String.fromUtf8(data)
-            case String | Json | Enum | Set | TinyBlob | MediumBlob | LongBlob | Blob | VarString =>
-                // match (charset) {
-                //     case Binary => 
-                //         throw Exception("Unsupported Charset: Binary")
-                //     case Utf8mb3GeneralCi => 
-                //         return String.fromUtf8(data)
-                //     case Latin1SwedishCi => 
-                //         throw Exception("Unsupported Charset: Latin1SwedishCi")
-                // }
-                return String
-                .fromUtf8(data)
-            case Date => return getDate(index).getOrThrow().toString(DB_DATE_FORMAT)
-            case DateTime | Timestamp => return getDateTime(index).getOrThrow().toString(DB_DATE_TIME_FORMAT)
-            case Time => return getTime(index).getOrThrow().toString(DB_TIME_FORMAT)
-            //case _ => throw Exception("Unsupport MySQL binary type")
-        }
+
     }
 
     public override func getArray(index: Int64): ?Array<Byte> {
-        var columnType = getFieldType(index)
-        var dataOp = getBinaryData(index)
-        if (dataOp.isNone()) {
-            return None
-        }
-        var data = dataOp.getOrThrow()
-        match (columnType) {
-            case String | VarString | Json | Enum | Set | TinyBlob | Blob | MediumBlob | LongBlob => return data
-            case _ => throw UnsupportedException("Unsupported database type ${columnType} convert to Array")
+        match (getBinaryData(index)) {
+            case None => return None
+            case Some(v) => 
+                let columnType = getFieldType(index)
+                match (columnType) {
+                    case String | VarString | Json | Enum | Set | TinyBlob | Blob | MediumBlob | LongBlob => 
+                        return v
+                    case _ => 
+                        throw UnsupportedException("Unsupported database type ${columnType} convert to Array")
+                }
         }
     }
 
     public override func getJsonValue(index: Int64): ?JsonValue {
-        var val = getString(index)
-        if (val.isNone()) {
-            return None
-        } else {
-            return JsonValue.fromStr(val.getOrThrow())
+        match (getString(index)) {
+            case None => return None
+            case Some(v) => return JsonValue.fromStr(v)
         }
     }
 
