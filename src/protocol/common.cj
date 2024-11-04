@@ -18,13 +18,10 @@ protected open class CommonPacket {
 
     internal static const NUMBER_SIZE: Int64 = 1
 
-    //通用头部长度
     internal static const HEADER_SIZE: Int64 = LENGTH_SIZE + NUMBER_SIZE;
 
-    //子包长度
     internal var _length: UInt32
 
-    //子包编号
     internal var _number: UInt8
 
     // consturct for response packet
@@ -40,6 +37,7 @@ protected open class CommonPacket {
         }
         _number = single[0]
     }
+    
     //constructor for request packet
     protected init(length: UInt32, number: UInt8) {
         this._length = length
@@ -66,10 +64,10 @@ protected open class Request <: CommonPacket {
     }
     
     protected open func toByteArray(): Array<Byte> {
-        var appender = ArrayList<Byte>()
-        appender.appendAll(uInt32ToLittleEndian(_length).slice(0, 3))
-        appender.append(_number)
-        return appender.toArray()
+        var buf = ArrayList<Byte>(4)
+        buf.appendAll(uInt32ToLittleEndian(_length).slice(0, 3))
+        buf.append(_number)
+        return buf.toArray()
     }
     
 }

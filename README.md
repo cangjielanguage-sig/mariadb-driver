@@ -37,9 +37,15 @@ mysqlclient4cj是为Cangjie编程语言提供MySql原生驱动程序,基于MySql
 
 ### 2.2 接口说明
 
+> 参考仓颉官方的数据库接口文档
+
 ## <img alt="" src="./doc/readme-image/readme-icon-compile.png" style="display: inline-block;" width=3%/> 3 使用说明
 
-> 仓颉提供的摘要算法和加密算法依赖 OpenSSL 3 的 crypto 动态库文件,因此使用本驱动时需要确保当前环境的OpenSSL版本为3.x
+> 仓颉提供的摘要算法和加密算法依赖OpenSSL3的crypto 动态库文件, 因此使用该驱动时需要确保本地环境有相应的动态库文件。
+>
+> windows openSSL预编译包下载 -> https://slproweb.com/products/Win32OpenSSL.html
+
+<img alt="" src="./doc/readme-image/env.png"/>
 
 ### 3.1 编译构建（Win/Linux/Mac）
 

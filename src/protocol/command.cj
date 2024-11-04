@@ -25,10 +25,10 @@ protected abstract class Command <: Request {
     }
 
     protected open override func toByteArray(): Array<Byte> {
-        var list = ArrayList<Byte>()
-        list.appendAll(super.toByteArray())
-        list.append(_commandType.value())
-        return list.toArray()
+        let buf = ArrayList<Byte>()
+        buf.appendAll(super.toByteArray())
+        buf.append(_commandType.value())
+        return buf.toArray()
     }
 }
 
@@ -47,10 +47,10 @@ protected class QueryCommand <: Command {
     }
 
     protected override func toByteArray(): Array<Byte> {
-        var list = ArrayList<Byte>()
-        list.appendAll(super.toByteArray())
-        list.appendAll(_query.toArray())
-        return list.toArray()
+        let buf = ArrayList<Byte>()
+        buf.appendAll(super.toByteArray())
+        buf.appendAll(_query.toArray())
+        return buf.toArray()
     }
 
 }
@@ -65,15 +65,15 @@ protected class PrepareCommand <: Command {
 
     protected init(sql: String) {
         super(StmtPrepare)
-        this._length += UInt32(sql.size)
+        _length += UInt32(sql.size)
         _sql = sql
     }
 
     public override func toByteArray(): Array<Byte> {
-        var list = ArrayList<Byte>()
-        list.appendAll(super.toByteArray())
-        list.appendAll(_sql.toArray())
-        return list.toArray()
+        let buf = ArrayList<Byte>()
+        buf.appendAll(super.toByteArray())
+        buf.appendAll(_sql.toArray())
+        return buf.toArray()
     }
 
 }
@@ -85,9 +85,9 @@ protected class PrepareCommand <: Command {
  */
 protected class FetchCommand <: Command {
     
-    private var statemetnId: UInt32
+    private let statemetnId: UInt32
 
-    private var numRows: UInt32
+    private let numRows: UInt32
 
     protected init(statemetnId: UInt32, numRows: UInt32){
         super(StmtFetch)
@@ -97,11 +97,11 @@ protected class FetchCommand <: Command {
     }
 
     protected override func toByteArray(): Array<Byte> {
-        var list = ArrayList<Byte>()
-        list.appendAll(super.toByteArray())
-        list.appendAll(uInt32ToLittleEndian(statemetnId))
-        list.appendAll(uInt32ToLittleEndian(numRows))
-        return list.toArray()
+        let buf = ArrayList<Byte>()
+        buf.appendAll(super.toByteArray())
+        buf.appendAll(uInt32ToLittleEndian(statemetnId))
+        buf.appendAll(uInt32ToLittleEndian(numRows))
+        return buf.toArray()
     }
 
 }
@@ -112,19 +112,19 @@ protected class FetchCommand <: Command {
 */
 protected class CloseCommand <: Command {
 
-    private var _statementId: UInt32
+    private let _statementId: UInt32
 
     protected init(id: UInt32){
         super(StmtClose)
-        this._length += 4
+        _length += 4
         _statementId = id
     }
 
     protected override func toByteArray(): Array<Byte> {
-        var list = ArrayList<Byte>()
-        list.appendAll(super.toByteArray())
-        list.appendAll(uInt32ToLittleEndian(_statementId))
-        return list.toArray()
+        let buf = ArrayList<Byte>()
+        buf.appendAll(super.toByteArray())
+        buf.appendAll(uInt32ToLittleEndian(_statementId))
+        return buf.toArray()
     }
 }
 
@@ -134,19 +134,19 @@ protected class CloseCommand <: Command {
  */
 protected class ResetCommand <: Command {
 
-    private var _statementId: UInt32
+    private let _statementId: UInt32
 
     internal init(statementId: UInt32){
         super(StmtClose)
-        this._length += 4
+        _length += 4
         _statementId = statementId
     }
 
     public override func toByteArray(): Array<Byte> {
-        var list = ArrayList<Byte>()
-        list.appendAll(super.toByteArray())
-        list.appendAll(uInt32ToLittleEndian(_statementId))
-        return list.toArray()
+        let buf = ArrayList<Byte>()
+        buf.appendAll(super.toByteArray())
+        buf.appendAll(uInt32ToLittleEndian(_statementId))
+        return buf.toArray()
     }
 }
 
@@ -156,27 +156,27 @@ protected class ResetCommand <: Command {
  */
 protected class SendLongDataCommand <: Command {
 
-    private var statemetnId: UInt32
+    private let _statemetnId: UInt32
 
-    private var parameterId: UInt16
+    private let _parameterId: UInt16
 
-    private var data: Array<Byte>
+    private let _data: Array<Byte>
 
     protected init(statemetnId: UInt32, parameterId: UInt16, data: Array<Byte>){
         super(StmtSendLongData)
-        this._length += UInt32(data.size + 6)
-        this.statemetnId = statemetnId
-        this.parameterId = parameterId
-        this.data = data
+        _length += UInt32(data.size + 6)
+        _statemetnId = statemetnId
+        _parameterId = parameterId
+        _data = data
     }
 
     public override func toByteArray(): Array<Byte> {
-        var list = ArrayList<Byte>()
-        list.appendAll(super.toByteArray())
-        list.appendAll(uInt32ToLittleEndian(statemetnId))
-        list.appendAll(uInt16ToLittleEndian(parameterId))
-        list.appendAll(data)
-        return list.toArray()
+        let buf = ArrayList<Byte>()
+        buf.appendAll(super.toByteArray())
+        buf.appendAll(uInt32ToLittleEndian(_statemetnId))
+        buf.appendAll(uInt16ToLittleEndian(_parameterId))
+        buf.appendAll(_data)
+        return buf.toArray()
     }
 
 }

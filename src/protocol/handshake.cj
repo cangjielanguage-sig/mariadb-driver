@@ -48,10 +48,10 @@ protected class Handshake <: CommonPacket {
 
     protected prop salt: Array<Byte>{
         get() {
-            var arrayList = ArrayList<Byte>()
-            arrayList.appendAll(_salt1)
-            arrayList.appendAll(_salt2)
-            return arrayList.toArray()
+            var buf = ArrayList<Byte>()
+            buf.appendAll(_salt1)
+            buf.appendAll(_salt2)
+            return buf.toArray()
         }
     }
 

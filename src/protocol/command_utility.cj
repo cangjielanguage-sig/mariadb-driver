@@ -29,18 +29,18 @@ protected class QuitCommand <: Command {
  */
 protected class InitDbCommand <: Command {
 
-    private let database: String
+    private let _database: String
 
     protected init(database: String) {
         super(InitDB)
-        this._length += UInt32(database.size)
-        this.database = database
+        _length += UInt32(database.size)
+        _database = database
     }
 
     protected override func toByteArray(): Array<Byte> {
         var list = ArrayList<Byte>()
         list.appendAll(super.toByteArray())
-        list.appendAll(database.toArray())
+        list.appendAll(_database.toArray())
         return list.toArray()
     }
 }
@@ -93,18 +93,18 @@ protected class ResetConnectionCommand <: Command {
  */
 protected class SetOptionCommand <: Command {
 
-    private let operation: StatementOption
+    private let _operation: StatementOption
 
     protected init(option: StatementOption) {
         super(SetOption)
-        this._length += UInt32(2)
-        this.operation = option
+        _length += UInt32(2)
+        _operation = option
     }
 
     protected override func toByteArray(): Array<Byte> {
         var list = ArrayList<Byte>()
         list.appendAll(super.toByteArray())
-        list.appendAll(uInt16ToLittleEndian(operation.value()))
+        list.appendAll(uInt16ToLittleEndian(_operation.value()))
         return list.toArray()
     }
 
