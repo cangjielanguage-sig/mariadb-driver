@@ -3,13 +3,12 @@
  */
 protected package mysqlclient4cj.protocol
 
+import std.time.DateTime
+import std.time.TimeZone
+import std.io.ByteBuffer
+import std.io.InputStream
+import encoding.hex.toHexString
 import std.collection.ArrayList
-import std.binary.*
-import std.time.*
-import std.io.*
-import encoding.hex.*
-import std.math.numeric.*
-import encoding.json.*
 
 
 /*
@@ -43,7 +42,7 @@ protected func toNullTerminated(val: String): (Array<Byte>, Int64) {
 /*
  * 从流的当前位置读取一个长度编码的二进制字符串
  * 设第一个字节值为x
- * x < 0xfb: 第一个字节值即为数据的真实长度
+ * x <= 0xfa: 第一个字节值即为数据的真实长度
  * x = 0xfb: 空值数据，数据的真实长度为零
  * x = 0xfc: 后续额外2个字节标识了数据的真实长度
  * x = 0xfd: 后续额外3个字节标识了数据的真实长度
@@ -60,76 +59,47 @@ protected func readLengthEncodedString(stream: InputStream): ?String {
 }
 
 protected func readLengthEncodedStringRaw(stream: InputStream): ?Array<Byte> {
-    let single = Array<Byte>(1, repeat: 0)
-    stream.read(single)
-    let flag = single[0]
-    match (flag) {
-        case 0x00 => return []
-        case 0xFB => return None
-        case 0xFC => return readString(stream, 2)
-        case 0xFD => return readString(stream, 3)
-        case 0xFE => return readString(stream, 8)
-        case 0xFF => throw InvalidPacketException("This packet is Error packet")
-        case _ =>
-            let buf = Array<Byte>(Int64(single[0]), repeat: 0)
-            stream.read(buf)
-            return buf
+    match (readLengthEncodedInteger(stream)) {
+        case None => return None
+        case Some(length) => return readStringRaw(stream, length)
     }
 }
 
-private func readString(stream: InputStream, len: Int64): Array<Byte> {
-    let buf = Array<Byte>(len, repeat: 0)
-    stream.read(buf)
-    let length = UInt64.fromLittleEndian(buf)
+private func readStringRaw(stream: InputStream, length: UInt64): Array<Byte> {
+    if(length == 0) {
+        return []
+    }
     let data = Array<Byte>(Int64(length), repeat: 0)
     stream.read(data)
     return data
 }
 
 /*
- * 字符串转LengthEncodedString
- */
-protected func toLengthEncoded(value: ?String): Array<Byte> {
-    match (value) {
-        case None => return [0xFB]
-        case Some(v) =>
-            let buf = ArrayList<Byte>()
-            if (v.size <= 0xFA) {
-                buf.append(UInt8(v.size))
-                buf.appendAll(v.toArray())
-            } else if (v.size <= (2 ** 16)) {
-                buf.append(0xFC)
-                buf.appendAll(UInt16(v.size).toLittleEndian())
-                buf.appendAll(v.toArray())
-            } else if (v.size <= 2 ** 24) {
-                buf.append(0xFD)
-                buf.appendAll(UInt32(v.size).toLittleEndian().slice(0, 3))
-                buf.appendAll(v.toArray())
-            } else {
-                buf.append(0xFE)
-                buf.appendAll(UInt64(v.size).toLittleEndian())
-                buf.appendAll(v.toArray())
-            }
-            buf.toArray()
-    }
-}
-
-/*
  * 从流的当前位置读取一个长度编码的二进制整数
  * 设第一个字节值为x
  * x <= 0xfa: 第一个字节值即为实际数据
+ * x = 0xfb: 表示数据库空数据
  * x = 0xfc: 后续额外2个字节为实际数据
  * x = 0xfd: 后续额外3个字节为实际数据
  * x = 0xfe: 后续额外8个字节为实际数据
  * x = 0xff: 表示该数据包为 1 个 ERR_Packet
  */
-protected func readLengthEncodedInteger(stream: InputStream): Array<Byte> {
+
+protected func readLengthEncodedInteger(stream: InputStream): ?UInt {
+    match (readLengthEncodedIntegerRaw(stream)) {
+        case None => return None
+        case Some(v) => UInt64.fromLittleEndian(v)
+    }
+}
+
+protected func readLengthEncodedIntegerRaw(stream: InputStream): ?Array<Byte> {
     let single = Array<Byte>(1, repeat: 0)
     if (stream.read(single) == 0) {
-        return []
+        throw IllegalArgumentException("read a length encoded integer failed")
     }
     let flag = single[0]
     match (flag) {
+        case 0xFB => return None
         case 0xFC =>
             let buffer = Array<Byte>(2, repeat: 0)
             stream.read(buffer)
@@ -142,23 +112,23 @@ protected func readLengthEncodedInteger(stream: InputStream): Array<Byte> {
             let buffer = Array<Byte>(8, repeat: 0)
             stream.read(buffer)
             return buffer
-        case 0xff => throw InvalidPacketException("This packet is Error packet")
-        //case 0xff => single
+        case 0xFF => throw InvalidPacketException("This packet is Error packet")
         case _ => return single
     }
 }
 
+
 /*
  * 整数转LengthEncodedInteger
  */
-protected func toLengthEncoded(value: UInt64): Array<Byte> {
+protected func toLengthEncoded(value: UInt): Array<Byte> {
     let buf = ArrayList<Byte>()
     if (value < 0xFB) {
         buf.append(UInt8(value))
-    } else if (value < UInt64(2 ** 16)) {
+    } else if (value < UInt64(1 << 16)) {
         buf.append(0xFC)
         buf.appendAll(UInt16(value).toLittleEndian())
-    } else if (value < UInt64(2 ** 24)) {
+    } else if (value < UInt64(1 << 24)) {
         buf.append(0xFD)
         buf.appendAll(UInt32(value).toLittleEndian().slice(0, 3))
     } else {
@@ -166,6 +136,35 @@ protected func toLengthEncoded(value: UInt64): Array<Byte> {
         buf.appendAll(value.toLittleEndian())
     }
     return buf.toArray()
+}
+
+
+/*
+ * 字符串转LengthEncodedString
+ */
+protected func toLengthEncoded(value: ?String): Array<Byte> {
+    match (value) {
+        case None => return [0xFB]
+        case Some(v) =>
+            let buf = ArrayList<Byte>()
+            if (v.size <= 0xFA) {
+                buf.append(UInt8(v.size))
+                buf.appendAll(v.toArray())
+            } else if (v.size <= (1 << 16)) {
+                buf.append(0xFC)
+                buf.appendAll(UInt16(v.size).toLittleEndian())
+                buf.appendAll(v.toArray())
+            } else if (v.size <= (1 << 24)) {
+                buf.append(0xFD)
+                buf.appendAll(UInt32(v.size).toLittleEndian().slice(0, 3))
+                buf.appendAll(v.toArray())
+            } else {
+                buf.append(0xFE)
+                buf.appendAll(UInt64(v.size).toLittleEndian())
+                buf.appendAll(v.toArray())
+            }
+            buf.toArray()
+    }
 }
 
 /*

@@ -14,16 +14,14 @@ import mysqlclient4cj.protocol.*
 
 protected class BinaryResultSet <: ResultSet {
     
-    private var columns: Array<ColumnDefinition>
+    private let columns: Array<ColumnDefinition>
 
-    //private var rows: Array<BinaryResult>
-    private var rows: Array<Array<?Array<Byte>>>
+    private let rows: Array<Array<?Array<Byte>>>
+
+    private let indexMap: Map<String, Int64>
 
     private var currentRow: Int64
 
-    private var indexMap: Map<String, Int64>
-
-    // rotected BinaryResultSet(columns: Array<ColumnDefinition>, rows: Array<BinaryResult>) {
     protected BinaryResultSet(columns: Array<ColumnDefinition>, rows: Array<Array<?Array<Byte>>>) {
         this.columns = columns
         this.rows = rows

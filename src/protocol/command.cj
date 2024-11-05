@@ -3,13 +3,6 @@
  */
 protected package mysqlclient4cj.protocol
 
-import std.collection.*
-import std.time.*
-import encoding.json.*
-import std.convert.*
-import encoding.hex.*
-import std.io.*
-import std.math.numeric.*
 
 /*
  * Command Phase

@@ -13,13 +13,13 @@ import mysqlclient4cj.protocol.*
 
 protected class TextResultSet <: ResultSet {
 
-    private var _columns: Array<ColumnDefinition>
+    private let _columns: Array<ColumnDefinition>
 
-    private var _rows: Array<TextResult>
+    private let _rows: Array<TextResult>
+
+    private let _indexMap: Map<String, Int64>
 
     private var _currentRow: Int64
-
-    private var _indexMap: Map<String, Int64>
 
     protected TextResultSet(fields: Array<ColumnDefinition>, rows: Array<TextResult>) {
         _columns = fields

@@ -3,14 +3,16 @@
  */
 package mysqlclient4cj.cdbc
 
-import std.database.sql.*
-import std.socket.*
-import std.collection.*
-import std.sync.*
+
+import std.sync.AtomicBool
+import std.collection.HashMap
+import std.database.sql.Datasource
+import std.database.sql.Connection
+import std.database.sql.SqlException
 
 public class DatasourceImpl <: Datasource {
 
-    private var _optinos: Map<String, String>
+    private var _optinos: HashMap<String, String>
 
     private var _closed: AtomicBool
 

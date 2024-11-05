@@ -3,10 +3,7 @@
  */
 protected package mysqlclient4cj.protocol
 
-import std.log.*
-import std.collection.*
-import std.console.*
-import std.io.*
+import std.io.InputStream
 
 /*
 * MySQL Packet

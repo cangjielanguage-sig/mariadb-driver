@@ -3,9 +3,8 @@
  */
 protected package mysqlclient4cj.protocol
 
-import std.io.*
-import std.collection.*
-import std.core.StringBuilder
+import std.io.InputStream
+import std.collection.ArrayList
 
 /*
  * Field Count packet
@@ -22,12 +21,11 @@ protected class ColumnCount <: CommonPacket {
     }
 
     protected init(stream: InputStream) {
-        super(stream)
-        var count = readLengthEncodedInteger(stream)
-        if (count.size == 0) {
-            throw InvalidPacketException("This packet is not a Column Count packet: read fields count failed")
+        super(stream) 
+        match (readLengthEncodedIntegerRaw(stream)) {
+            case None => throw InvalidPacketException("This packet is not a Column Count packet: read fields count failed")
+            case Some(v) => _count = UInt32.fromLittleEndian(v)
         }
-        _count = UInt32.fromLittleEndian(count)
     }
 }
 

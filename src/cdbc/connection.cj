@@ -3,12 +3,18 @@
  */
 package mysqlclient4cj.cdbc
 
-import std.database.sql.*
 import std.collection.*
 import std.sync.*
 import std.convert.*
+import std.database.sql.Connection
+import std.database.sql.ConnectionState
+import std.database.sql.Transaction
+import std.database.sql.Statement
+import std.database.sql.QueryResult
+import std.database.sql.UpdateResult
+import std.database.sql.SqlException
 import mysqlclient4cj.result.*
-import mysqlclient4cj.protocol.*
+import mysqlclient4cj.protocol.ParameterConvertException
 import mysqlclient4cj.connection.*
 
 public class ConnectionImpl <: Connection{

@@ -3,7 +3,7 @@
  */
 package mysqlclient4cj.cdbc
 
-import std.database.sql.*
+import std.database.sql.UpdateResult
 
 public class UpdateResultImpl <: UpdateResult{
     

@@ -9,14 +9,11 @@ import std.io.*
 import encoding.json.*
 import mysqlclient4cj.protocol.*
 
-/*
-* 
-*/
 protected class ChangeResult {
     
-    private var _effectRow: UInt64
+    private let _effectRow: UInt64
 
-    private var _firstInsertId: UInt64
+    private let _firstInsertId: UInt64
 
     public ChangeResult(effectRow: UInt64, firstInsertId: UInt64) {
         _effectRow = effectRow
@@ -38,11 +35,11 @@ protected class ChangeResult {
 
 protected class PrepareResult {
 
-    private var _info: PrepareResposne
+    private let _info: PrepareResposne
 
-    private var _parames: Array<ColumnDefinition>
+    private let _parames: Array<ColumnDefinition>
 
-    private var _columns: Array<ColumnDefinition>
+    private let _columns: Array<ColumnDefinition>
 
     protected PrepareResult(info: PrepareResposne, parameters: Array<ColumnDefinition>, columns: Array<ColumnDefinition>){
         _info = info

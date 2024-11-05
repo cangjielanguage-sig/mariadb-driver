@@ -3,8 +3,9 @@
  */
 package mysqlclient4cj.cdbc
 
-import std.database.sql.*
-import encoding.json.*
+import std.database.sql.SqlDbType
+import std.database.sql.SqlNullableDbType
+import encoding.json.JsonValue
 
 public class SqlJson <: SqlDbType{
 

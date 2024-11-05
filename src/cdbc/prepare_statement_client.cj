@@ -4,17 +4,15 @@
 package mysqlclient4cj.cdbc
 
 import std.database.sql.*
-import std.collection.*
-import std.convert.*
-import std.time.*
-import std.io.*
-import std.sync.*
-import std.regex.*
-import encoding.json.*
-import encoding.hex.*
-import mysqlclient4cj.protocol.*
-import mysqlclient4cj.connection.*
-import mysqlclient4cj.result.*
+import std.collection.HashMap
+import std.sync.AtomicBool
+import std.regex.Regex
+import std.regex.Matcher
+import mysqlclient4cj.protocol.to0xString
+import mysqlclient4cj.protocol.toArray
+import mysqlclient4cj.protocol.DB_DATE_FORMAT
+import mysqlclient4cj.protocol.DB_TIME_FORMAT
+import mysqlclient4cj.protocol.DB_DATE_TIME_FORMAT
 
 public class ClientPrepareStatement <: Statement {
 
@@ -22,7 +20,7 @@ public class ClientPrepareStatement <: Statement {
 
     private var _originSql: String
 
-    private var _option: Map<String, String>
+    private var _option: HashMap<String, String>
 
     private var _closed: AtomicBool
 

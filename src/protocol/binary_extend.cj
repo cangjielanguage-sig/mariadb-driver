@@ -3,7 +3,7 @@
  */
 protected package mysqlclient4cj.protocol
 
-import std.binary.*
+import std.binary.LittleEndianOrder
 
 protected interface LittleEndian<T> {
 

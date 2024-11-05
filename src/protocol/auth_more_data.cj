@@ -3,7 +3,7 @@
  */
 protected package mysqlclient4cj.protocol
 
-import std.io.*
+import std.io.InputStream
 
 /*
 * AuthMoreData Packet

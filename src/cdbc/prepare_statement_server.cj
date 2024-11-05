@@ -4,18 +4,21 @@
 
 package mysqlclient4cj.cdbc
 
-import std.convert.*
 import std.database.sql.*
-import std.sync.*
-import std.collection.*
-import std.regex.*
-import mysqlclient4cj.result.*
+import std.convert.Parsable
+import std.sync.AtomicBool
+import std.collection.ArrayList
+import std.collection.HashMap
+import std.regex.Regex
+import std.regex.Matcher
+import mysqlclient4cj.result.PrepareResult
+import mysqlclient4cj.protocol.ColumnFlag
 
 public class ServerPrepareStatement <: Statement {
 
     private var _id: UInt32
 
-    private var _option: Map<String, String>
+    private var _option: HashMap<String, String>
 
     private var _paramsInfo: Array<ColumnInfo>
 

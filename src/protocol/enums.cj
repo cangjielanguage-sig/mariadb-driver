@@ -3,7 +3,6 @@
  */
 protected package mysqlclient4cj.protocol
 
-import std.collection.*
 
 /*
  * 认证状态枚举
@@ -17,7 +16,7 @@ protected enum AuthState {
         match (value) {
             case 0x03 => return FastAuthSuccess
             case 0x04 => return PerformFullAuthentication
-            case _ => throw Exception("Don't have this AuthState by value ${value}")
+            case _ => throw IllegalArgumentException("Don't have this AuthState by value ${value}")
         }
     }
 

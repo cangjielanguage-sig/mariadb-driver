@@ -3,9 +3,11 @@
  */
 package mysqlclient4cj.cdbc
 
-import std.database.sql.*
-import std.sync.*
-import mysqlclient4cj.connection.*
+import std.database.sql.SqlException
+import std.database.sql.Transaction
+import std.database.sql.TransactionIsoLevel
+import std.database.sql.TransactionAccessMode
+import std.database.sql.TransactionDeferrableMode
 
 class TransactionImpl <: Transaction {
     

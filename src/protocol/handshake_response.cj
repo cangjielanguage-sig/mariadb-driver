@@ -3,7 +3,7 @@
  */
 protected package mysqlclient4cj.protocol
 
-import std.collection.*
+import std.collection.HashMap
 
 /*
 * HandshakeResponse41
@@ -27,7 +27,7 @@ protected class HandshakeResponse <: Request {
 
     private var _clientAuthPlugin: String = ""
 
-    private var _attribute: Map<String, String> = HashMap<String, String>()
+    private var _attribute: HashMap<String, String> = HashMap<String, String>()
 
     private var _zstdCompressionLevel: Byte = 0x00
     

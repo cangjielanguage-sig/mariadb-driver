@@ -3,9 +3,8 @@
  */
 protected package mysqlclient4cj.protocol
 
-import std.io.*
-import std.collection.*
-
+import std.io.InputStream
+import std.collection.ArrayList
 /*
 * Generic Response Packets
 * referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_basic_response_packets.html
@@ -68,29 +67,35 @@ protected class OkResponse <: Response {
 
     protected init(stream: InputStream){
         super(stream)
-        var effectRows = readLengthEncodedInteger(stream)
-        if(effectRows.size == 0){
-            throw InvalidPacketException("This packet is not a Ok Repsposne packet: read effect rows failed")
+        let effectRows = readLengthEncodedIntegerRaw(stream)
+        match (effectRows) {
+            case None =>  throw InvalidPacketException("This packet is not a Ok Repsposne packet: read effect rows failed")
+            case Some(v) => _effectRows = UInt64.fromLittleEndian(v)
         }
-        _effectRows = UInt64.fromLittleEndian(effectRows)
 
-        var index = readLengthEncodedInteger(stream)
-        if(index.size == 0){
-            throw InvalidPacketException("This packet is not a Ok Repsposne packet: read index failed")
+        let index = readLengthEncodedIntegerRaw(stream)
+        match (index) {
+            case None => throw InvalidPacketException("This packet is not a Ok Repsposne packet: read index failed")
+            case Some(v) => _index = UInt64.fromLittleEndian(v)
         }
-        _index = UInt64.fromLittleEndian(index)
-        var serverStatus = Array<Byte>(2, repeat: 0)
+
+        let serverStatus = Array<Byte>(2, repeat: 0)
         if(stream.read(serverStatus) == 0){
             throw InvalidPacketException("This packet is not a Ok Repsposne packet: read server status failed")
         }
         _serverStatus = UInt16.fromLittleEndian(serverStatus)
 
-        var waringCount = Array<Byte>(2, repeat: 0)
+        let waringCount = Array<Byte>(2, repeat: 0)
         if(stream.read(waringCount) == 0){
             throw InvalidPacketException("This packet is not a Ok Repsposne packet: read waring count failed")
         }
         _waringCount = UInt16.fromLittleEndian(waringCount)
-        var message = Array<Byte>(Int64(_length - 5), repeat: 0)
+
+        let message = Array<Byte>(Int64(_length - 5), repeat: 0)
+        stream.read(message) // message is optional
+        // if(stream.read(message) == 0){
+        //     throw InvalidPacketException("This packet is not a Ok Repsposne packet: read message failed")
+        // }
         _message = String.fromUtf8(message.toArray())
     }
 }
@@ -132,15 +137,6 @@ protected class ErrorResponse <: Response{
         if(stream.read(message) == 0){
             throw InvalidPacketException("This packet is not a Error Repsposne packet: read message failed")
         }
-        // var message = ArrayList<Byte>()
-        // do {
-        //     if(stream.read(single) == 0) {
-        //         throw InvalidPacketException("This packet is not a Error Repsposne packet: read message failed")
-        //     }
-        //     if(single[0] != 0) {
-        //         message.appendAll(single)
-        //     }
-        // }while(single[0] != 0)
         _message = String.fromUtf8(message.toArray())
     }
 

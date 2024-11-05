@@ -5,7 +5,7 @@ package mysqlclient4cj.cdbc
 
 import std.database.sql.*
 import mysqlclient4cj.connection.*
-import mysqlclient4cj.protocol.*
+import mysqlclient4cj.protocol.ColumnType
 
 public class ColumnInfoImpl <: ColumnInfo {
 

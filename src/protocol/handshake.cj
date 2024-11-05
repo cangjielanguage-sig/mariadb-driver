@@ -3,9 +3,8 @@
  */
 protected package mysqlclient4cj.protocol
 
-import std.io.*
-import std.collection.*
-import std.binary.*
+import std.io.InputStream
+import std.collection.ArrayList
 
 
 /*
@@ -38,10 +37,8 @@ protected class Handshake <: CommonPacket {
 
     protected prop capabilities: UInt32{
         get() {
-            var part1 = Array<Byte>(2, repeat: 0)
-            _serverCapabilities.writeLittleEndian(part1)
-            var part2 = Array<Byte>(2, repeat: 0)
-            _extendedServerCapabilities.writeLittleEndian(part2)
+            var part1 = _serverCapabilities.toLittleEndian()
+            var part2 = _extendedServerCapabilities.toLittleEndian()
             return UInt32.fromLittleEndian([part1[0], part1[1], part2[0], part2[1]])
         }
     }

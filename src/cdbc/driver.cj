@@ -4,14 +4,14 @@
 package mysqlclient4cj.cdbc
 
 import std.database.sql.DriverManager
-import std.database.sql.*
-import std.convert.*
-import std.log.*
-import std.console.*
-import std.collection.*
-import std.time.*
-import encoding.url.*
-import mysqlclient4cj.connection.*
+import std.database.sql.Driver
+import std.database.sql.Datasource
+import std.database.sql.PooledDatasource
+import std.convert.Parsable
+import std.collection.ArrayList
+import encoding.url.URL
+import encoding.url.UrlSyntaxException
+import mysqlclient4cj.connection.Params
 
 public class MySqlDriver <: Driver {
 

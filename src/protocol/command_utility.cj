@@ -3,14 +3,6 @@
  */
 protected package mysqlclient4cj.protocol
 
-import std.collection.*
-import std.time.*
-import encoding.json.*
-import std.convert.*
-import encoding.hex.*
-import std.io.*
-import std.math.numeric.*
-
 /*
  * Tells the server that the client wants it to close the connection.
  * referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_com_quit.html

@@ -4,14 +4,12 @@
 package mysqlclient4cj.cdbc
 
 import std.database.sql.*
-import std.convert.*
-import std.time.*
-import std.io.*
-import std.sync.*
+import std.convert.Parsable
+import std.time.DateTime
+import std.sync.ReentrantMutex
+import std.sync.AtomicBool
 import std.collection.ArrayList
-import encoding.json.*
-import mysqlclient4cj.connection.*
-import mysqlclient4cj.result.*
+import mysqlclient4cj.result.ResultSet
 
 public class QueryResultImpl <: QueryResult {
     
@@ -32,17 +30,17 @@ public class QueryResultImpl <: QueryResult {
     protected QueryResultImpl(result: ResultSet) {
         _result = result
         _columnInfos = []
-        //var arrayList = ArrayList<ColumnInfo>()
-        // for(i in 0.._result.columnSize){
-        //     var name = _result.getFieldName(i + 1)
-        //     var fieldType = _result.getFieldType(i + 1)
-        //     var notNull = _result.getFieldIsNotNull(i + 1)
-        //     var length = _result.getFieldLength(i + 1)
-        //     var decimal = _result.getFieldDecimal(i + 1)
-        //     var info = ColumnInfoImpl(name, getSqlType(fieldType, notNull), Int64(length), Int64(length), Int64(decimal), !notNull)
-        //     arrayList.append(info)
-        // }
-        // _columnInfos = arrayList.toArray()
+        let arrayList = ArrayList<ColumnInfo>()
+        for(i in 1..=_result.columnSize){
+            let name = _result.getFieldName(i)
+            let fieldType = _result.getFieldType(i)
+            let notNull = _result.getFieldIsNotNull(i)
+            let length = _result.getFieldLength(i)
+            let decimal = _result.getFieldDecimal(i)
+            let info = ColumnInfoImpl(name, toSqlType(fieldType, notNull), Int64(length), Int64(length), Int64(decimal), !notNull)
+            arrayList.append(info)
+        }
+        _columnInfos = arrayList.toArray()
     }   
 
     /*向后移动一行，必须先调用一次 next 才能移动到第一行，第二次调用移动到第二行，依此类推。当返回 true 时，驱动会在 values 中填入行数据；当返回 false 时结束，且不会修改 values 的内容。*/
