@@ -3,13 +3,23 @@
  */
 protected package mysqlclient4cj.result
 
-import std.time.*
-import std.convert.*
-import std.io.*
-import encoding.json.*
-import std.math.numeric.*
-import std.collection.*
-import mysqlclient4cj.protocol.*
+import std.time.DateTime
+import std.time.TimeParseException
+import std.math.numeric.BigInt
+import std.math.numeric.Decimal
+import std.convert.Parsable
+import std.io.InputStream
+import std.collection.HashMap
+import encoding.json.JsonValue
+import mysqlclient4cj.protocol.Charset
+import mysqlclient4cj.protocol.ColumnDefinition
+import mysqlclient4cj.protocol.TextResult
+import mysqlclient4cj.protocol.DB_DATE_FORMAT
+import mysqlclient4cj.protocol.DB_DATE_TIME_FORMAT
+import mysqlclient4cj.protocol.DB_TIME_FORMAT
+import mysqlclient4cj.protocol.DB_TIME_PREFIX
+import mysqlclient4cj.protocol.toInputStream
+import mysqlclient4cj.protocol.ColumnType
 
 protected class TextResultSet <: ResultSet {
 
@@ -17,7 +27,7 @@ protected class TextResultSet <: ResultSet {
 
     private let _rows: Array<TextResult>
 
-    private let _indexMap: Map<String, Int64>
+    private let _indexMap: HashMap<String, Int64>
 
     private var _currentRow: Int64
 

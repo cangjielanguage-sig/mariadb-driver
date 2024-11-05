@@ -3,11 +3,15 @@
  */
 package mysqlclient4cj.jdbc
 
-import std.time.{DateTime, TimeZone, DayOfWeek, Month, DateTimeFormat}
+import std.time.Month
+import std.time.DateTime
+import std.time.TimeZone
+import std.time.DayOfWeek
+import std.time.DateTimeFormat
 
 public class Date <: ToString & Comparable<Date> & Hashable {
 
-    private var delegate: DateTime
+    private let delegate: DateTime
 
     public init(year: Int64, month: Int64, day: Int64, timeZone!: TimeZone = TimeZone.Local) {
         delegate = DateTime.of(year: year, month: month, dayOfMonth: day, timeZone: timeZone)

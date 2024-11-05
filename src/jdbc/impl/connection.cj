@@ -4,12 +4,21 @@
 package mysqlclient4cj.jdbc.impl
 
 import std.collection.Map
-import std.sync.*
-import std.convert.*
-import mysqlclient4cj.jdbc.*
-import mysqlclient4cj.connection.*
-import mysqlclient4cj.result.*
-import mysqlclient4cj.protocol.*
+import std.sync.ReentrantMutex
+import std.convert.Parsable
+import mysqlclient4cj.jdbc.Statement
+import mysqlclient4cj.jdbc.Connection
+import mysqlclient4cj.jdbc.SqlException
+import mysqlclient4cj.jdbc.IsolationLevel
+import mysqlclient4cj.result.ResultSet
+import mysqlclient4cj.result.ChangeResult
+import mysqlclient4cj.result.PrepareResult
+import mysqlclient4cj.connection.Params
+import mysqlclient4cj.connection.MySqlConnection
+import mysqlclient4cj.connection.ResponseErrorException
+import mysqlclient4cj.connection.MySqlConnectionFactory
+import mysqlclient4cj.connection.ConnectFailedException
+import mysqlclient4cj.protocol.ParameterConvertException
 
 public class ConnectionImpl <: Connection {
     

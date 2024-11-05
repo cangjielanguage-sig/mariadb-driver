@@ -3,11 +3,9 @@
  */
 protected package mysqlclient4cj.result
 
-import std.time.*
-import std.convert.*
-import std.io.*
-import encoding.json.*
-import mysqlclient4cj.protocol.*
+import mysqlclient4cj.protocol.PrepareResposne
+import mysqlclient4cj.protocol.ColumnDefinition
+
 
 protected class ChangeResult {
     

@@ -359,9 +359,7 @@ protected func toArray(inputStream: InputStream): Array<Byte> {
  * Array转InputStream
  */
 protected func toInputStream(buffer: Array<Byte>): InputStream{
-    var stream = ByteBuffer(buffer.size)
-    stream.write(buffer)
-    return stream
+    return ByteBuffer(buffer)
 }
 
 /*

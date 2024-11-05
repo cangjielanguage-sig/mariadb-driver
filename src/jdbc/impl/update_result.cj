@@ -3,7 +3,7 @@
  */
 package mysqlclient4cj.jdbc.impl
 
-import mysqlclient4cj.jdbc.*
+import mysqlclient4cj.jdbc.UpdateResult
 
 public class UpdateResultImpl <: UpdateResult {
 

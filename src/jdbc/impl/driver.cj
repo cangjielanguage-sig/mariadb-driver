@@ -3,9 +3,12 @@
  */
 package mysqlclient4cj.jdbc.impl
 
-import encoding.url.*
+import encoding.url.URL
+import encoding.url.UrlSyntaxException
+import mysqlclient4cj.jdbc.Driver
+import mysqlclient4cj.jdbc.Datasource
 import mysqlclient4cj.connection.Params
-import mysqlclient4cj.jdbc.*
+
 
 public class MySqlDriver <: Driver {
  

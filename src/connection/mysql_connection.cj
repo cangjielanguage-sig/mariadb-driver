@@ -1,15 +1,48 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
- * @author Yesokim
  */
 protected package mysqlclient4cj.connection
 
-import std.collection.*
-import std.io.*
-import std.sync.*
-import std.net.*
-import mysqlclient4cj.result.*
-import mysqlclient4cj.protocol.*
+import std.io.InputStream
+import std.sync.ReentrantMutex
+import std.collection.ArrayList
+import std.net.TcpSocket
+import std.net.StreamingSocket
+import mysqlclient4cj.result.ResultSet
+import mysqlclient4cj.result.ChangeResult
+import mysqlclient4cj.result.PrepareResult
+import mysqlclient4cj.result.TextResultSet
+import mysqlclient4cj.result.BinaryResultSet
+import mysqlclient4cj.protocol.Request
+import mysqlclient4cj.protocol.toArray
+import mysqlclient4cj.protocol.Response
+import mysqlclient4cj.protocol.Handshake
+import mysqlclient4cj.protocol.AuthState
+import mysqlclient4cj.protocol.OkResponse
+import mysqlclient4cj.protocol.TextResult
+import mysqlclient4cj.protocol.AuthStatus
+import mysqlclient4cj.protocol.AuthSwitch
+import mysqlclient4cj.protocol.nothingTodo
+import mysqlclient4cj.protocol.ColumnCount
+import mysqlclient4cj.protocol.AbstractEOF
+import mysqlclient4cj.protocol.QuitCommand
+import mysqlclient4cj.protocol.EofResponse
+import mysqlclient4cj.protocol.ResponseCode
+import mysqlclient4cj.protocol.QueryCommand
+import mysqlclient4cj.protocol.BinaryResult
+import mysqlclient4cj.protocol.FetchCommand
+import mysqlclient4cj.protocol.AuthMoreData
+import mysqlclient4cj.protocol.CloseCommand
+import mysqlclient4cj.protocol.ErrorResponse
+import mysqlclient4cj.protocol.toInputStream
+import mysqlclient4cj.protocol.ExecuteCommand
+import mysqlclient4cj.protocol.PrepareCommand
+import mysqlclient4cj.protocol.PrepareResposne
+import mysqlclient4cj.protocol.ColumnDefinition
+import mysqlclient4cj.protocol.PublicKeyResponse
+import mysqlclient4cj.protocol.HandshakeResponse
+import mysqlclient4cj.protocol.SendLongDataCommand
+
 
 /**
 * The mysql connection object facilitates the upper-layer driver to interact with the database
@@ -32,10 +65,10 @@ protected class MySqlConnection <: Resource {
 
     protected mut prop socket: StreamingSocket {
         get() {
-            channel.getSocket()
+            channel.socket
         }
         set(value) {
-            channel.setSocket(value)
+            channel.socket = value
         }
     }
 

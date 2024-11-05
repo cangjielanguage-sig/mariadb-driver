@@ -3,12 +3,15 @@
  */
 protected package mysqlclient4cj.connection
 
-import std.math.numeric.{Decimal, BigInt}
 import std.time.DateTime
-import std.io.*
-import encoding.json.*
-import mysqlclient4cj.protocol.*
-import mysqlclient4cj.result.*
+import std.io.InputStream
+import std.math.numeric.Decimal
+import std.math.numeric.BigInt
+import encoding.json.JsonValue
+import mysqlclient4cj.result.ResultSet
+import mysqlclient4cj.protocol.Charset
+import mysqlclient4cj.protocol.ColumnType
+import mysqlclient4cj.protocol.ColumnDefinition
 
 protected class CursorResultSet <: ResultSet {
 

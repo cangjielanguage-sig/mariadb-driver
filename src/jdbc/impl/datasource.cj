@@ -3,9 +3,10 @@
  */
 package mysqlclient4cj.jdbc.impl
 
-import mysqlclient4cj.jdbc.*
 import std.collection.Map
 import std.collection.HashMap
+import mysqlclient4cj.jdbc.Connection
+import mysqlclient4cj.jdbc.Datasource
 
 public class DatasourceImpl <: Datasource  {
 

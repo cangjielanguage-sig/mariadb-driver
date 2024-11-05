@@ -9,31 +9,15 @@ import mysqlclient4cj.protocol.ColumnType
 
 public class ColumnInfoImpl <: ColumnInfo {
 
-    private var _name: String
 
-    private var _type: String
+    public ColumnInfoImpl(
+        private let _name: String,
+        private let _type: String, 
+        private let _displaySize: Int64, 
+        private let _length: Int64, 
+        private let _scale: Int64,
+        private let _nullable: Bool){}
 
-    private var _displaySize: Int64
-
-    private var _length: Int64
-
-    private var _scale: Int64
-
-    private var _nullable: Bool
-
-    public ColumnInfoImpl(fieldName: String,
-                          fieldType: String, 
-                          displaySize: Int64, 
-                          length: Int64, 
-                          scale: Int64,
-                          nullable: Bool) {
-        _name = fieldName
-        _type = fieldType
-        _displaySize = displaySize
-        _length = length
-        _scale = scale
-        _nullable = nullable
-    }
 
     public override prop name: String {
         get() {

@@ -3,12 +3,12 @@
  */
 protected package mysqlclient4cj.connection
 
-import crypto.digest.*
-import crypto.keys.*
-import std.convert.*
-import std.io.*
-import std.collection.*
-
+import std.io.ByteBuffer
+import crypto.digest.SHA1
+import crypto.digest.SHA256
+import crypto.keys.PadOption
+import crypto.keys.OAEPOption
+import crypto.keys.RSAPublicKey
 /*
 caching_sha2_password 插件
 XOR(SHA256(password), SHA256(SHA256(SHA256(password)), nonce))
@@ -43,24 +43,20 @@ internal func cachingSha2Password(password: Array<Byte>, salt: Array<Byte>): Arr
     return scramble
 }
 
-internal func performFullAuthentication(pubPem: String,password: Array<Byte>, salt: Array<Byte>): Array<Byte>{
+internal func performFullAuthentication(pubPem: String, password: Array<Byte>, salt: Array<Byte>): Array<Byte>{
     if(password.size == 0){
         return []
     }
     var x: Int64 = 0
-    var array = ArrayList<Byte>()
-    array.appendAll(password)
-    array.append(0x00)
-    var pwd = array.toArray()
-    while(x < pwd.size){
-        pwd[x] ^= salt[x % salt.size]
+    while(x < password.size){
+        password[x] ^= salt[x % salt.size]
         x++
     }
     var publicKey = RSAPublicKey.decodeFromPem(pubPem)
     var inStream = ByteBuffer()
-    inStream.write(pwd)
+    inStream.write(password)
     var outStream = ByteBuffer()
-    publicKey.encrypt(inStream, outStream,padType: PadOption.OAEP(OAEPOption(SHA1(), SHA1(), label: "")))
+    publicKey.encrypt(inStream, outStream, padType: PadOption.OAEP(OAEPOption(SHA1(), SHA1(), label: "")))
     return outStream.bytes()
 }
 

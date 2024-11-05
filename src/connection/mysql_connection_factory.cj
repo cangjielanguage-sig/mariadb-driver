@@ -1,22 +1,37 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
- * @author Yesokim
  */
 protected package mysqlclient4cj.connection
 
-import std.net.*
-import std.collection.*
-import std.convert.*
-import std.io.*
-import net.tls.*
-import std.sync.*
-import std.fs.*
-import crypto.x509.*
-import crypto.keys.*
-import std.time.*
-import std.sort.*
-import mysqlclient4cj.result.*
-import mysqlclient4cj.protocol.*
+import std.fs.File
+import std.collection.Map
+import std.convert.Parsable
+import std.net.TcpSocket
+import std.net.SocketException
+import std.net.SocketTimeoutException
+import net.tls.TlsSocket
+import net.tls.TlsSession
+import net.tls.TlsException
+import net.tls.TlsClientConfig
+import net.tls.CertificateVerifyMode
+import crypto.x509.PrivateKey
+import crypto.x509.X509Certificate
+import crypto.x509.PublicKeyAlgorithm
+import crypto.keys.RSAPrivateKey
+import crypto.keys.ECDSAPrivateKey
+import mysqlclient4cj.protocol.Response
+import mysqlclient4cj.protocol.Handshake
+import mysqlclient4cj.protocol.AuthState
+import mysqlclient4cj.protocol.Capability
+import mysqlclient4cj.protocol.AuthStatus
+import mysqlclient4cj.protocol.AuthSwitch
+import mysqlclient4cj.protocol.OkResponse
+import mysqlclient4cj.protocol.SendPassword
+import mysqlclient4cj.protocol.ErrorResponse
+import mysqlclient4cj.protocol.toNullTerminated
+import mysqlclient4cj.protocol.RequestPublicKey
+import mysqlclient4cj.protocol.PublicKeyResponse
+import mysqlclient4cj.protocol.HandshakeResponse
 
 public class MySqlConnectionFactory {
 
@@ -62,7 +77,8 @@ public class MySqlConnectionFactory {
             case ok: OkResponse => return connection
             case error: ErrorResponse => throw ConnectFailedException(error.message)
             case key: PublicKeyResponse => 
-                let encryptedPwd = performFullAuthentication(key.publicKey, originPassword.toArray(), handshake.salt)
+                let (pwd, _) = toNullTerminated(originPassword)
+                let encryptedPwd = performFullAuthentication(key.publicKey, pwd, handshake.salt)
                 return sendPassword(connection, encryptedPwd, key.number)
             case authSwitch: AuthSwitch =>
                 match (authSwitch.pluginName) {
@@ -77,7 +93,8 @@ public class MySqlConnectionFactory {
                             return sendPassword(connection, pwd , authSwitch.number)
                         }else{
                             let (publicKey, lastPacketNumber) = requestPublicKey(connection, SHA256_REQUESET_KEY_CODE,authSwitch.number)
-                            let encryptedPwd = performFullAuthentication(publicKey, originPassword.toArray(), authSwitch.salt)
+                            let (pwd, _) = toNullTerminated(originPassword)
+                            let encryptedPwd = performFullAuthentication(publicKey, pwd, authSwitch.salt)
                             return sendPassword(connection, encryptedPwd, lastPacketNumber)
                         }
                     case "mysql_native_password" =>
@@ -197,7 +214,8 @@ public class MySqlConnectionFactory {
                 return sendPassword(connection, pwd, authState.number)    
             } else {
                 let (publicKey, lastPacketNumber) = requestPublicKey(connection, CACHING_SHA2_REQUEST_KEY_CODE,authState.number)
-                let encryptedPwd = performFullAuthentication(publicKey, originPassword.toArray(), salt)
+                let (pwd, _) = toNullTerminated(originPassword)
+                let encryptedPwd = performFullAuthentication(publicKey, pwd, salt)
                 return sendPassword(connection, encryptedPwd, lastPacketNumber)
             }
         } else if (authState.state == AuthState.FastAuthSuccess) {

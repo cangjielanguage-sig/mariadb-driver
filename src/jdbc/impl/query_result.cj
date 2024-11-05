@@ -3,12 +3,16 @@
  */
 package mysqlclient4cj.jdbc.impl
 
-import std.math.numeric.{Decimal, BigInt}
 import std.time.DateTime
 import std.io.InputStream
+import std.math.numeric.BigInt
+import std.math.numeric.Decimal
 import encoding.json.JsonValue
-import mysqlclient4cj.result.*
-import mysqlclient4cj.jdbc.*
+import mysqlclient4cj.jdbc.Date
+import mysqlclient4cj.jdbc.Time
+import mysqlclient4cj.jdbc.QueryResult
+import mysqlclient4cj.jdbc.SqlException
+import mysqlclient4cj.result.ResultSet
 
 public class QueryResultImpl <: QueryResult {
 

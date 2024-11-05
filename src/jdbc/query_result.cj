@@ -3,9 +3,10 @@
  */
 package mysqlclient4cj.jdbc
 
-import std.math.numeric.{Decimal, BigInt}
 import std.time.DateTime
 import std.io.InputStream
+import std.math.numeric.BigInt
+import std.math.numeric.Decimal
 import encoding.json.JsonValue
 
 public interface QueryResult <: Resource {

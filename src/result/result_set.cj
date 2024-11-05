@@ -3,13 +3,13 @@
  */
 protected package mysqlclient4cj.result
 
-import std.time.*
-import std.convert.*
-import std.io.*
-import encoding.json.*
-import std.math.numeric.{Decimal, BigInt}
-import mysqlclient4cj.protocol.*
-
+import std.time.DateTime
+import std.io.InputStream
+import std.math.numeric.Decimal
+import std.math.numeric.BigInt
+import encoding.json.JsonValue
+import mysqlclient4cj.protocol.Charset
+import mysqlclient4cj.protocol.ColumnType
 protected interface ResultSet {
 
     prop rowSize: Int64

@@ -3,14 +3,27 @@
  */
 protected package mysqlclient4cj.result
 
-import std.time.*
-import std.convert.*
-import std.io.*
-import std.math.numeric.*
-import std.collection.Map
+import std.time.DateTime
+import std.time.TimeParseException
+import std.math.numeric.BigInt
+import std.math.numeric.Decimal
+import std.convert.Parsable
+import std.io.InputStream
 import std.collection.HashMap
-import encoding.json.*
-import mysqlclient4cj.protocol.*
+import encoding.json.JsonValue
+import mysqlclient4cj.protocol.toBool
+import mysqlclient4cj.protocol.toInputStream
+import mysqlclient4cj.protocol.timeToDateTime
+import mysqlclient4cj.protocol.dateTimeToDateTime
+import mysqlclient4cj.protocol.Charset
+import mysqlclient4cj.protocol.ColumnFlag
+import mysqlclient4cj.protocol.ColumnType
+import mysqlclient4cj.protocol.LittleEndian
+import mysqlclient4cj.protocol.ColumnDefinition
+import mysqlclient4cj.protocol.DB_DATE_FORMAT
+import mysqlclient4cj.protocol.DB_TIME_FORMAT
+import mysqlclient4cj.protocol.DB_DATE_TIME_FORMAT
+
 
 protected class BinaryResultSet <: ResultSet {
     
@@ -18,7 +31,7 @@ protected class BinaryResultSet <: ResultSet {
 
     private let rows: Array<Array<?Array<Byte>>>
 
-    private let indexMap: Map<String, Int64>
+    private let indexMap: HashMap<String, Int64>
 
     private var currentRow: Int64
 
@@ -67,53 +80,53 @@ protected class BinaryResultSet <: ResultSet {
     @OverflowWrapping
     public override func getInt8(index: Int64): ?Int8 {
         match (getUInt8(index)) {
-            case Some(v) => Int8(v)
             case None => None
+            case Some(v) => Int8(v)
         }
     }
 
     public override func getUInt8(index: Int64): ?UInt8 {
         match (getUInt64(index)) {
-            case Some(v) => UInt8(v)
             case None => None
+            case Some(v) => UInt8(v)
         }
     }
 
     @OverflowWrapping
     public override func getInt16(index: Int64): ?Int16 {
         match (getUInt16(index)) {
-            case Some(v) => Int16(v)
             case None => None
+            case Some(v) => Int16(v)
         }
     }
 
     public override func getUInt16(index: Int64): ?UInt16 {
         match (getUInt64(index)) {
-            case Some(v) => UInt16(v)
             case None => None
+            case Some(v) => UInt16(v)
         }
     }
 
     @OverflowWrapping
     public override func getInt32(index: Int64): ?Int32 {
         match (getUInt32(index)) {
-            case Some(v) => Int32(v)
             case None => None
+            case Some(v) => Int32(v)
         }
     }
 
     public override func getUInt32(index: Int64): ?UInt32 {
         match (getUInt64(index)) {
-            case Some(v) => UInt32(v)
             case None => None
+            case Some(v) => UInt32(v)
         }
     }
 
     @OverflowWrapping
     public override func getInt64(index: Int64): ?Int64 {
         match (getUInt64(index)) {
-            case Some(v) => Int64(v)
             case None => None
+            case Some(v) => Int64(v)
         }
     }
 
