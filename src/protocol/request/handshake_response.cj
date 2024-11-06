@@ -1,173 +1,138 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-protected package mysqlclient4cj.protocol
+protected package mysqlclient4cj.protocol.request
 
 import std.collection.HashMap
-
+import std.collection.ArrayList
+import mysqlclient4cj.protocol.*
 /*
 * HandshakeResponse41
 * referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_connection_phase_packets_protocol_handshake_response.html
 */
 protected class HandshakeResponse <: Request {
 
-    private var _capabilities: UInt32 = 0x00
+    private var capabilities: UInt32 = 0x00
 
-    private var _maxPacket: UInt32 = 0x00
+    private var maxPacket: UInt32 = 0x00
 
-    private var _charset: Byte = 0x00
+    private var charset: Byte = 0x00
 
-    private var _unused: Array<Byte> = Array<Byte>(23, repeat: 0)
+    private var unused: Array<Byte> = Array<Byte>(23, repeat: 0)
 
-    private var _username: String = ""
+    private var username: String = ""
 
-    private var _authResponse: Array<Byte> = []
+    private var authResponse: Array<Byte> = []
     
-    private var _schema: String = ""
+    private var schema: String = ""
 
-    private var _clientAuthPlugin: String = ""
+    private var clientAuthPlugin: String = ""
 
-    private var _attribute: HashMap<String, String> = HashMap<String, String>()
+    private var attributes: HashMap<String, String> = HashMap<String, String>()
 
-    private var _zstdCompressionLevel: Byte = 0x00
+    private var zstdCompressionLevel: Byte = 0x00
     
     protected init(number: UInt8) {
-        super(0, number)
+        super(number)
     }
     
     protected func setNumber(number: UInt8): HandshakeResponse{
-            this._number = number
-            return this
+        this.number = number
+        return this
     }
 
     protected func setMaxPacket(maxPacket: UInt32): HandshakeResponse {
-        this._maxPacket = maxPacket
+        this.maxPacket = maxPacket
         return this
     }
 
     protected func setCharset(charset: Byte): HandshakeResponse {
-        this._charset = charset
+        this.charset = charset
         return this
     }
 
     protected func setUsername(username: String): HandshakeResponse {
-        this._username = username
+        this.username = username
         return this
     }
 
     protected func setAuthResponse(authResponse: Array<Byte>): HandshakeResponse {
-        this._authResponse = authResponse
+        this.authResponse = authResponse
         return this
     }
 
-    protected func setDatabase(database: String): HandshakeResponse {
-        _schema = database
+    protected func setDatabase(schema: String): HandshakeResponse {
+        this.schema = schema
         return this
     }
 
     protected func setClientAuthPlugin(plugin: String): HandshakeResponse {
-        this._clientAuthPlugin = plugin
+        this.clientAuthPlugin = plugin
         return this
     }
 
-    protected func setAttrbiture(name: String, value: String): HandshakeResponse {
-        this._attribute.put(name, value)
+    protected func addAttrbiture(name: String, value: String): HandshakeResponse {
+        this.attributes.put(name, value)
         return this
     }
 
     protected func setZstdCompressionLevel(level: Byte) {
-        this._zstdCompressionLevel = level
+        this.zstdCompressionLevel = level
         return this
     }
 
     protected func setCapability(capability: Capability): HandshakeResponse {
-        _capabilities |= capability.value()
+        this.capabilities |= capability.value()
         return this
     }
 
     protected func hasCapability(capability: Capability): Bool{
-        return (_capabilities & capability.value()) != 0
+        return (this.capabilities & capability.value()) != 0
     }
 
     public override func pack(): Unit {
-        var length: Int64 = 0
         //put packet length and number placeholer
         super.pack()
         //put client Capabilities
-        buf.appendAll(_capabilities.toLittleEndian())
-        length += 4
+        buf.appendAll(capabilities.toLittleEndian())
         //put max packet
-        buf.appendAll(_maxPacket.toLittleEndian())
-        length += 4
+        buf.appendAll(maxPacket.toLittleEndian())
         //put charset
-        buf.append(_charset)
-        length += 1
+        buf.append(charset)
         //put unused
-        buf.appendAll(_unused)
-        length += 23
+        buf.appendAll(unused)
         //put username
-        let (uname, size) = toNullTerminated(_username)
-        buf.appendAll(uname)
-        length += size
+        buf.appendAll(username.toNullTerminated())
         //put auth response
         if(hasCapability(PluginAuthLenencClientData)){
-            buf.append(UInt8(_authResponse.size))
-            length += 1
-            buf.appendAll(_authResponse)
-            length += _authResponse.size
+            buf.append(UInt8(authResponse.size))
+            buf.appendAll(authResponse)
         }else{
-            buf.appendAll(_authResponse)
-            length += _authResponse.size
+            buf.appendAll(authResponse)
         }
         // put schema if 'Connect With DB' are set
         if(hasCapability(ConnectWithDB)){
-            let schema = _schema.toArray()
-            buf.appendAll(schema)
-            length += schema.size
-            buf.append(0x00)
-            length += 1
+            buf.appendAll(schema.toNullTerminated())
         }
         //put client auth plguin
         if(hasCapability(PluginAuth)){
-            let pluginArray: Array<Byte> = _clientAuthPlugin.toArray()
-            buf.appendAll(pluginArray)
-            length += pluginArray.size
-            buf.append(0x00)
-            length += 1
+            buf.appendAll(clientAuthPlugin.toNullTerminated())
         }
-        //put attributes length placeholder
+        //put attributes
         if(hasCapability(ConnectAttrs)) {
-            buf.append(0x00)
-            var attrLenIndex: Int = length + HeaderSize
-            length += 1
-            var attrLen: Int = 0
-            for((k,v) in _attribute){
-                //put attr name length
-                var name = k.toArray()
-                buf.append(UInt8(name.size))
-                attrLen++
-                //put attr name
-                buf.appendAll(name)
-                attrLen += name.size
-                //put attr value length
-                buf.append(UInt8(v.toArray().size))
-                attrLen++
-                //put attr value
-                var valueArr = v.toArray()
-                buf.appendAll(valueArr)
-                attrLen += valueArr.size
+            let temp = ArrayList<Byte>()
+            for((k,v) in attributes) {
+                let key = k.toNullTerminated()
+                temp.appendAll(key)
+                let value = v.toNullTerminated()
+                temp.appendAll(value)
             }
-            length += attrLen
-            // set attribiters length
-            buf.set(Int64(attrLenIndex), UInt8(attrLen))
+            buf.appendAll(UInt64(temp.size).toLengthEncoded())
+            buf.appendAll(temp)
         }
-
         if(hasCapability(ZSTDCompressionAlgorithm)) {
-            buf.append(_zstdCompressionLevel)
-            length += 1
+            buf.append(zstdCompressionLevel)
         }
-        // set packet length
-        reset(UInt32(length))
     }
 
     /*
@@ -175,21 +140,16 @@ protected class HandshakeResponse <: Request {
     * referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_connection_phase_packets_protocol_ssl_request.html
     */
     protected func sslRequest(): Array<Byte> {
-        var length: Int = 0
         super.pack()
         //put client Capabilities
-        buf.appendAll(_capabilities.toLittleEndian())
-        length += 4
+        buf.appendAll(capabilities.toLittleEndian())
         //put max packet
-        buf.appendAll(_maxPacket.toLittleEndian())
-        length += 4
+        buf.appendAll(maxPacket.toLittleEndian())
         //put charset
-        buf.append(_charset)
-        length += 1
+        buf.append(charset)
         //put unused
-        buf.appendAll(_unused)
-        length += 23
-        reset(UInt32(length))
+        buf.appendAll(unused)
+        setHeader()
         return buf.toArray()
     }
 
@@ -223,22 +183,16 @@ protected class HandshakeResponse <: Request {
  */
 protected class RequestPublicKey <: Request{
 
-    internal var _code: Byte = 0x02
+    protected let code: Byte
 
     protected init(number: UInt8, code: Byte){
-        super(1,number)
-        _code = code
-    }
-    
-    protected prop code: Byte{
-        get() {
-            return _code
-        }
+        super(number)
+        this.code = code
     }
 
     protected override func pack(): Unit {
         super.pack()
-        buf.append(_code)
+        buf.append(code)
     }
 
 }
@@ -248,16 +202,16 @@ protected class RequestPublicKey <: Request{
  */
 protected class SendPassword <: Request{
 
-    private var _authResponse: Array<Byte>
+    private var authResponse: Array<Byte>
 
-    protected init(number: UInt8,password: Array<Byte>){
-        super(UInt32(password.size),number)
-        this._authResponse = password
+    protected init(number: UInt8, password: Array<Byte>){
+        super(number)
+        this.authResponse = password
     }
 
     protected override func pack(): Unit {
         super.pack()
-        buf.appendAll(_authResponse)
+        buf.appendAll(authResponse)
     }
 
 

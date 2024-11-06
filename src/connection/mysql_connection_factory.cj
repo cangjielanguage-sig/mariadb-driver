@@ -19,19 +19,9 @@ import crypto.x509.X509Certificate
 import crypto.x509.PublicKeyAlgorithm
 import crypto.keys.RSAPrivateKey
 import crypto.keys.ECDSAPrivateKey
-import mysqlclient4cj.protocol.Response
-import mysqlclient4cj.protocol.Handshake
-import mysqlclient4cj.protocol.AuthState
-import mysqlclient4cj.protocol.Capability
-import mysqlclient4cj.protocol.AuthStatus
-import mysqlclient4cj.protocol.AuthSwitch
-import mysqlclient4cj.protocol.OkResponse
-import mysqlclient4cj.protocol.SendPassword
-import mysqlclient4cj.protocol.ErrorResponse
-import mysqlclient4cj.protocol.toNullTerminated
-import mysqlclient4cj.protocol.RequestPublicKey
-import mysqlclient4cj.protocol.PublicKeyResponse
-import mysqlclient4cj.protocol.HandshakeResponse
+import mysqlclient4cj.protocol.*
+import mysqlclient4cj.protocol.request.*
+import mysqlclient4cj.protocol.response.*
 
 public class MySqlConnectionFactory {
 
@@ -77,8 +67,7 @@ public class MySqlConnectionFactory {
             case ok: OkResponse => return connection
             case error: ErrorResponse => throw ConnectFailedException(error.message)
             case key: PublicKeyResponse => 
-                let (pwd, _) = toNullTerminated(originPassword)
-                let encryptedPwd = performFullAuthentication(key.publicKey, pwd, handshake.salt)
+                let encryptedPwd = performFullAuthentication(key.publicKey, originPassword.toNullTerminated(), handshake.salt)
                 return sendPassword(connection, encryptedPwd, key.number)
             case authSwitch: AuthSwitch =>
                 match (authSwitch.pluginName) {
@@ -89,12 +78,10 @@ public class MySqlConnectionFactory {
                         return checkCachingSha2PasswordAuthStatus(connection, response, originPassword, authSwitch.salt, sslEnabled)
                     case "sha256_password" => 
                         if(sslEnabled){
-                            let (pwd, _) = toNullTerminated(originPassword)
-                            return sendPassword(connection, pwd , authSwitch.number)
+                            return sendPassword(connection, originPassword.toNullTerminated(), authSwitch.number)
                         }else{
                             let (publicKey, lastPacketNumber) = requestPublicKey(connection, SHA256_REQUESET_KEY_CODE,authSwitch.number)
-                            let (pwd, _) = toNullTerminated(originPassword)
-                            let encryptedPwd = performFullAuthentication(publicKey, pwd, authSwitch.salt)
+                            let encryptedPwd = performFullAuthentication(publicKey, originPassword.toNullTerminated(), authSwitch.salt)
                             return sendPassword(connection, encryptedPwd, lastPacketNumber)
                         }
                     case "mysql_native_password" =>
@@ -148,7 +135,7 @@ public class MySqlConnectionFactory {
                 encryptedPassword = cachingSha2Password(originPassword.toArray(),handshake.salt)
             case "sha256_password" => 
                 if(sslEnabled){
-                    (encryptedPassword, _) = toNullTerminated(originPassword)
+                    encryptedPassword = originPassword.toNullTerminated()
                 }else {
                     encryptedPassword =  [1]
                 }
@@ -210,12 +197,10 @@ public class MySqlConnectionFactory {
         let authState = (response as AuthStatus).getOrThrow()
         if (authState.state == AuthState.PerformFullAuthentication) {
             if (sslEnabled) {
-                let (pwd, _) = toNullTerminated(originPassword)
-                return sendPassword(connection, pwd, authState.number)    
+                return sendPassword(connection, originPassword.toNullTerminated(), authState.number)    
             } else {
                 let (publicKey, lastPacketNumber) = requestPublicKey(connection, CACHING_SHA2_REQUEST_KEY_CODE,authState.number)
-                let (pwd, _) = toNullTerminated(originPassword)
-                let encryptedPwd = performFullAuthentication(publicKey, pwd, salt)
+                let encryptedPwd = performFullAuthentication(publicKey, originPassword.toNullTerminated(), salt)
                 return sendPassword(connection, encryptedPwd, lastPacketNumber)
             }
         } else if (authState.state == AuthState.FastAuthSuccess) {

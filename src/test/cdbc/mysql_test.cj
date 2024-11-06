@@ -660,7 +660,9 @@ public class MySqlTest {
     public func costTest(): Unit {
         let start = MonoTime.now()
         let prepare = connection.prepareStatement("select * from full_test")
-        let result = prepare.query()
+        for(i in 0..10) {
+            let result = prepare.query()
+        }
         let end = MonoTime.now()
         let cost = end - start
         println("耗时: ${cost.toMilliseconds()}")

@@ -3,9 +3,7 @@
  */
 protected package mysqlclient4cj.result
 
-import mysqlclient4cj.protocol.PrepareResposne
-import mysqlclient4cj.protocol.ColumnDefinition
-
+import mysqlclient4cj.protocol.response.*
 
 protected class ChangeResult {
     

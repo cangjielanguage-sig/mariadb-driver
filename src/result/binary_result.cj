@@ -5,24 +5,15 @@ protected package mysqlclient4cj.result
 
 import std.time.DateTime
 import std.time.TimeParseException
+import std.io.ByteBuffer
+import std.io.InputStream
 import std.math.numeric.BigInt
 import std.math.numeric.Decimal
 import std.convert.Parsable
-import std.io.InputStream
 import std.collection.HashMap
 import encoding.json.JsonValue
-import mysqlclient4cj.protocol.toBool
-import mysqlclient4cj.protocol.toInputStream
-import mysqlclient4cj.protocol.timeToDateTime
-import mysqlclient4cj.protocol.dateTimeToDateTime
-import mysqlclient4cj.protocol.Charset
-import mysqlclient4cj.protocol.ColumnFlag
-import mysqlclient4cj.protocol.ColumnType
-import mysqlclient4cj.protocol.LittleEndian
-import mysqlclient4cj.protocol.ColumnDefinition
-import mysqlclient4cj.protocol.DB_DATE_FORMAT
-import mysqlclient4cj.protocol.DB_TIME_FORMAT
-import mysqlclient4cj.protocol.DB_DATE_TIME_FORMAT
+import mysqlclient4cj.protocol.*
+import mysqlclient4cj.protocol.response.*
 
 
 protected class BinaryResultSet <: ResultSet {
@@ -264,11 +255,11 @@ protected class BinaryResultSet <: ResultSet {
                 let columnType = getFieldType(index)
                 match (columnType) {
                     case Date => 
-                        return dateTimeToDateTime(v)
+                        return DateTime.fromBinaryDateTime(v)
                     case DateTime | Timestamp => 
-                        return dateTimeToDateTime(v)
+                        return DateTime.fromBinaryDateTime(v)
                     case Time => 
-                        return timeToDateTime(v)
+                        return DateTime.fromBinaryTime(v)
                     case _ => 
                         throw ValueConvertException("Unsupported conversion from ${columnType} to DateTime")
         }
@@ -280,7 +271,7 @@ protected class BinaryResultSet <: ResultSet {
     public override func getInputStream(index: Int64): ?InputStream {
         match (getBinaryData(index)) {
             case None => return None
-            case Some(v) => return toInputStream(v)
+            case Some(v) => return ByteBuffer(v)
         }
     }
 

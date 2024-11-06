@@ -1,7 +1,9 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-protected package mysqlclient4cj.protocol
+protected package mysqlclient4cj.protocol.request
+
+import mysqlclient4cj.protocol.*
 
 /*
  * Tells the server that the client wants it to close the connection.
@@ -21,17 +23,16 @@ protected class QuitCommand <: Command {
  */
 protected class InitDbCommand <: Command {
 
-    private let _database: String
+    private let database: String
 
     protected init(database: String) {
         super(InitDB)
-        _length += UInt32(database.size)
-        _database = database
+        this.database = database
     }
 
     protected override func pack(): Unit {
         super.pack()
-        buf.appendAll(_database.toArray())
+        buf.appendAll(database.toArray())
     }
 }
 
@@ -83,17 +84,16 @@ protected class ResetConnectionCommand <: Command {
  */
 protected class SetOptionCommand <: Command {
 
-    private let _operation: StatementOption
+    private let operation: StatementOption
 
     protected init(option: StatementOption) {
         super(SetOption)
-        _length += UInt32(2)
-        _operation = option
+        operation = option
     }
 
     protected override func pack(): Unit {
         super.pack()
-        buf.appendAll(_operation.value().toLittleEndian())
+        buf.appendAll(operation.value().toLittleEndian())
     }
 
 }

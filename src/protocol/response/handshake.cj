@@ -1,17 +1,16 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-protected package mysqlclient4cj.protocol
+protected package mysqlclient4cj.protocol.response
 
-import std.io.InputStream
+import std.io.ByteBuffer
 import std.collection.ArrayList
-
-
+import mysqlclient4cj.protocol.*
 /*
 * Initial handshake packet for protocol version 10.
 * referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_connection_phase_packets_protocol_handshake_v10.html
 */
-protected class Handshake <: CommonPacket {
+protected class Handshake <: CommonResponse {
 
     private var _protocol: Byte = 0x00
 
@@ -62,11 +61,11 @@ protected class Handshake <: CommonPacket {
         return (capabilities & capability.value()) != 0
     }
 
-    protected init(stream: InputStream){
-        super(stream)
+    protected init(length: UInt32, buffer: ByteBuffer){
+        super(length, buffer)
         // 协议: 1 byte
         var protocol = Array<Byte>(1, repeat: 0)
-        if(stream.read(protocol) == 0){
+        if(buffer.read(protocol) == 0){
             throw InvalidPacketException("This packet is not a Handshake packet: read protocol failed")
         }
         this._protocol = protocol[0]
@@ -74,7 +73,7 @@ protected class Handshake <: CommonPacket {
         var single = Array<Byte>(1, repeat: 0)
         var sversion = ArrayList<Byte>()
         do {
-            if(stream.read(single) == 0){
+            if(buffer.read(single) == 0){
                 throw InvalidPacketException("This packet is not a Handshake packet: read version failed")
             }
             if(single[0] != 0){
@@ -84,14 +83,14 @@ protected class Handshake <: CommonPacket {
         this._version = String.fromUtf8(sversion.toArray())
         // 线程id: 4 byte
         var threadId = Array<Byte>(4, repeat: 0)
-        if(stream.read(threadId) == 0){
+        if(buffer.read(threadId) == 0){
             throw InvalidPacketException("This packet is not a Handshake packet: read threadId failed")
         }
         this._threadId = UInt32.fromLittleEndian(threadId)
         // 随机盐: n byte,以空字符结束
         var salt1 = ArrayList<Byte>()
         do {
-            if(stream.read(single) == 0){
+            if(buffer.read(single) == 0){
                 throw InvalidPacketException("This packet is not a Handshake packet: read first salt failed")
             }
             if(single[0] != 0){
@@ -101,32 +100,32 @@ protected class Handshake <: CommonPacket {
         this._salt1 = salt1.toArray()
         // 服务器权能标志: 2 byte
         var serverCapabilities = Array<Byte>(2, repeat: 0)
-        if(stream.read(serverCapabilities) == 0){
+        if(buffer.read(serverCapabilities) == 0){
             throw InvalidPacketException("This packet is not a Handshake packet: read server capabilities failed")
         }
         this._serverCapabilities = UInt16.fromLittleEndian(serverCapabilities)
         // 服务字符编码集: 1 byte
         var serverLanguage = Array<Byte>(1, repeat: 0)
-        if(stream.read(serverLanguage) == 0){
+        if(buffer.read(serverLanguage) == 0){
             throw InvalidPacketException("This packet is not a Handshake packet: read server language failed")
         }
         this._serverLanguage = serverLanguage[0]
         // 服务器状态: 2 byte
         var serverStatus = Array<Byte>(2, repeat: 0)
-        if(stream.read(serverStatus) == 0){
+        if(buffer.read(serverStatus) == 0){
             throw InvalidPacketException("This packet is not a Handshake packet: read server status failed")
         }
         this._serverStatus = UInt16.fromLittleEndian(serverStatus)
         // 服务器权能标志扩展: 2 byte
         var extendedServerCapabilities = Array<Byte>(2, repeat: 0)
-        if(stream.read(extendedServerCapabilities) == 0){
+        if(buffer.read(extendedServerCapabilities) == 0){
             throw InvalidPacketException("This packet is not a Handshake packet: read extended server capabilities failed")
         }
         this._extendedServerCapabilities = UInt16.fromLittleEndian(extendedServerCapabilities)
         // 认证插件长度: 1 byte
         if(hasCapability(PluginAuth)){
             var authenticationDataLength = Array<Byte>(1, repeat: 0)
-            if(stream.read(authenticationDataLength) == 0){
+            if(buffer.read(authenticationDataLength) == 0){
                 throw InvalidPacketException("This packet is not a Handshake packet: read length of authentication plugin name failed")
             }
             this._authenticationDataLength = authenticationDataLength[0]
@@ -135,13 +134,13 @@ protected class Handshake <: CommonPacket {
         }
         // 未使用: 10 byte
         var unused = Array<Byte>(10, repeat: 0)
-        if(stream.read(unused) == 0){
+        if(buffer.read(unused) == 0){
             throw InvalidPacketException("This packet is not a Handshake packet: read padding failed")
         }
         // 随机盐: n byte
         var salt2 = ArrayList<Byte>()
         do {
-            if(stream.read(single) == 0){
+            if(buffer.read(single) == 0){
                 throw InvalidPacketException("This packet is not a Handshake packet: read second salt failed")
             }
             if(single[0] != 0){
@@ -153,7 +152,7 @@ protected class Handshake <: CommonPacket {
         if(hasCapability(PluginAuth)){
             var authenticationPlugin = ArrayList<Byte>()
             do {
-                if(stream.read(single) == 0){
+                if(buffer.read(single) == 0){
                     throw InvalidPacketException("This packet is not a Handshake packet: read second salt failed")
                 }
                 if(single[0] != 0){

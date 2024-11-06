@@ -10,6 +10,7 @@ import std.math.numeric.BigInt
 import encoding.json.JsonValue
 import mysqlclient4cj.protocol.Charset
 import mysqlclient4cj.protocol.ColumnType
+
 protected interface ResultSet {
 
     prop rowSize: Int64

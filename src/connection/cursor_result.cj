@@ -9,9 +9,8 @@ import std.math.numeric.Decimal
 import std.math.numeric.BigInt
 import encoding.json.JsonValue
 import mysqlclient4cj.result.ResultSet
-import mysqlclient4cj.protocol.Charset
-import mysqlclient4cj.protocol.ColumnType
-import mysqlclient4cj.protocol.ColumnDefinition
+import mysqlclient4cj.protocol.*
+import mysqlclient4cj.protocol.response.*
 
 protected class CursorResultSet <: ResultSet {
 

@@ -15,7 +15,7 @@ import mysqlclient4cj.jdbc.QueryResult
 import mysqlclient4cj.jdbc.SqlException
 import mysqlclient4cj.jdbc.UpdateResult
 import mysqlclient4cj.result.PrepareResult
-import mysqlclient4cj.protocol.nothingTodo
+import mysqlclient4cj.protocol.nothing
 
 
 public class ServerPrepareStatement <: AllocateStatement {
@@ -43,7 +43,7 @@ public class ServerPrepareStatement <: AllocateStatement {
             match(params[i]){
                 case v: Date => params[i] = DateTime.of(year: v.year, month: v.month, dayOfMonth: v.dayOfMonth)
                 case v: Time => params[i] = DateTime.of(year: 1970, month: 1, dayOfMonth: 1, hour: v.hour, minute: v.minute, second: v.second)
-                case _ => nothingTodo(0)
+                case _ => nothing(0)
             }
         }
         var result = _connection.executeQueryPrepare(_prepareResult, params)
@@ -56,7 +56,7 @@ public class ServerPrepareStatement <: AllocateStatement {
             match(params[i]){
                 case v: Date => params[i] = DateTime.of(year: v.year, month: v.month, dayOfMonth: v.dayOfMonth)
                 case v: Time => params[i] = DateTime.of(year: 1970, month: 1, dayOfMonth: 1, hour: v.hour, minute: v.minute, second: v.second)
-                case _ => nothingTodo(0)
+                case _ => nothing(0)
             }
         }
         var result = _connection.executeUpdatePrepare(_prepareResult, params)

@@ -1,10 +1,10 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-protected package mysqlclient4cj.protocol
+protected package mysqlclient4cj.protocol.response
 
-import std.io.InputStream
-
+import std.io.ByteBuffer
+import mysqlclient4cj.protocol.*
 /*
 * AuthMoreData Packet
 * referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_connection_phase_packets_protocol_auth_more_data.html
@@ -17,11 +17,10 @@ protected open class AuthMoreData <: Response {
      */
     internal var _authRep: Array<Byte>
 
-
-    internal init(stream: InputStream){
-        super(stream)
-        var authReq = Array<Byte>(Int64(_length), repeat: 0)
-        if(stream.read(authReq) == 0){
+    internal init(length:UInt32, buffer: ByteBuffer){
+        super(length, buffer)
+        var authReq = Array<Byte>(Int64(length), repeat: 0)
+        if(buffer.read(authReq) == 0){
             throw InvalidPacketException("This packet is not a Auth Response packet: read auth response failed")
         }
         _authRep = authReq
@@ -40,8 +39,8 @@ protected class PublicKeyResponse <: AuthMoreData {
         }
     }
 
-    protected init(stream: InputStream){
-        super(stream)
+    protected init(length: UInt32, buffer: ByteBuffer){
+        super(length, buffer)
     }
 }
 
@@ -56,8 +55,8 @@ protected class AuthStatus <: AuthMoreData {
         }
     }
 
-    protected init(stream: InputStream){
-        super(stream)
+    protected init(length: UInt32, buffer: ByteBuffer){
+        super(length, buffer)
     }
     
 }

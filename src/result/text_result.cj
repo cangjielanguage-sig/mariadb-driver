@@ -5,21 +5,16 @@ protected package mysqlclient4cj.result
 
 import std.time.DateTime
 import std.time.TimeParseException
+import std.io.ByteBuffer
+import std.io.InputStream
 import std.math.numeric.BigInt
 import std.math.numeric.Decimal
 import std.convert.Parsable
-import std.io.InputStream
+
 import std.collection.HashMap
 import encoding.json.JsonValue
-import mysqlclient4cj.protocol.Charset
-import mysqlclient4cj.protocol.ColumnDefinition
-import mysqlclient4cj.protocol.TextResult
-import mysqlclient4cj.protocol.DB_DATE_FORMAT
-import mysqlclient4cj.protocol.DB_DATE_TIME_FORMAT
-import mysqlclient4cj.protocol.DB_TIME_FORMAT
-import mysqlclient4cj.protocol.DB_TIME_PREFIX
-import mysqlclient4cj.protocol.toInputStream
-import mysqlclient4cj.protocol.ColumnType
+import mysqlclient4cj.protocol.*
+import mysqlclient4cj.protocol.response.*
 
 protected class TextResultSet <: ResultSet {
 
@@ -195,7 +190,7 @@ protected class TextResultSet <: ResultSet {
     public override func getInputStream(index: Int64): ?InputStream {
         match (getArray(index)) {
             case None => None
-            case Some(v) => toInputStream(v)
+            case Some(v) => ByteBuffer(v)
         }
     }
 

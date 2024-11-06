@@ -1,7 +1,9 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-protected package mysqlclient4cj.protocol
+protected package mysqlclient4cj.protocol.request
+
+import mysqlclient4cj.protocol.*
 
 
 /*
@@ -10,16 +12,16 @@ protected package mysqlclient4cj.protocol
  */
 protected abstract class Command <: Request {
 
-    private let _commandType: CommandType
+    private let commandType: CommandType
 
-    protected init(command: CommandType) {
-        super(1, 0)
-        _commandType = command
+    protected init(commandType: CommandType) {
+        super(0)
+        this.commandType = commandType
     }
 
     protected open override func pack(): Unit {
         super.pack()
-        buf.append(_commandType.value())
+        buf.append(commandType.value())
     }
 
 }
@@ -30,17 +32,16 @@ protected abstract class Command <: Request {
  */
 protected class QueryCommand <: Command {
 
-    private let _query: String
+    private let query: String
 
     protected init(query: String) {
         super(Query)
-        this._length += UInt32(query.size)
-        _query = query
+        this.query = query
     }
 
     protected override func pack(): Unit {
         super.pack()
-        buf.appendAll(_query.toArray())
+        buf.appendAll(query.toArray())
     }
 
 }
@@ -51,17 +52,16 @@ protected class QueryCommand <: Command {
  */
 protected class PrepareCommand <: Command {
 
-    private let _sql: String
+    private let sql: String
 
     protected init(sql: String) {
         super(StmtPrepare)
-        _length += UInt32(sql.size)
-        _sql = sql
+        this.sql = sql
     }
 
     public override func pack(): Unit{
         super.pack()
-        buf.appendAll(_sql.toArray())
+        buf.appendAll(sql.toArray())
     }
 
 }
@@ -73,21 +73,20 @@ protected class PrepareCommand <: Command {
  */
 protected class FetchCommand <: Command {
     
-    private let _statemetnId: UInt32
+    private let statemetnId: UInt32
 
-    private let _numRows: UInt32
+    private let numRows: UInt32
 
     protected init(statemetnId: UInt32, numRows: UInt32){
         super(StmtFetch)
-        _length += 8
-        _statemetnId = statemetnId
-        _numRows = numRows
+        this.statemetnId = statemetnId
+        this.numRows = numRows
     }
 
     protected override func pack(): Unit {
         super.pack()
-        buf.appendAll(_statemetnId.toLittleEndian())
-        buf.appendAll(_numRows.toLittleEndian())
+        buf.appendAll(statemetnId.toLittleEndian())
+        buf.appendAll(numRows.toLittleEndian())
     }
 
 }
@@ -98,17 +97,16 @@ protected class FetchCommand <: Command {
 */
 protected class CloseCommand <: Command {
 
-    private let _statementId: UInt32
+    private let statementId: UInt32
 
     protected init(id: UInt32){
         super(StmtClose)
-        _length += 4
-        _statementId = id
+        this.statementId = id
     }
 
     protected override func pack(): Unit {
         super.pack()
-        buf.appendAll(_statementId.toLittleEndian())
+        buf.appendAll(statementId.toLittleEndian())
     }
 }
 
@@ -118,17 +116,16 @@ protected class CloseCommand <: Command {
  */
 protected class ResetCommand <: Command {
 
-    private let _statementId: UInt32
+    private let statementId: UInt32
 
     internal init(statementId: UInt32){
         super(StmtClose)
-        _length += 4
-        _statementId = statementId
+        this.statementId = statementId
     }
 
     public override func pack(): Unit {
         super.pack()
-        buf.appendAll(_statementId.toLittleEndian())
+        buf.appendAll(statementId.toLittleEndian())
     }
 }
 
@@ -138,25 +135,24 @@ protected class ResetCommand <: Command {
  */
 protected class SendLongDataCommand <: Command {
 
-    private let _statemetnId: UInt32
+    private let statemetnId: UInt32
 
-    private let _parameterId: UInt16
+    private let parameterId: UInt16
 
-    private let _data: Array<Byte>
+    private let data: Array<Byte>
 
     protected init(statemetnId: UInt32, parameterId: UInt16, data: Array<Byte>) {
         super(StmtSendLongData)
-        _length += UInt32(data.size + 6)
-        _statemetnId = statemetnId
-        _parameterId = parameterId
-        _data = data
+        this.statemetnId = statemetnId
+        this.parameterId = parameterId
+        this.data = data
     }
 
     public override func pack(): Unit {
         super.pack()
-        buf.appendAll(_statemetnId.toLittleEndian())
-        buf.appendAll(_parameterId.toLittleEndian())
-        buf.appendAll(_data)
+        buf.appendAll(statemetnId.toLittleEndian())
+        buf.appendAll(parameterId.toLittleEndian())
+        buf.appendAll(data)
     }
 
 }

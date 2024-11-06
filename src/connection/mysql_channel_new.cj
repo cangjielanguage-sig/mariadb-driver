@@ -37,7 +37,7 @@ protected class MySqlChannel <: Resource {
     /*
      * read a mysql package from socket
      */
-    protected func read(): Array<Byte> {
+    protected func read(): (UInt32, Array<Byte>) {
         //尝试从上次剩余的数据读取下一个包的长度
         if(lastRemaining.size != 0) {
             if(lastRemaining.size >= 3) {
@@ -65,10 +65,11 @@ protected class MySqlChannel <: Resource {
         }else{
             socket.read(header)
         }
-        let subLength = Int64(UInt32.fromLittleEndian(header)) + 1
-        let buffer = Array<Byte>(subLength, repeat: 0)
-        readFully(buffer, 0, subLength)
-        return header.concat(buffer)
+        let subLength = UInt32.fromLittleEndian(header)
+        let bufferSize = Int64(subLength) + 1
+        let buffer = Array<Byte>(bufferSize, repeat: 0)
+        readFully(buffer, 0, bufferSize)
+        return (subLength, buffer)
     }
 
     private func readFully(buffer: Array<Byte>, offset: Int, len: Int): Int {
