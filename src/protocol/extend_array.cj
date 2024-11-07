@@ -4,7 +4,7 @@
 protected package mysqlclient4cj.protocol
 
 import std.collection.ArrayList
-
+import encoding.hex.toHexString
 
 protected interface ToLengthEncoded {
 
@@ -18,8 +18,15 @@ protected interface ToNullTerminated {
 
 }
 
+protected interface ToHexString {
+    
+    func toHexString(): String
 
-extend Array<Byte> <: ToLengthEncoded & ToNullTerminated {
+    func toHexStringWithPrefix(): String
+
+}
+
+extend Array<Byte> <: ToLengthEncoded & ToNullTerminated & ToHexString {
 
 
     public func toLengthEncoded(): Array<Byte> {
@@ -50,5 +57,15 @@ extend Array<Byte> <: ToLengthEncoded & ToNullTerminated {
         return buf.toArray()
     }
 
+    public func toHexString(): String {
+        return toHexString(this)
+    }
+
+    public func toHexStringWithPrefix(): String {
+        if(this.size == 0) {
+            return "''"
+        }
+        return "0x${toHexString()}"
+    }
 
 }

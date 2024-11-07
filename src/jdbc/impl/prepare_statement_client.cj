@@ -19,8 +19,9 @@ import mysqlclient4cj.jdbc.QueryResult
 import mysqlclient4cj.jdbc.SqlException
 import mysqlclient4cj.jdbc.UpdateResult
 import mysqlclient4cj.protocol.toArray
-import mysqlclient4cj.protocol.toInteger
-import mysqlclient4cj.protocol.to0xString
+import mysqlclient4cj.protocol.ToBool
+import mysqlclient4cj.protocol.ToInteger
+import mysqlclient4cj.protocol.ToHexString
 import mysqlclient4cj.protocol.DB_DATE_FORMAT
 import mysqlclient4cj.protocol.DB_TIME_FORMAT
 import mysqlclient4cj.protocol.DB_DATE_TIME_FORMAT
@@ -91,7 +92,7 @@ public class ClientPrepareStatement <: AllocateStatement {
         for (i in 0..params.size) {
             match (params[i]) {
                 case v: Bool =>
-                    setParamWithoutQuotation(replacer, toInteger(v).toString())
+                    setParamWithoutQuotation(replacer, v.toInteger().toString())
                 case v: Int8 => 
                     setParamWithoutQuotation(replacer, v.toString())
                 case v: UInt8 => 
@@ -125,9 +126,9 @@ public class ClientPrepareStatement <: AllocateStatement {
                 case v: DateTime => 
                     setParamWithQuotation(replacer,v.toString(DB_DATE_TIME_FORMAT))
                 case v: InputStream => 
-                    setParamWithoutQuotation(replacer, to0xString(toArray(v)))
+                    setParamWithoutQuotation(replacer, toArray(v).toHexStringWithPrefix())
                 case v: Array<Byte> => 
-                    setParamWithoutQuotation(replacer, to0xString(v))
+                    setParamWithoutQuotation(replacer, v.toHexStringWithPrefix())
                 case v: JsonValue => 
                     setParamWithQuotation(replacer, v.toJsonString())
                 case v: String => 

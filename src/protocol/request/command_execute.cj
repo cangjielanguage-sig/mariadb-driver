@@ -144,7 +144,7 @@ protected class ExecuteCommand <: Command {
     }
 
     private func appendBool(index: Int64, buf: ArrayList<Byte>, value: Bool): Unit {
-        return appendUInt8(index, buf, toInteger(value))
+        return appendUInt8(index, buf, value.toInteger())
     }
 
     @OverflowWrapping

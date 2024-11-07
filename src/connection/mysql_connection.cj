@@ -220,7 +220,7 @@ protected class MySqlConnection <: Resource {
             read()
         }
         let columns = ArrayList<ColumnDefinition>(Int64(prepareResponse.numColumns))
-        if(prepareResponse.numColumns > 0){
+        if(prepareResponse.numColumns > 0) {
             for (_ in 0..prepareResponse.numColumns) {
                 let (length, payload) = read()
                 columns.append(ColumnDefinition(length, ByteBuffer(payload)))

@@ -77,7 +77,7 @@ public class MySqlConnectionFactory {
                         let response = connection.readResponse()
                         return checkCachingSha2PasswordAuthStatus(connection, response, originPassword, authSwitch.salt, sslEnabled)
                     case "sha256_password" => 
-                        if(sslEnabled){
+                        if(sslEnabled) {
                             return sendPassword(connection, originPassword.toNullTerminated(), authSwitch.number)
                         }else{
                             let (publicKey, lastPacketNumber) = requestPublicKey(connection, SHA256_REQUESET_KEY_CODE,authSwitch.number)
