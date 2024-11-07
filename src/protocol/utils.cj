@@ -21,15 +21,6 @@ protected func toInteger(value: Bool): UInt8 {
     }
 }
 
-protected func toBool(value: String): Bool {
-    match (value) {
-        case "1" => return true
-        case "0" => return false
-        case _ => throw IllegalArgumentException("parse string to bool faild")
-    }
-}
-
-
 
 /*
  * InputStream转Array

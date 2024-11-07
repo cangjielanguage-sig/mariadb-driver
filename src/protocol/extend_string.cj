@@ -5,46 +5,29 @@ protected package mysqlclient4cj.protocol
 
 import std.collection.ArrayList
 
-protected interface ToLengthEncoded {
+protected interface ToBool {
 
-    func toLengthEncoded(): Array<Byte>
-
-}
-
-protected interface ToNullTerminated {
-
-    func toNullTerminated(): Array<Byte>
+    func toBool(): Bool
 
 }
 
-extend String <: ToLengthEncoded & ToNullTerminated {
+
+extend String <: ToLengthEncoded & ToNullTerminated & ToBool {
 
     public func toLengthEncoded(): Array<Byte> {
-        let buf = ArrayList<Byte>()
-        if (this.size <= 0xFA) {
-            buf.append(UInt8(this.size))
-            buf.appendAll(this.toArray())
-        } else if (this.size <= (1 << 16)) {
-            buf.append(0xFC)
-            buf.appendAll(UInt16(this.size).toLittleEndian())
-            buf.appendAll(this.toArray())
-        } else if (this.size <= (1 << 24)) {
-            buf.append(0xFD)
-            buf.appendAll(UInt32(this.size).toLittleEndian().slice(0, 3))
-            buf.appendAll(this.toArray())
-        } else {
-            buf.append(0xFE)
-            buf.appendAll(UInt64(this.size).toLittleEndian())
-            buf.appendAll(this.toArray())
-        }
-        buf.toArray()
+        return this.toArray().toLengthEncoded()
     }
 
     public func toNullTerminated(): Array<Byte> {
-        let buf = ArrayList<Byte>(this.size + 1)
-        buf.appendAll(this.toArray())
-        buf.append(0)
-        return buf.toArray()
+        return this.toArray().toNullTerminated()
+    }
+
+    public func toBool(): Bool {
+        match (this) {
+            case "1" => return true
+            case "0" => return false
+            case _ => throw IllegalArgumentException("parse string to bool faild")
+        }
     }
 
 }

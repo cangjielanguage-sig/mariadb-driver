@@ -81,6 +81,11 @@ protected class HandshakeResponse <: Request {
         return this
     }
 
+    protected func setCapabilitys(capabilities: UInt32): HandshakeResponse {
+        this.capabilities = capabilities
+        return this
+    }
+
     protected func setCapability(capability: Capability): HandshakeResponse {
         this.capabilities |= capability.value()
         return this
@@ -105,10 +110,10 @@ protected class HandshakeResponse <: Request {
         buf.appendAll(username.toNullTerminated())
         //put auth response
         if(hasCapability(PluginAuthLenencClientData)){
-            buf.append(UInt8(authResponse.size))
-            buf.appendAll(authResponse)
+            buf.appendAll(authResponse.toLengthEncoded())
         }else{
-            buf.appendAll(authResponse)
+            buf.append(UInt8(authResponse.size))
+            buf.appendAll(authResponse.toLengthEncoded())
         }
         // put schema if 'Connect With DB' are set
         if(hasCapability(ConnectWithDB)){
@@ -155,24 +160,7 @@ protected class HandshakeResponse <: Request {
 
     protected static func getDefault(number: UInt8): HandshakeResponse{
         return HandshakeResponse(number)
-                            .setCapability(LongPassword)
-                            .setCapability(LongFlags)
-                            .setCapability(LocalFiles)
-                            .setCapability(Protocol41)
-                            .setCapability(Interactive)
-                            .setCapability(Transactions)
-                            .setCapability(MultiStatements)
-                            .setCapability(MultiResults)
-                            .setCapability(PsMultiResults)
-                            .setCapability(PluginAuth)
-                            .setCapability(ConnectAttrs)
-                            .setCapability(PluginAuthLenencClientData)
-                            .setCapability(CanHandleExpiredPasswords)
-                            .setCapability(SessionTrack)
-                            .setCapability(RememberOptions)
-                            .setCapability(Reserved2)
-                            //.setCapability(FoundRows)
-                            //.setCapability(QueryAttributes)
+                            .setCapabilitys(DefaultCapability.default)
                             .setCharset(33)
                             .setMaxPacket(1073741824)
     }

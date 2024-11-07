@@ -12,20 +12,12 @@ import mysqlclient4cj.protocol.*
  */
 protected class ColumnCount <: CommonResponse {
 
-    private var _count: UInt32
-
-    protected prop count: UInt32 {
-        get() {
-            return _count
-        }
-    }
+    protected let count: UInt64
 
     protected init(length: UInt32, buffer: ByteBuffer) {
         super(length, buffer) 
-        match (buffer.readLengthEncodedIntegerRaw()) {
-            case None => throw InvalidPacketException("This packet is not a Column Count packet: read fields count failed")
-            case Some(v) => _count = UInt32.fromLittleEndian(v)
-        }
+        //列的数量: lenenc
+        this.count = UInt64.fromLittleEndian(buffer.readLengthEncodedIntegerRaw().getOrThrow())
     }
 }
 
@@ -35,112 +27,60 @@ protected class ColumnCount <: CommonResponse {
  */
 protected class ColumnDefinition <: CommonResponse {
     /*目录名*/
-    private var _catalog: String
+    protected let catalog: String
     /*数据库名*/
-    private var _database: String
+    protected let database: String
     /*表名*/
-    private var _table: String
+    protected let table: String
     /*原始表名*/
-    private var _originalTable: String
+    protected let originalTable: String
     /*字段名*/
-    private var _name: String
+    protected let name: String
     /*原始字段名*/
-    private var _originalName: String
+    protected let originalName: String
     /*填充值*/
-    private var _padding: Byte
+    protected let padding: Byte
     /*字符串编码*/
-    private var _charset: Charset
+    protected let charset: Charset
     /*字段长度*/
-    private var _columnLength: UInt32
+    protected let columnLength: UInt32
     /*字段类型*/
-    private var _columnType: ColumnType
+    protected let columnType: ColumnType
     /*字段标志*/
-    private var _flags: UInt16
+    protected let flags: UInt16
     /*浮点型精度*/
-    private var _decimals: Byte
+    protected let decimals: Byte
 
     protected init(length: UInt32, buffer: ByteBuffer) {
         super(length, buffer)
-        _catalog = buffer.readLengthEncodedString().getOrThrow() {
-            => InvalidPacketException("This packet is not a Field packet: read catalog failed")
-        }
-        _database = buffer.readLengthEncodedString().getOrThrow() {
-            => InvalidPacketException("This packet is not a Field packet: read database failed")
-        }
-        _table = buffer.readLengthEncodedString().getOrThrow() {
-            => InvalidPacketException("This packet is not a Field packet: read table failed")
-        }
-        _originalTable = buffer.readLengthEncodedString().getOrThrow() {
-            => InvalidPacketException("This packet is not a Field packet: read original table failed")
-        }
-        _name = buffer.readLengthEncodedString().getOrThrow() {
-            => InvalidPacketException("This packet is not a Field packet: read name failed")
-        }
-        _originalName = buffer.readLengthEncodedString().getOrThrow() {
-            => InvalidPacketException("This packet is not a Field packet: read original name failed")
-        }
-        let single = Array<Byte>(1, repeat: 0)
-        if (buffer.read(single) == 0) {
-            throw InvalidPacketException("This packet is not a Field packet: read padding failed")
-        }
-        this._padding = single[0]
-        let charset = Array<Byte>(2, repeat: 0)
-        if (buffer.read(charset) == 0) {
-            throw InvalidPacketException("This packet is not a Field packet: read charset failed")
-        }
-        _charset = Charset.of(UInt16.fromLittleEndian(charset))
-        let fieldLength = Array<Byte>(4, repeat: 0)
-        if (buffer.read(fieldLength) == 0) {
-            throw InvalidPacketException("This packet is not a Field packet: read field length failed")
-        }
-        this._columnLength = UInt32.fromLittleEndian(fieldLength)
-        if (buffer.read(single) == 0) {
-            throw InvalidPacketException("This packet is not a Field packet: read field type failed")
-        }
-        this._columnType = ColumnType.of(single[0])
-        let flags = Array<Byte>(2, repeat: 0)
-        if (buffer.read(flags) == 0) {
-            throw InvalidPacketException("This packet is not a Field packet: read flags failed")
-        }
-        this._flags = UInt16.fromLittleEndian(flags)
-        if (buffer.read(single) == 0) {
-            throw InvalidPacketException("This packet is not a Field packet: read decimals failed")
-        }
-        this._decimals = single[0]
-    }
-
-    protected prop name: String {
-        get() {
-            _name
-        }
-    }
-
-    protected prop columnType: ColumnType {
-        get() {
-            return _columnType
-        }
-    }
-
-    protected prop columnLength: UInt32 {
-        get() {
-            _columnLength
-        }
-    }
-
-    protected prop charset: Charset {
-        get() {
-            _charset
-        }
-    }
-
-    protected prop decimals: Byte {
-        get() {
-            _decimals
-        }
+        //目录名: lenenc
+        this.catalog = buffer.readLengthEncodedString().getOrThrow()
+        //数据库名: lenenc
+        this.database = buffer.readLengthEncodedString().getOrThrow()
+        //表别名: lenenc
+        this.table = buffer.readLengthEncodedString().getOrThrow()
+        //表名: lenenc
+        this.originalTable = buffer.readLengthEncodedString().getOrThrow()
+        //列别名: lenenc
+        this.name = buffer.readLengthEncodedString().getOrThrow()
+        //列名: lenenc
+        this.originalName = buffer.readLengthEncodedString().getOrThrow()
+        //保留位: 1 byte
+        this.padding = buffer.readOneByte()
+        //字符集: 2 byte
+        this.charset = Charset.of(UInt16.fromLittleEndian(buffer.readBytes(2)))
+        //字段最大长度: 4 byte
+        this.columnLength = UInt32.fromLittleEndian(buffer.readBytes(4))
+        //列类型: 1 byte
+        this.columnType = ColumnType.of(buffer.readOneByte())
+        //列标志: 2 byte
+        this.flags = UInt16.fromLittleEndian(buffer.readBytes(2))
+        //精度: 1 byte
+        this.decimals = buffer.readOneByte()
     }
 
     protected func hasFlag(flag: ColumnFlag): Bool {
-        (_flags & flag.value()) != 0
+        (flags & flag.value()) != 0
     }
 }
 
@@ -150,21 +90,15 @@ protected class ColumnDefinition <: CommonResponse {
  */
 protected class TextResult <: CommonResponse {
 
-    private var _values: Array<?Array<Byte>>
-
-    protected prop row: Array<?Array<Byte>> {
-        get() {
-            _values.toArray()
-        }
-    }
+    protected let row: Array<?Array<Byte>>
 
     protected init(length: UInt32, buffer: ByteBuffer, columnCount: Int64) {
-        super(length,buffer)
-        var list = ArrayList<?Array<Byte>>(columnCount)
+        super(length, buffer)
+        let columns = ArrayList<?Array<Byte>>(columnCount)
         for (_ in 0..columnCount) {
-            list.append(buffer.readLengthEncodedStringRaw())
+            columns.append(buffer.readLengthEncodedStringRaw())
         }
-        _values = list.toArray()
+        this.row = columns.toArray()
     }
 }
 
@@ -174,64 +108,42 @@ protected class TextResult <: CommonResponse {
  */
 protected class BinaryResult <: Response {
     
-    private var _nullMap: Array<Byte>
+    protected let nullMap: Array<Byte>
 
-    private var _binaryData: Array<?Array<Byte>>
-
-    protected prop nullMap: Array<Byte> {
-        get() {
-            _nullMap
-        }
-    }
-
-    protected prop binaryData: Array<?Array<Byte>> {
-        get() {
-            _binaryData
-        }
-    }
+    protected let binaryData: Array<?Array<Byte>>
 
     protected init(length: UInt32, buffer: ByteBuffer, columnInfos: Array<ColumnDefinition>) {
         super(length, buffer)
-        var columnCount = columnInfos.size
-        var nullMap = Array<Byte>((columnCount + 7 + 2) / 8, repeat: 0)
-        buffer.read(nullMap)
-        _nullMap = nullMap
-        _binaryData = Array<?Array<Byte>>(columnCount, repeat: [])
-        for (i in 0..columnCount) {
-            var isNull = (_nullMap[(i + 2) / 8] & (1u8 << ((i + 2) % 8))) != 0
+        let columnCount = columnInfos.size
+        //null数据位图
+        this.nullMap = buffer.readBytes((columnCount + 7 + 2) / 8)
+        //二进制数据
+        this.binaryData = Array<?Array<Byte>>(columnCount, repeat: [])
+        for (i in 0..columnCount){
+            let isNull = (nullMap[(i + 2) / 8] & (1u8 << ((i + 2) % 8))) != 0
             if (isNull) {
-                _binaryData[i] = None
-            } else {
-                var columnInfo = columnInfos[i]
-                var columnType = columnInfo.columnType
+                binaryData[i] = None
+            } else{
+                let columnInfo = columnInfos[i] 
+                let columnType = columnInfo.columnType
                 match (columnType) {
                     case Tiny =>
-                        let array = Array<Byte>(1, repeat: 0)
-                        buffer.read(array)
-                        _binaryData[i] = array
+                        binaryData[i] = buffer.readBytes(1)
                     case Short | Year =>
-                        let array = Array<Byte>(2, repeat: 0)
-                        buffer.read(array)
-                        _binaryData[i] = array
+                        binaryData[i] = buffer.readBytes(2)
                     case Long | Int24 | Float =>
-                        let array = Array<Byte>(4, repeat: 0)
-                        buffer.read(array)
-                        _binaryData[i] = array
+                        binaryData[i] = buffer.readBytes(4)
                     case LongLong | Double =>
-                        let array = Array<Byte>(8, repeat: 0)
-                        buffer.read(array)
-                        _binaryData[i] = array
+                        binaryData[i] = buffer.readBytes(8)
                     case String | NewDecimal | Json | Enum | Set | TinyBlob | MediumBlob | LongBlob | Blob | VarString =>
-                         _binaryData[i] = buffer.readLengthEncodedStringRaw()
+                         binaryData[i] = buffer.readLengthEncodedStringRaw()
                     case Date | DateTime | Timestamp | Time =>
-                        let single = Array<Byte>(1, repeat: 0)
-                        buffer.read(single)
-                        let temp = Array<Byte>(Int64(single[0]), repeat: 0)
-                        buffer.read(temp)
-                        let list = ArrayList<Byte>(Int64(1 + single[0]))
-                        list.appendAll(single)
+                        let flag = buffer.readOneByte()
+                        let temp = buffer.readBytes(Int64(flag))
+                        let list = ArrayList<Byte>(Int64(1 + flag))
+                        list.append(flag)
                         list.appendAll(temp)
-                        _binaryData[i] = list.toArray()
+                        binaryData[i] = list.toArray()
                     //case _ => throw Exception("Unsupport MySQL binary type")
                 }
             }

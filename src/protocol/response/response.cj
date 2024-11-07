@@ -6,27 +6,18 @@ protected package mysqlclient4cj.protocol.response
 import std.io.ByteBuffer
 import std.collection.ArrayList
 import mysqlclient4cj.protocol.*
+
 /*
 * Generic Response Packets
 * referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_basic_response_packets.html
 */
 protected open class Response <: CommonResponse {
 
-    internal var _code: ResponseCode
+    protected var code: ResponseCode
 
-    // internal prop code: ResponseCode {
-    //     get() {
-    //         return _code
-    //     }
-    // }
-
-    internal init(length: UInt32, buffer: ByteBuffer){
+    protected init(length: UInt32, buffer: ByteBuffer){
         super(length, buffer)
-        var single = Array<Byte>(1, repeat: 0)
-        if(buffer.read(single) == 0){
-            throw InvalidPacketException("This packet is not a Response packet: read response code failed")
-        }
-        _code = ResponseCode.get(single[0])
+        code = ResponseCode.get(buffer.readOneByte())
     }
 }
 
@@ -37,60 +28,43 @@ protected open class Response <: CommonResponse {
 */
 protected class OkResponse <: Response {
 
-    private var _effectRows: UInt64
+    protected var effectRows: UInt64
 
-    private var _index: UInt64
+    protected var index: UInt64
 
-    private var _serverStatus: UInt16
+    protected var serverStatus: UInt16
 
-    private var _waringCount: UInt16
+    protected var waringCount: UInt16
 
-    private var _message: String
+    //protected var message: String
 
-    protected prop message: String{
-        get() {
-            return _message
-        }
-    }
+    //protected var sessionInfo: String
 
-    protected prop effectRows: UInt64{
-        get() {
-            _effectRows
-        }
-    }
-
-    protected prop index: UInt64{
-        get() {
-            _index
-        }
-    }
-
-
-    protected init(length: UInt32, buffer: ByteBuffer){
+    protected init(length: UInt32, buffer: ByteBuffer) {
         super(length, buffer)
-        match (buffer.readLengthEncodedIntegerRaw()) {
-            case None =>  throw InvalidPacketException("This packet is not a Ok Repsposne packet: read effect rows failed")
-            case Some(v) => _effectRows = UInt64.fromLittleEndian(v)
-        } 
-        match (buffer.readLengthEncodedIntegerRaw()) {
-            case None => throw InvalidPacketException("This packet is not a Ok Repsposne packet: read index failed")
-            case Some(v) => _index = UInt64.fromLittleEndian(v)
-        }
-        let serverStatus = Array<Byte>(2, repeat: 0)
-        if(buffer.read(serverStatus) == 0){
-            throw InvalidPacketException("This packet is not a Ok Repsposne packet: read server status failed")
-        }
-        _serverStatus = UInt16.fromLittleEndian(serverStatus)
+        //受影响的行: lenenc byte
+        this.effectRows = UInt64.fromLittleEndian(buffer.readLengthEncodedIntegerRaw().getOrThrow())
+        //最后一个插入的ID: lenenc byte
+        this.index = UInt64.fromLittleEndian(buffer.readLengthEncodedIntegerRaw().getOrThrow())
+        //服务器状态: 2 byte
+        this.serverStatus = UInt16.fromLittleEndian(buffer.readBytes(2))
+        //警告数量: 2 byte
+        this.waringCount = UInt16.fromLittleEndian(buffer.readBytes(2))
+        //this.message = ""
+        //this.sessionInfo = ""
+        // if(DefaultCapability.has(SessionTrack)) {
+        //     this.message = buffer.readLengthEncodedString().getOrThrow()
+        //     if(hasStatus(SessionStateChanged)) {
+        //         this.sessionInfo = buffer.readLengthEncodedString().getOrThrow()
+        //     }
+        // }else {
+        //     message = String.fromUtf8(buffer.readBytes(Int64(length - 5)))
+        // }
+        
+    }
 
-        let waringCount = Array<Byte>(2, repeat: 0)
-        if(buffer.read(waringCount) == 0){
-            throw InvalidPacketException("This packet is not a Ok Repsposne packet: read waring count failed")
-        }
-        _waringCount = UInt16.fromLittleEndian(waringCount)
-
-        let message = Array<Byte>(Int64(length - 5), repeat: 0)
-        buffer.read(message) // message is optional
-        _message = String.fromUtf8(message.toArray())
+    protected func hasStatus(status: ServerStatus): Bool {
+        return (serverStatus & status.value()) != 0
     }
 }
 
@@ -102,43 +76,26 @@ protected class OkResponse <: Response {
 */
 protected class ErrorResponse <: Response{
 
-    private var _errorCode: UInt16
+    protected var errorCode: UInt16
 
-    private var _serverStatusFlag: Byte
+    protected var serverStatusFlag: Byte
 
-    private var _sqlStatus: Array<Byte>
+    protected var sqlStatus: Array<Byte>
 
-    private var _message: String
+    protected var message: String
 
     protected init(length: UInt32,buffer: ByteBuffer){
         super(length, buffer)
-        var errorCode = Array<Byte>(2,repeat: 0)
-        if(buffer.read(errorCode) == 0){
-            throw InvalidPacketException("This packet is not a Error Repsposne packet: read error code failed")
-        }
-        _errorCode = UInt16.fromLittleEndian(errorCode)
-        var single = Array<Byte>(1,repeat: 0)
-        if(buffer.read(single) == 0){
-            throw InvalidPacketException("This packet is not a Error Repsposne packet: read server status flag failed")
-        }
-        _serverStatusFlag = single[0]
-        var sqlStatus = Array<Byte>(5, repeat: 0)
-        if(buffer.read(sqlStatus) == 0){
-            throw InvalidPacketException("This packet is not a Error Repsposne packet: read sql status failed")
-        }
-        _sqlStatus = sqlStatus
-        var message = Array<Byte>(Int64(length - (8 + 1)), repeat: 0)
-        if(buffer.read(message) == 0){
-            throw InvalidPacketException("This packet is not a Error Repsposne packet: read message failed")
-        }
-        _message = String.fromUtf8(message.toArray())
+        //错误代码: 2 byte
+        this.errorCode = UInt16.fromLittleEndian(buffer.readBytes(2))
+        //SQL状态标记: 1 byte
+        this.serverStatusFlag = buffer.readOneByte()
+        //SQL状态: 5 byte
+        this.sqlStatus = buffer.readBytes(5)
+        //错误信息: rest byte
+        this.message = String.fromUtf8(buffer.readBytes(Int64(length - 9)))
     }
 
-    protected prop message: String {
-        get() {
-            _message
-        }
-    }
 }
 
 /*
@@ -147,7 +104,7 @@ protected class ErrorResponse <: Response{
 */
 protected open class AbstractEOF <: Response{
 
-    internal init(length: UInt32, buffer: ByteBuffer){
+    protected init(length: UInt32, buffer: ByteBuffer){
         super(length, buffer)
     }
 }
@@ -157,47 +114,18 @@ protected open class AbstractEOF <: Response{
 */
 protected class AuthSwitch <: AbstractEOF{
 
-    private var _pluginName: String
+    protected var pluginName: String
 
-    private var _salt: Array<Byte>
+    protected var salt: Array<Byte>
 
     protected init(length: UInt32, buffer: ByteBuffer){
         super(length, buffer)
-        var single = Array<Byte>(1, repeat: 0)
-        var pluginName = ArrayList<Byte>()
-        if(buffer.read(single) == 0){
-            throw InvalidPacketException("This packet is not a Auth Switch Repsposne packet: read plugin name failed")
-        }
-        while(single[0] != 0){
-            pluginName.append(single[0])
-            if(buffer.read(single) == 0){
-                throw InvalidPacketException("This packet is not a Auth Switch Repsposne packet: read plugin name failed")
-            }
-        }
-        _pluginName = String.fromUtf8(pluginName.toArray())
-        var salt = ArrayList<Byte>()
-        if(buffer.read(single) == 0){
-            throw InvalidPacketException("This packet is not a Auth Switch Repsposne packet: read plugin data failed")
-        }
-        while(single[0] != 0){
-            salt.append(single[0])
-            if(buffer.read(single) == 0){
-                throw InvalidPacketException("This packet is not a Auth Switch Repsposne packet: read plugin data failed")
-            }
-        }
-        _salt= salt.toArray()
+        //插件名称: null end
+        this.pluginName = buffer.readNullTerminatedString()
+        //插件提供的数据: null end
+        this.salt= buffer.readNullTerminatedStringRaw()
     }
 
-    protected prop pluginName: String{
-        get() {
-            _pluginName
-        }
-    }
-    protected prop salt: Array<Byte>{
-        get() {
-            _salt
-        }
-    }
 }
 
 /*
@@ -205,23 +133,16 @@ protected class AuthSwitch <: AbstractEOF{
 */
 protected class EofResponse <: AbstractEOF{
 
-    private var _waringCount: UInt16
+    protected var waringCount: UInt16
 
-    private var _status: UInt16
-
+    protected var status: UInt16
 
     protected init(length: UInt32, buffer: ByteBuffer){
         super(length, buffer)
-        var waringCount = Array<Byte>(2, repeat: 0)
-        if(buffer.read(waringCount) == 0){
-            throw InvalidPacketException("This packet is not a Eof Resposne packet: read effect rows failed")
-        }
-        _waringCount = UInt16.fromLittleEndian(waringCount)
-        var status = Array<Byte>(2, repeat: 0)
-        if(buffer.read(status) == 0){
-            throw InvalidPacketException("This packet is not a Eof Repsposne packet: read effect rows failed")
-        }
-        _status = UInt16.fromLittleEndian(status)
+        //警告数量: 2 byte
+        this.waringCount = UInt16.fromLittleEndian(buffer.readBytes(2))
+        //状态标志
+        this.status = UInt16.fromLittleEndian(buffer.readBytes(2))
     }
 
 }
@@ -232,56 +153,31 @@ protected class EofResponse <: AbstractEOF{
 */
 protected class PrepareResposne <: Response{
 
-    private var _statementId: UInt32
+    protected var statementId: UInt32
 
-    private var _numColumns: UInt16
+    protected var numColumns: UInt16
 
-    private var _numParams: UInt16
+    protected var numParams: UInt16
 
-    private var _reserved: UInt8
+    protected var reserved: UInt8
 
-    private var _warningCount: UInt16
+    protected var warningCount: UInt16
 
     protected init(length: UInt32, buffer: ByteBuffer){
         super(length, buffer)
-        var statementId = Array<Byte>(4, repeat: 0)
-        if(buffer.read(statementId) == 0){
-            throw InvalidPacketException("This packet is not a PrepareOkResposnePacket: read statementId failed")
-        }
-        _statementId = UInt32.fromLittleEndian(statementId)
-        var numColumns = Array<Byte>(2, repeat: 0)
-        if(buffer.read(numColumns) == 0){
-            throw InvalidPacketException("This packet is not a PrepareOkResposnePacket: read numColumns failed")
-        }
-        _numColumns = UInt16.fromLittleEndian(numColumns)
-        var numParams = Array<Byte>(2, repeat: 0)
-        if(buffer.read(numParams) == 0){
-            throw InvalidPacketException("This packet is not a PrepareOkResposnePacket: read numParams failed")
-        }
-        _numParams = UInt16.fromLittleEndian(numParams)
-        _reserved = 0x00
-        var warningCount = Array<Byte>(2, repeat: 0)
-        if(buffer.read(warningCount) == 0){
-            throw InvalidPacketException("This packet is not a PrepareOkResposnePacket: read waringCount failed")
-        }
-        _warningCount = UInt16.fromLittleEndian(warningCount)
-    }
-
-    protected prop statementId: UInt32{
-        get() {
-            _statementId
-        }
-    }
-
-    protected prop numColumns: UInt16{
-        get() {
-            _numColumns
-        }
-    }
-
-    protected prop numParams: UInt16{
-        get() {
-            _numParams
+        //语句id: 4 byte
+        this.statementId = UInt32.fromLittleEndian(buffer.readBytes(4))
+        //列的数量: 2 byte
+        this.numColumns = UInt16.fromLittleEndian(buffer.readBytes(2))
+        //参数的数量: 2 byte
+        this.numParams = UInt16.fromLittleEndian(buffer.readBytes(2))
+        //保留位: 1 byte
+        this.reserved = 0x00
+        //警告数量
+        if(length > 12) {
+            this.warningCount = UInt16.fromLittleEndian(buffer.readBytes(2))
+        }else {
+            this.warningCount = 0
         }
     }
 

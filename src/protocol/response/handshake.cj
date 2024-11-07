@@ -12,48 +12,48 @@ import mysqlclient4cj.protocol.*
 */
 protected class Handshake <: CommonResponse {
 
-    private var _protocol: Byte = 0x00
+    protected let protocol: Byte
 
-    private var _version: String = ""
+    protected let version: String
 
-    private var _threadId: UInt32 = 0x00
+    protected let threadId: UInt32
 
-    private var _salt1: Array<Byte> = []
+    protected let salt1: Array<Byte>
 
-    private var _serverCapabilities: UInt16 = 0x00
+    protected let serverCapabilities: UInt16
 
-    private var _serverLanguage: Byte = 0x00
+    protected let serverLanguage: Byte
 
-    private var _serverStatus: UInt16 = 0x00
+    protected let serverStatus: UInt16
 
-    private var _extendedServerCapabilities: UInt16 = 0x00
+    protected let extendedServerCapabilities: UInt16 
 
-    private var _authenticationDataLength: Byte = 0x00
+    protected let authenticationDataLength: Byte
 
-    private var _salt2: Array<Byte> = []
+    protected let salt2: Array<Byte>
 
-    private var _authenticationPlugin: String = ""
+    protected let authenticationPlugin: String
 
     protected prop capabilities: UInt32{
         get() {
-            var part1 = _serverCapabilities.toLittleEndian()
-            var part2 = _extendedServerCapabilities.toLittleEndian()
+            let part1 = serverCapabilities.toLittleEndian()
+            let part2 = extendedServerCapabilities.toLittleEndian()
             return UInt32.fromLittleEndian([part1[0], part1[1], part2[0], part2[1]])
         }
     }
 
     protected prop salt: Array<Byte>{
         get() {
-            var buf = ArrayList<Byte>()
-            buf.appendAll(_salt1)
-            buf.appendAll(_salt2)
+            let buf = ArrayList<Byte>(salt1.size + salt2.size)
+            buf.appendAll(salt1)
+            buf.appendAll(salt2)
             return buf.toArray()
         }
     }
 
     protected prop authPlugin: String{
         get() {
-            _authenticationPlugin
+            authenticationPlugin
         }
     }
     
@@ -64,103 +64,37 @@ protected class Handshake <: CommonResponse {
     protected init(length: UInt32, buffer: ByteBuffer){
         super(length, buffer)
         // 协议: 1 byte
-        var protocol = Array<Byte>(1, repeat: 0)
-        if(buffer.read(protocol) == 0){
-            throw InvalidPacketException("This packet is not a Handshake packet: read protocol failed")
-        }
-        this._protocol = protocol[0]
+        this.protocol = buffer.readOneByte()
         // 服务器版本: n byte,以空字符结束
-        var single = Array<Byte>(1, repeat: 0)
-        var sversion = ArrayList<Byte>()
-        do {
-            if(buffer.read(single) == 0){
-                throw InvalidPacketException("This packet is not a Handshake packet: read version failed")
-            }
-            if(single[0] != 0){
-                sversion.append(single[0])
-            }
-        } while (single[0] != 0)
-        this._version = String.fromUtf8(sversion.toArray())
+        this.version = buffer.readNullTerminatedString()
         // 线程id: 4 byte
-        var threadId = Array<Byte>(4, repeat: 0)
-        if(buffer.read(threadId) == 0){
-            throw InvalidPacketException("This packet is not a Handshake packet: read threadId failed")
-        }
-        this._threadId = UInt32.fromLittleEndian(threadId)
+        this.threadId = UInt32.fromLittleEndian(buffer.readBytes(4))
         // 随机盐: n byte,以空字符结束
-        var salt1 = ArrayList<Byte>()
-        do {
-            if(buffer.read(single) == 0){
-                throw InvalidPacketException("This packet is not a Handshake packet: read first salt failed")
-            }
-            if(single[0] != 0){
-                 salt1.append(single[0])
-            }
-        } while (single[0] != 0)
-        this._salt1 = salt1.toArray()
+        this.salt1 = buffer.readNullTerminatedStringRaw()
         // 服务器权能标志: 2 byte
-        var serverCapabilities = Array<Byte>(2, repeat: 0)
-        if(buffer.read(serverCapabilities) == 0){
-            throw InvalidPacketException("This packet is not a Handshake packet: read server capabilities failed")
-        }
-        this._serverCapabilities = UInt16.fromLittleEndian(serverCapabilities)
+        this.serverCapabilities = UInt16.fromLittleEndian(buffer.readBytes(2))
         // 服务字符编码集: 1 byte
-        var serverLanguage = Array<Byte>(1, repeat: 0)
-        if(buffer.read(serverLanguage) == 0){
-            throw InvalidPacketException("This packet is not a Handshake packet: read server language failed")
-        }
-        this._serverLanguage = serverLanguage[0]
+        this.serverLanguage = buffer.readOneByte()
         // 服务器状态: 2 byte
-        var serverStatus = Array<Byte>(2, repeat: 0)
-        if(buffer.read(serverStatus) == 0){
-            throw InvalidPacketException("This packet is not a Handshake packet: read server status failed")
-        }
-        this._serverStatus = UInt16.fromLittleEndian(serverStatus)
+        this.serverStatus = UInt16.fromLittleEndian(buffer.readBytes(2))
         // 服务器权能标志扩展: 2 byte
-        var extendedServerCapabilities = Array<Byte>(2, repeat: 0)
-        if(buffer.read(extendedServerCapabilities) == 0){
-            throw InvalidPacketException("This packet is not a Handshake packet: read extended server capabilities failed")
-        }
-        this._extendedServerCapabilities = UInt16.fromLittleEndian(extendedServerCapabilities)
+        this.extendedServerCapabilities = UInt16.fromLittleEndian(buffer.readBytes(2))
         // 认证插件长度: 1 byte
-        if(hasCapability(PluginAuth)){
-            var authenticationDataLength = Array<Byte>(1, repeat: 0)
-            if(buffer.read(authenticationDataLength) == 0){
-                throw InvalidPacketException("This packet is not a Handshake packet: read length of authentication plugin name failed")
-            }
-            this._authenticationDataLength = authenticationDataLength[0]
-        }else{
-            this._authenticationDataLength = 0x00
-        }
+        this.authenticationDataLength = buffer.readOneByte()
+        // if(hasCapability(PluginAuth)){
+        //     this.authenticationDataLength = buffer.readOneByte()
+        // }else{
+        //     this.authenticationDataLength = 0x00
+        // }
         // 未使用: 10 byte
-        var unused = Array<Byte>(10, repeat: 0)
-        if(buffer.read(unused) == 0){
-            throw InvalidPacketException("This packet is not a Handshake packet: read padding failed")
-        }
+        buffer.readBytes(10)
         // 随机盐: n byte
-        var salt2 = ArrayList<Byte>()
-        do {
-            if(buffer.read(single) == 0){
-                throw InvalidPacketException("This packet is not a Handshake packet: read second salt failed")
-            }
-            if(single[0] != 0){
-                salt2.append(single[0])
-            }
-        } while (single[0] != 0)
-        this._salt2 = salt2.toArray()
+        this.salt2 = buffer.readNullTerminatedStringRaw()
         // 认证插件: n byte
-        if(hasCapability(PluginAuth)){
-            var authenticationPlugin = ArrayList<Byte>()
-            do {
-                if(buffer.read(single) == 0){
-                    throw InvalidPacketException("This packet is not a Handshake packet: read second salt failed")
-                }
-                if(single[0] != 0){
-                    authenticationPlugin.append(single[0])
-                }
-            } while (single[0] != 0)
-            this._authenticationPlugin = String.fromUtf8(authenticationPlugin.toArray())
-        }
+        this.authenticationPlugin = buffer.readNullTerminatedString()
+        // if(hasCapability(PluginAuth)){
+        //     this.authenticationPlugin = buffer.readNullTerminatedString()
+        // }
     }
 
 }

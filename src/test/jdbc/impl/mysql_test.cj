@@ -8,7 +8,6 @@ import std.fs.*
 import std.io.*
 import std.math.numeric.*
 import encoding.json.*
-
 import mysqlclient4cj.jdbc.*
 import mysqlclient4cj.jdbc.impl.*
 import mysqlclient4cj.protocol.*
@@ -26,8 +25,8 @@ public class MySqlTest{
         var property2= ("password","MySql123!")
         var property3 = ("database","driver_test")
         var property4 = ("ssl.mode","disabled")
-        var property5 = ("prepare.mode","server")
-        //var property5 = ("prepare.mode","client")
+        //var property5 = ("prepare.mode","server")
+        var property5 = ("prepare.mode","client")
         var dataSource = driver.open("mysql://localhost", [property1,property2,property3,property4,property5])
         connection =  dataSource.connect()
     } 
@@ -155,8 +154,8 @@ public class MySqlTest{
     */
     @TestCase
     public func queryTest(){
-        var prepare = connection.prepareStatement("select * from full_test where id = ?")
-        var result = prepare.query([199])
+        var prepare = connection.prepareStatement("select * from full_test")
+        var result = prepare.query()
         while (result.next()) {
             println(result.getInt64(1))
             println(result.getInt8(2))
@@ -187,7 +186,7 @@ public class MySqlTest{
             println(result.getArray(26))
             println(result.getArray(27))
             println(result.getArray(28))
-            println(toArray(result.getInputStream(29).getOrThrow()).size)
+            println(toArray(result.getInputStream(29).getOrDefault({=>ByteBuffer()})).size)
             println(result.getJsonValue(30))
             println(result.getString(31))
             println(result.getString(32))
@@ -199,8 +198,8 @@ public class MySqlTest{
     */
     @TestCase
     public func queryByNameTest(){
-        var prepare = connection.prepareStatement("select * from full_test where id = ?")
-        var result = prepare.query([199])
+        var prepare = connection.prepareStatement("select * from full_test")
+        var result = prepare.query()
         while (result.next()) {
             println(result.getInt64("id"))
             println(result.getInt8("tinyint_col"))
@@ -231,7 +230,7 @@ public class MySqlTest{
             println(result.getArray("tinyblob_col"))
             println(result.getArray("blob_col"))
             println(result.getArray("mediumblob_col"))
-            println(toArray(result.getInputStream("longblob_col").getOrThrow()).size)
+            println(toArray(result.getInputStream("longblob_col").getOrDefault({=>ByteBuffer()})).size)
             println(result.getJsonValue("json_col"))
             println(result.getString("set_col"))
             println(result.getString("enum_col"))

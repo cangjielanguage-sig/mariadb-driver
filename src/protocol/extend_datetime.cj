@@ -58,125 +58,59 @@ extend DateTime <: BinaryDate {
     }
 
     public static func fromBinaryDateTime(data: Array<Byte>): ?DateTime {
-        let stream = ByteBuffer(data)
-        let single = Array<Byte>(1, repeat: 0)
-        stream.read(single)
-        let year = Array<Byte>(2, repeat: 0)
-        let month = Array<Byte>(1, repeat: 0)
-        let day = Array<Byte>(1, repeat: 0)
-        let hour = Array<Byte>(1, repeat: 0)
-        let minute = Array<Byte>(1, repeat: 0)
-        let second = Array<Byte>(1, repeat: 0)
-        let micorSecond = Array<Byte>(4, repeat: 0)
-        match (single[0]) {
+        let buffer = ByteBuffer(data)
+        match (buffer.readOneByte()) {
             case 0 => return None
             case 4 =>
-                stream.read(year)
-                stream.read(month)
-                stream.read(day)
-                let year = UInt16.fromLittleEndian(year)
-                let month = UInt8.fromLittleEndian(month)
-                let day = UInt8.fromLittleEndian(day)
+                let year = UInt16.fromLittleEndian(buffer.readBytes(2))
+                let month = UInt8.fromLittleEndian(buffer.readBytes(1))
+                let day = UInt8.fromLittleEndian(buffer.readBytes(1))
                 return DateTime.of(year: Int64(year), month: Int64(month), dayOfMonth: Int64(day),
                     timeZone: TimeZone.UTC)
             case 7 =>
-                stream.read(year)
-                stream.read(month)
-                stream.read(day)
-                stream.read(hour)
-                stream.read(minute)
-                stream.read(second)
-                let year = UInt16.fromLittleEndian(year)
-                let month = UInt8.fromLittleEndian(month)
-                let day = UInt8.fromLittleEndian(day)
-                let hour = UInt8.fromLittleEndian(hour)
-                let minute = UInt8.fromLittleEndian(minute)
-                let second = UInt8.fromLittleEndian(second)
+                let year = UInt16.fromLittleEndian(buffer.readBytes(2))
+                let month = UInt8.fromLittleEndian(buffer.readBytes(1))
+                let day = UInt8.fromLittleEndian(buffer.readBytes(1))
+                let hour = UInt8.fromLittleEndian(buffer.readBytes(1))
+                let minute = UInt8.fromLittleEndian(buffer.readBytes(1))
+                let second = UInt8.fromLittleEndian(buffer.readBytes(1))
                 return DateTime.of(year: Int64(year), month: Int64(month), dayOfMonth: Int64(day), hour: Int64(hour),
                     minute: Int64(minute), second: Int64(second), timeZone: TimeZone.Local)
             case 11 =>
-                stream.read(year)
-                stream.read(month)
-                stream.read(day)
-                stream.read(hour)
-                stream.read(minute)
-                stream.read(second)
-                stream.read(micorSecond)
-                let year = UInt16.fromLittleEndian(year)
-                let month = UInt8.fromLittleEndian(month)
-                let day = UInt8.fromLittleEndian(day)
-                let hour = UInt8.fromLittleEndian(hour)
-                let minute = UInt8.fromLittleEndian(minute)
-                let second = UInt8.fromLittleEndian(second)
-                let micorSecond = UInt32.fromLittleEndian(micorSecond)
-                return DateTime.of(
-                    year: Int64(year),
-                    month: Int64(month),
-                    dayOfMonth: Int64(day),
-                    hour: Int64(hour),
-                    minute: Int64(minute),
-                    second: Int64(second),
-                    nanosecond: Int64(micorSecond),
-                    timeZone: TimeZone.Local
-                )
+                let year = UInt16.fromLittleEndian(buffer.readBytes(2))
+                let month = UInt8.fromLittleEndian(buffer.readBytes(1))
+                let day = UInt8.fromLittleEndian(buffer.readBytes(1))
+                let hour = UInt8.fromLittleEndian(buffer.readBytes(1))
+                let minute = UInt8.fromLittleEndian(buffer.readBytes(1))
+                let second = UInt8.fromLittleEndian(buffer.readBytes(1))
+                let micorSecond = UInt32.fromLittleEndian(buffer.readBytes(4))
+                return DateTime.of(year: Int64(year),month: Int64(month),dayOfMonth: Int64(day),hour: Int64(hour),
+                    minute: Int64(minute),second: Int64(second),nanosecond: Int64(micorSecond),timeZone: TimeZone.Local)
             case _ => throw InvalidPacketException("")
         }
     }
 
     public static func fromBinaryTime(data: Array<Byte>): ?DateTime {
-        let stream = ByteBuffer(data)
-        let single = Array<Byte>(1, repeat: 0)
-        stream.read(single)
-        let negative = Array<Byte>(1, repeat: 0)
-        let day = Array<Byte>(4, repeat: 0)
-        let hour = Array<Byte>(1, repeat: 0)
-        let minute = Array<Byte>(1, repeat: 0)
-        let second = Array<Byte>(1, repeat: 0)
-        let micorSecond = Array<Byte>(4, repeat: 0)
-        match (single[0]) {
+        let buffer = ByteBuffer(data)
+        match (buffer.readOneByte()) {
             case 0 => return None
             case 8 =>
-                stream.read(negative)
-                stream.read(day)
-                stream.read(hour)
-                stream.read(minute)
-                stream.read(second)
-                //var negative = littleEndianToUInt64(negativeArray)
-                //var day = littleEndianToUInt64(dayArray)
-                let hour = UInt8.fromLittleEndian(hour)
-                let minute = UInt8.fromLittleEndian(minute)
-                let second = UInt8.fromLittleEndian(second)
-                return DateTime.of(
-                    year: 1970,
-                    month: 1,
-                    dayOfMonth: 1,
-                    hour: Int64(hour),
-                    minute: Int64(minute),
-                    second: Int64(second),
-                    timeZone: TimeZone.UTC
-                )
+                let _ = buffer.readBytes(1) //negative
+                let _ = buffer.readBytes(4) //day
+                let hour = UInt8.fromLittleEndian(buffer.readBytes(1))
+                let minute = UInt8.fromLittleEndian(buffer.readBytes(1))
+                let second = UInt8.fromLittleEndian(buffer.readBytes(1))
+                return DateTime.of(year: 1970,month: 1,dayOfMonth: 1, hour: Int64(hour),
+                    minute: Int64(minute),second: Int64(second),timeZone: TimeZone.UTC)
             case 12 =>
-                stream.read(negative)
-                stream.read(day)
-                stream.read(hour)
-                stream.read(minute)
-                stream.read(second)
-                stream.read(micorSecond)
-                //var negative = littleEndianToUInt64(negativeArray)
-                //var day = littleEndianToUInt64(dayArray)
-                let hour = UInt8.fromLittleEndian(hour)
-                let minute = UInt8.fromLittleEndian(minute)
-                let second = UInt8.fromLittleEndian(second)
-                let micorSecond = UInt32.fromLittleEndian(micorSecond)
-                return DateTime.of(
-                    year: 1970,
-                    month: 1,
-                    dayOfMonth: 1,
-                    hour: Int64(hour),
-                    minute: Int64(minute),
-                    second: Int64(second),
-                    nanosecond: Int64(micorSecond),
-                    timeZone: TimeZone.Local
+                let _ = buffer.readBytes(1) //negative
+                let _ = buffer.readBytes(4) //day
+                let hour = UInt8.fromLittleEndian(buffer.readBytes(1))
+                let minute = UInt8.fromLittleEndian(buffer.readBytes(1))
+                let second = UInt8.fromLittleEndian(buffer.readBytes(1))
+                let micorSecond = UInt32.fromLittleEndian(buffer.readBytes(4))
+                return DateTime.of(year: 1970, month: 1, dayOfMonth: 1, hour: Int64(hour), minute: Int64(minute),
+                    second: Int64(second), nanosecond: Int64(micorSecond), timeZone: TimeZone.Local
                 )
             case _ => throw InvalidPacketException("")
         }

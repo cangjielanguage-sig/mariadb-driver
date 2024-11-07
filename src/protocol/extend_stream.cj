@@ -4,7 +4,7 @@
 protected package mysqlclient4cj.protocol
 
 import std.io.ByteBuffer
-
+import std.collection.ArrayList
 protected interface ReadLengthEncoded {
     
     func readLengthEncodedString(): ?String
@@ -16,7 +16,23 @@ protected interface ReadLengthEncoded {
     func readLengthEncodedIntegerRaw(): ?Array<Byte>
 }
 
-extend ByteBuffer <: ReadLengthEncoded {
+protected interface ReadFixedByte {
+
+    func readOneByte(): Byte 
+
+    func readBytes(n: Int): Array<Byte>
+
+}
+
+protected interface ReadNullTerminatedString {
+
+    func readNullTerminatedString(): String
+
+    func readNullTerminatedStringRaw(): Array<Byte>
+
+}
+
+extend ByteBuffer <: ReadLengthEncoded & ReadFixedByte & ReadNullTerminatedString {
 
     public func readLengthEncodedString(): ?String {
         match (readLengthEncodedStringRaw()) {
@@ -71,5 +87,39 @@ extend ByteBuffer <: ReadLengthEncoded {
         let data = Array<Byte>(Int64(length), repeat: 0)
         read(data)
         return data
+    }
+
+    public func readOneByte(): Byte {
+        match (readByte()) {
+            case None => throw InvalidPacketException("read a byte failed")
+            case Some(v) => return v
+        }
+    }
+
+    public func readBytes(n: Int): Array<Byte> {
+        let b = Array<Byte>(n, repeat: 0)
+        if(this.read(b) != n) {
+            throw InvalidPacketException("read ${n} bytes failed")
+        }
+        return b
+    }
+
+    public func readNullTerminatedString(): String {
+        return String.fromUtf8(readNullTerminatedStringRaw())
+    }
+
+    public func readNullTerminatedStringRaw(): Array<Byte> {
+        let buf = ArrayList<Byte>()
+        while (true) {
+            let b = match (readByte()) {
+                case None => throw InvalidPacketException("read a null terminated string failed")
+                case Some(v) => v
+            }
+            if(b == 0) {
+                break
+            }
+            buf.append(b)
+        }
+        return buf.toArray()
     }
 }

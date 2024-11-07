@@ -64,7 +64,7 @@ protected class BinaryResultSet <: ResultSet {
     public override func getBool(index: Int64): ?Bool {
         match (getString(index)) {
             case None => return None
-            case Some(v) => return toBool(v)
+            case Some(v) => return v.toBool()
         }
     }
 

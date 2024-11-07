@@ -8,7 +8,7 @@ protected package mysqlclient4cj.protocol
 * referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/group__group__cs__capabilities__flags.html
 */
 protected enum Capability {
-    
+
     | LongPassword
     | FoundRows
     | LongFlags
@@ -78,4 +78,37 @@ protected enum Capability {
             case RememberOptions => return 1 << 31
         }
     }
+
+}
+
+protected class DefaultCapability {
+
+    protected static var default: UInt32 = 0
+
+    protected static func set(capability: Capability) {
+        default |= capability.value()
+    }
+
+    protected static func has(capability: Capability): Bool{
+        return (default & capability.value()) != 0
+    }
+
+    static init() {
+        set(LongPassword)
+        set(LongFlags)
+        set(LocalFiles)
+        set(Protocol41)
+        set(Interactive)
+        set(Transactions)
+        set(MultiStatements)
+        set(MultiResults)
+        set(PluginAuth)
+        set(ConnectAttrs)
+        set(PluginAuthLenencClientData)
+        set(CanHandleExpiredPasswords)
+        set(SessionTrack)
+        set(RememberOptions)
+        set(Reserved2)
+    }
+
 }
