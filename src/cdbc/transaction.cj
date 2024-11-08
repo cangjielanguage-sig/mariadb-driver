@@ -17,22 +17,26 @@ class TransactionImpl <: Transaction {
 
     private var accessPower: TransactionAccessMode = ReadWrite
 
-    public TransactionImpl(transaction: MySqlTransaction) {
+    public init(transaction: MySqlTransaction) {
         this.transaction = transaction
         this.accessPower = ReadWrite
         this.isolationLevel = RepeatableRead
-        checkResourceAvailability()
         match (transaction.getTransactionIsolation()) {
-            case "READ-UNCOMMITTED" => isoLevel = ReadUncommitted
-            case "READ-COMMITTED" => isoLevel = ReadCommitted
-            case "REPEATABLE-READ" => isoLevel = RepeatableRead
-            case "SERIALIZABLE" => isoLevel = Serializable
+            case "READ-UNCOMMITTED" => 
+                this.isolationLevel = ReadUncommitted
+            case "READ-COMMITTED" => 
+                this.isolationLevel = ReadCommitted
+            case "REPEATABLE-READ" => 
+                this.isolationLevel = RepeatableRead
+            case "SERIALIZABLE" => 
+                this.isolationLevel = Serializable
             case _ => throw SqlException("Unknown transaction isolation level")
         }
-        
-        match(transaction.isReadOnly()){
-            case true => accessMode = ReadOnly
-            case false => accessMode = ReadWrite
+        match(transaction.isReadOnly()) {
+            case true => 
+                this.accessPower = ReadOnly
+            case false => 
+                this.accessPower = ReadWrite
         } 
     }
 
@@ -44,15 +48,17 @@ class TransactionImpl <: Transaction {
         set(value) {
             checkResourceAvailability()
             if (value != isoLevel) {
-                let level = match (value) {
-                    case ReadUncommitted => "READ-UNCOMMITTED"
-                    case ReadCommitted => "READ-COMMITTED"
-                    case RepeatableRead => "REPEATABLE-READ"
-                    case Serializable => "SERIALIZABLE"
-                    case Unspecified => "REPEATABLE-READ"
-                    case _ => throw UnsupportedException()
+                synchronized(transaction.connection.mutex) {
+                    let level = match (value) {
+                        case ReadUncommitted => "READ-UNCOMMITTED"
+                        case ReadCommitted => "READ-COMMITTED"
+                        case RepeatableRead => "REPEATABLE-READ"
+                        case Serializable => "SERIALIZABLE"
+                        case Unspecified => "REPEATABLE-READ"
+                        case _ => throw UnsupportedException()
+                    }
+                    this.isolationLevel = value
                 }
-                this.isolationLevel = value
             }
         }
     }
@@ -71,7 +77,7 @@ class TransactionImpl <: Transaction {
                         case ReadOnly =>  transaction.setReadOnly(true)
                         case Unspecified => transaction.setReadOnly(true)
                     }
-                    accessMode = value
+                    accessPower = value
                 }
             }
         }

@@ -412,11 +412,20 @@ public class MySqlTest {
     @TestCase
     public func transactionTest(){
         var transaction = connection.createTransaction()
-        transaction.isoLevel = RepeatableRead
+        transaction.isoLevel = Serializable
+        transaction.accessMode = ReadOnly
         transaction.begin()
-        insertTest()
-        //transaction.rollback()
+        //insertTest()
+        transaction.rollback()
+        transaction.begin()
+        //insertTest()
         transaction.commit()
+        transaction.begin()
+        transaction.save("yesokim")
+        transaction.rollback("yesokim")
+        transaction.release("yesokim")
+        transaction.commit()
+        transaction.accessMode = ReadWrite
     }
 
     /*
