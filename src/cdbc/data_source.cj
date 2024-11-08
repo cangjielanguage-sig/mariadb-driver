@@ -12,33 +12,33 @@ import std.database.sql.SqlException
 
 public class DatasourceImpl <: Datasource {
 
-    private var _optinos: HashMap<String, String>
+    private var optinos: HashMap<String, String>
 
-    private var _closed: AtomicBool
+    private var closed: AtomicBool
 
     public DatasourceImpl() {
-        _optinos = HashMap<String, String>()
-        _closed = AtomicBool(false)
+        optinos = HashMap<String, String>()
+        closed = AtomicBool(false)
     }
     
     /*设置连接选项*/
     public override func setOption(key: String, value: String): Unit {
-        _optinos.put(key, value)
+        optinos.put(key, value)
     }
 
     /*返回一个可用的连接*/
     public override func connect(): Connection {
         checkResourceAvailability()
-        return ConnectionImpl(_optinos)
+        return ConnectionImpl(optinos)
     }
 
     public override func close() {
         checkResourceAvailability()
-        _closed.store(true)
+        closed.store(true)
     }
 
     public override func isClosed(): Bool {
-        return _closed.load()
+        return closed.load()
     }
 
     private func checkResourceAvailability(){

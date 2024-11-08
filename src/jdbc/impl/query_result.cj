@@ -16,7 +16,7 @@ import mysqlclient4cj.result.ResultSet
 
 public class QueryResultImpl <: QueryResult {
 
-    private var resultSet: ResultSet
+    private let resultSet: ResultSet
 
     protected init(resultSet: ResultSet) {
         this.resultSet = resultSet

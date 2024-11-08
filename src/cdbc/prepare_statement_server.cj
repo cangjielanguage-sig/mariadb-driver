@@ -16,45 +16,44 @@ import mysqlclient4cj.protocol.ColumnFlag
 
 public class ServerPrepareStatement <: Statement {
 
-    private var _id: UInt32
+    private var id: UInt32
 
-    private var _option: HashMap<String, String>
+    private var options: HashMap<String, String>
 
-    private var _paramsInfo: Array<ColumnInfo>
+    private var paramsInfo: Array<ColumnInfo> = []
 
-    private var _prepareResult: PrepareResult
+    private var prepareResult: PrepareResult
 
-    private var _connection: ConnectionImpl
+    private var connection: ConnectionImpl
 
-    private var _originSql: String
+    private var originSql: String
 
-    private var _closed: AtomicBool
+    private var closed: AtomicBool
 
     public ServerPrepareStatement(originSql: String, connection: ConnectionImpl) {
-        _connection = connection
-        _prepareResult = _connection.sendPrepare(originSql)
-        _option = HashMap<String, String>()
-        _id = _prepareResult.id
-        _originSql = originSql
-        _closed = AtomicBool(false)
-        _paramsInfo = []
-        _paramsInfo = paramsInfo()
+        this.connection = connection
+        this.prepareResult = connection.sendPrepare(originSql)
+        this.options = HashMap<String, String>()
+        this.id = prepareResult.id
+        this.originSql = originSql
+        this.closed = AtomicBool(false)
+        this.paramsInfo = parseParamsInfo()
     }
 
     public override prop parameterColumnInfos: Array<ColumnInfo> {
         get() {
-            return _paramsInfo
+            return paramsInfo
         }
     }
 
     public override func query(params: Array<SqlDbType>): QueryResult {
-        var parameters = getParams(params)
-        let result = match (_option.get("fetchSize")) {
+        let parameters = getParams(params)
+        let result = match (options.get("fetchSize")) {
             case None => 
-                _connection.executeQueryPrepare(_prepareResult, parameters)
+                connection.executeQueryPrepare(prepareResult, parameters)
             case Some(v) => 
                 let fetchSize = UInt32.parse(v)
-                _connection.executeQueryPrepareWithCurosr(_prepareResult, parameters, fetchSize)
+                connection.executeQueryPrepareWithCurosr(prepareResult, parameters, fetchSize)
         }
         return QueryResultImpl(result)
     }
@@ -62,7 +61,7 @@ public class ServerPrepareStatement <: Statement {
     public override func update(params: Array<SqlDbType>): UpdateResult {
         checkResourceAvailability()
         var parameters = getParams(params)
-        var result = _connection.executeUpdatePrepare(_prepareResult, parameters)
+        var result = connection.executeUpdatePrepare(prepareResult, parameters)
         var lastInsertId: Int64 = 0
         if (result.firstInsertId > 0) {
             lastInsertId += Int64(result.firstInsertId) + getInsertCount() - 1
@@ -196,7 +195,7 @@ public class ServerPrepareStatement <: Statement {
 
     public override func setOption(key: String, value: String): Unit {
         checkResourceAvailability()
-        _option.put(key, value)
+        options.put(key, value)
     }
 
     private func checkResourceAvailability() {
@@ -207,21 +206,21 @@ public class ServerPrepareStatement <: Statement {
 
     public override func close() {
         checkResourceAvailability()
-        _connection.closePrepare(_id)
-        _closed.store(true)
+        connection.closePrepare(id)
+        closed.store(true)
     }
 
     public override func isClosed(): Bool {
-        return _closed.load()
+        return closed.load()
     }
 
     private func getInsertCount(): Int64 {
-        var matcher = Matcher(Regex("\\((.*?)\\)"), _originSql.split("values")[1])
+        var matcher = Matcher(Regex("\\((.*?)\\)"), originSql.split("values")[1])
         return matcher.findAll().getOrThrow().size
     }
 
-    private func paramsInfo(): Array<ColumnInfo> {
-        let defines = _prepareResult.paramDefinitions
+    private func parseParamsInfo(): Array<ColumnInfo> {
+        let defines = prepareResult.paramDefinitions
         let size = defines.size
         let infos = ArrayList<ColumnInfo>(size)
         for(i in defines) {

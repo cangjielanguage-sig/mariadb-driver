@@ -19,46 +19,45 @@ import mysqlclient4cj.connection.*
 
 public class ConnectionImpl <: Connection{
     
-    /*描述与数据源连接的当前状态*/
-    private var _state: ConnectionState
+    private var currentState: ConnectionState
     
-    private var _connection: MySqlConnection
+    private var connection: MySqlConnection
 
-    private var _transaction: ?Transaction
+    private var transaction: ?Transaction
 
-    private var _options: Map<String, String>
+    private var options: Map<String, String>
 
-    override public prop state: ConnectionState{
+    override public prop state: ConnectionState {
         get() {
-            return _state
+            return currentState
         }
     }
 
     public ConnectionImpl(options: Map<String, String>){
-        _state = ConnectionState.Connecting
-        _options = options
-        _transaction = None
+        this.currentState = ConnectionState.Connecting
+        this.options = options
+        this.transaction = None
         try {
-             _connection = MySqlConnectionFactory.createAuthedConnection(options)
+             this.connection = MySqlConnectionFactory.createAuthedConnection(options)
              applyOptions()
         }catch (e: ConnectFailedException) {
-            _state = ConnectionState.Broken
+            currentState = ConnectionState.Broken
             throw e
         }
-        _state = ConnectionState.Connected
+        this.currentState = ConnectionState.Connected
     }
 
     /*返回连接到的数据源元数据*/
     override public func getMetaData(): Map<String,String>{
         checkResourceAvailability()
-        return _options
+        return options
     }
     
     /*通过传入的 sql 语句，返回一个预执行的 Statement 对象实例。*/
     override public func prepareStatement(sql: String): Statement{
         checkResourceAvailability()
         checkEmptySql(sql)
-        var prepareMode: String = _options.get(Params.PrepareMode).getOrDefault({=> "client"})
+        let prepareMode = options.get(Params.PrepareMode).getOrDefault({=> "client"})
         if (prepareMode == "server") {
             return ServerPrepareStatement(sql, this)
         } else if (prepareMode == "client") {
@@ -72,29 +71,29 @@ public class ConnectionImpl <: Connection{
     override public func createTransaction(): Transaction{
         checkResourceAvailability()
         synchronized(getConnectionMutex()){
-            if(_transaction.isNone()){
-                _transaction = TransactionImpl(this)
+            if(transaction.isNone()){
+                transaction = TransactionImpl(this.connection.createTransaction())
             }
-            return _transaction.getOrThrow()
+            return transaction.getOrThrow()
         }
     }
 
     override public func close(){
         checkResourceAvailability()
         synchronized(getConnectionMutex()){
-            _state = ConnectionState.Closed
-            _connection.close()
+            currentState = ConnectionState.Closed
+            connection.close()
         }
     }
     
     override public func isClosed(): Bool{
-        return _connection.isClosed()
+        return connection.isClosed()
     }
 
     //protected---
     protected func sendCommand(sql: String) {
         try {
-            return _connection.sendCommand(sql)
+            return connection.sendCommand(sql)
         }catch (e: ResponseErrorException) {
             throw SqlException(e.message)
         }
@@ -102,7 +101,7 @@ public class ConnectionImpl <: Connection{
 
     protected func sendQuery(sql: String): ResultSet {
         try {
-            return _connection.sendQuery(sql)
+            return connection.sendQuery(sql)
         }catch (e: ResponseErrorException) {
             throw SqlException(e.message)
         }
@@ -110,7 +109,7 @@ public class ConnectionImpl <: Connection{
 
     protected func sendUpdate(sql: String): ChangeResult {
         try {
-            return _connection.sendUpdate(sql)
+            return connection.sendUpdate(sql)
         }catch (e: ResponseErrorException) {
             throw SqlException(e.message)
         }
@@ -118,7 +117,7 @@ public class ConnectionImpl <: Connection{
 
     protected func sendPrepare(sql: String): PrepareResult {
         try {
-            return _connection.sendPrepare(sql)
+            return connection.sendPrepare(sql)
         }catch (e: ResponseErrorException) {
             throw SqlException(e.message)
         }
@@ -126,7 +125,7 @@ public class ConnectionImpl <: Connection{
 
     protected func executeQueryPrepare(prepare: PrepareResult, params: Array<Any>): ResultSet {
         try {
-            return _connection.executeQueryPrepare(prepare, params)
+            return connection.executeQueryPrepare(prepare, params)
         }catch (e: ResponseErrorException | ParameterConvertException) {
             throw SqlException(e.message)
         }
@@ -134,7 +133,7 @@ public class ConnectionImpl <: Connection{
 
     protected func executeQueryPrepareWithCurosr(prepare: PrepareResult, params: Array<Any>, fetchSize: UInt32): ResultSet {
         try {
-            return _connection.executeQueryPrepareWithCurosr(prepare, params, fetchSize)
+            return connection.executeQueryPrepareWithCurosr(prepare, params, fetchSize)
         }catch (e: ResponseErrorException) {
             throw SqlException(e.message)
         }
@@ -142,18 +141,18 @@ public class ConnectionImpl <: Connection{
 
     protected func executeUpdatePrepare(prepare: PrepareResult, params: Array<Any>): ChangeResult {
         try {
-            return _connection.executeUpdatePrepare(prepare, params)
+            return connection.executeUpdatePrepare(prepare, params)
         }catch (e: ResponseErrorException  | ParameterConvertException) {
             throw SqlException(e.message)
         }
     }
 
     protected func closePrepare(id: UInt32) {
-        return _connection.closePrepare(id)
+        return connection.closePrepare(id)
     }
 
     protected func getConnectionMutex(): ReentrantMutex{
-        return _connection.mutex
+        return connection.mutex
     }
 
     //private---
@@ -170,7 +169,7 @@ public class ConnectionImpl <: Connection{
     }
 
     private func applyOptions(){
-        var queryTimeout = _options.get(Params.QueryTimeout)
+        var queryTimeout = options.get(Params.QueryTimeout)
         if(!queryTimeout.isNone()){
             try {
                 var timeout = Int64.parse(queryTimeout.getOrThrow())
@@ -180,7 +179,7 @@ public class ConnectionImpl <: Connection{
             }
         }
 
-        var updateTimeout = _options.get(Params.UpdateTimeout)
+        var updateTimeout = options.get(Params.UpdateTimeout)
         if(!updateTimeout.isNone()){
              try {
                 var timeout = Int64.parse(updateTimeout.getOrThrow())

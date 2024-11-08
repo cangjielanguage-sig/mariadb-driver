@@ -15,59 +15,29 @@ import mysqlclient4cj.result.ChangeResult
 import mysqlclient4cj.result.PrepareResult
 import mysqlclient4cj.connection.Params
 import mysqlclient4cj.connection.MySqlConnection
+import mysqlclient4cj.connection.MySqlTransaction
 import mysqlclient4cj.connection.ResponseErrorException
 import mysqlclient4cj.connection.MySqlConnectionFactory
 import mysqlclient4cj.connection.ConnectFailedException
 import mysqlclient4cj.protocol.ParameterConvertException
 
 public class ConnectionImpl <: Connection {
-    
-    private static const QUERY_ISO_LEVEL_SQL: String = "SELECT @@transaction_isolation"
-
-    private static const QUERY_ACCESS_MODE_SQL = "SELECT @@transaction_read_only"
-
-    private static const QUERY_AUTO_COMMIT = "SELECT @@autocommit"
-
-    private static const START_TRANSACTION_SQL = "BEGIN"
-
-    private static const COMMIT_TRANSACTION_SQL = "COMMIT"
-
-    private static const ROLLBACK_TRANSACTION_SQL = "ROLLBACK"
-
-    private static const SAVE_TRANSACTION_SQL = "SAVEPOINT"
-
-    private static const ROLLBACK_TO_SAVEPOINT_SQL = "ROLLBACK TO"
-
-    private static const RELEASE_SAVEPOINT_SQL = "RELEASE SAVEPOINT"
-
-    private static const CHANGE_TO_READ_UNCOMMITED_SQL = "SET SESSION transaction_isolation = 'READ-UNCOMMITTED'"
-
-    private static const CHANGE_TO_READ_COMMITED_SQL = "SET SESSION transaction_isolation = 'READ-COMMITTED'"
-
-    private static const CHANGE_TO_REPEATABLE_READ_SQL = "SET SESSION transaction_isolation = 'REPEATABLE-READ'"
-
-    private static const CHANGE_TO_READ_SERIALIZABLE_SQL = "SET SESSION transaction_isolation = 'SERIALIZABLE'"
-
-    private static const CHANGE_TO_READ_WRITE_SQL = "SET SESSION transaction_read_only = OFF"
-
-    private static const CHANGE_TO_READ_ONLY_SQL = "SET SESSION transaction_read_only = ON"
-
-    private static const CLOSE_AUTO_COMMIT = "SET SESSION autocommit = 0"
-
-    private static const OPEN_AUTO_COMMIT = "SET SESSION autocommit = 1"
 
     private static const SET_SCHEMA = "USE"
 
     private static const GET_SCHEMA = "SELECT DATABASE()"
 
-    private var connection: MySqlConnection
+    private let connection: MySqlConnection
 
-    private var options: Map<String, String>
+    private let transaction: MySqlTransaction 
+
+    private let options: Map<String, String>
 
     public ConnectionImpl(options: Map<String, String>) {
         this.options = options
         try {
-            connection = MySqlConnectionFactory.createAuthedConnection(options)
+            this.connection = MySqlConnectionFactory.createAuthedConnection(options)
+            this.transaction = connection.createTransaction()
             applyOptions()
         } catch (e: ConnectFailedException) {
             throw SqlException(e.message)
@@ -82,7 +52,7 @@ public class ConnectionImpl <: Connection {
     public override func prepareStatement(sql: String): Statement {
         checkResourceAvailability()
         checkEmptySql(sql)
-        var prepareMode: String = options.get(Params.PrepareMode).getOrDefault({=> "client"})
+        let prepareMode = options.get(Params.PrepareMode).getOrDefault({=> "client"})
         if (prepareMode == "server") {
             return ServerPrepareStatement(sql, this)
         } else if (prepareMode == "client") {
@@ -94,106 +64,73 @@ public class ConnectionImpl <: Connection {
 
     public override func getAutoCommit(): Bool {
         checkResourceAvailability()
-        var result = connection.sendQuery(QUERY_AUTO_COMMIT)
-        if (!result.next() || result.rowSize != 1 || result.columnSize != 1) {
-            throw SqlException("Query transaction isolation level failed")
-        }
-        var autoCommit: String = result.getString(1).getOrThrow()
-        match (autoCommit) {
-            case "0" => false
-            case "1" => true
-            case _ => throw SqlException("Unknown transaction isolation level")
-        }
+        return transaction.getAutoCommit()
     }
 
     public override func setAutoCommit(autoCommit: Bool): Unit {
         checkResourceAvailability()
-        var changeAutoCommite = match (autoCommit) {
-            case true => OPEN_AUTO_COMMIT
-            case false => CLOSE_AUTO_COMMIT
-        }
-        connection.sendCommand(changeAutoCommite)
+        return transaction.setAutoCommit(autoCommit)
     }
 
     public override func getTransactionIsolation(): IsolationLevel {
-        checkResourceAvailability()
-        var result = connection.sendQuery(QUERY_ISO_LEVEL_SQL)
-        if (!result.next() || result.rowSize != 1 || result.columnSize != 1) {
-            throw SqlException("Query transaction isolation level failed")
-        }
-        var isoLevel: String = result.getString(1).getOrThrow()
-        match (isoLevel) {
-            case "READ-UNCOMMITTED" => ReadUncommitted
-            case "READ-COMMITTED" => ReadCommitted
-            case "REPEATABLE-READ" => RepeatableRead
-            case "SERIALIZABLE" => Serializable
-            case _ => throw SqlException("Unknown transaction isolation level")
-        }
+        match (transaction.getTransactionIsolation()) {
+            case "READ-UNCOMMITTED" => return ReadUncommitted
+            case "READ-COMMITTED" => return ReadCommitted
+            case "REPEATABLE-READ" => return RepeatableRead
+            case "SERIALIZABLE" => return Serializable
+            case other => throw IllegalArgumentException("Unkonw isolation level: ${other}")
+        } 
     }
 
     public override func setTransactionIsolation(level: IsolationLevel): Unit {
         checkResourceAvailability()
-        var changeIsoLevel = match (level) {
-            case ReadUncommitted => CHANGE_TO_READ_UNCOMMITED_SQL
-            case ReadCommitted => CHANGE_TO_READ_COMMITED_SQL
-            case RepeatableRead => CHANGE_TO_REPEATABLE_READ_SQL
-            case Serializable => CHANGE_TO_READ_SERIALIZABLE_SQL
-            case Unspecified => CHANGE_TO_REPEATABLE_READ_SQL
+        match (level) {
+            case ReadUncommitted => transaction.setTransactionIsolation("READ-UNCOMMITTED")
+            case ReadCommitted => transaction.setTransactionIsolation("READ-COMMITTED")
+            case RepeatableRead => transaction.setTransactionIsolation("REPEATABLE-READ")
+            case Serializable => transaction.setTransactionIsolation("SERIALIZABLE")
+            case Unsupported => transaction.setTransactionIsolation("REPEATABLE-READ")
         }
-        connection.sendCommand(changeIsoLevel)
     }
 
     public override func begin(): Unit {
         checkResourceAvailability()
-        connection.sendCommand(START_TRANSACTION_SQL)
+        transaction.begin()
     }
 
     public override func commit(): Unit {
         checkResourceAvailability()
-        connection.sendCommand(COMMIT_TRANSACTION_SQL)
+        transaction.commit()
     }
 
     public override func rollback(): Unit {
         checkResourceAvailability()
-        connection.sendCommand(ROLLBACK_TRANSACTION_SQL)
+        transaction.rollback()
     }
 
     public override func setSavepoint(name: String): Unit {
         checkResourceAvailability()
-        connection.sendCommand("${SAVE_TRANSACTION_SQL} ${name}")
+        transaction.setSavepoint(name)
     }
 
     public override func rollback(name: String): Unit {
         checkResourceAvailability()
-        connection.sendCommand("${ROLLBACK_TO_SAVEPOINT_SQL} ${name}")
+        transaction.rollback(name)
     }
 
     public override func releaseSavepoint(name: String): Unit {
         checkResourceAvailability()
-        connection.sendCommand("${RELEASE_SAVEPOINT_SQL} ${name}")
+        transaction.releaseSavepoint(name)
     }
 
     public override func setReadOnly(readOnly: Bool): Unit {
         checkResourceAvailability()
-        var changeAccessMode = match (readOnly) {
-            case false => CHANGE_TO_READ_WRITE_SQL
-            case true => CHANGE_TO_READ_ONLY_SQL
-        }
-        connection.sendCommand(changeAccessMode)
+        transaction.setReadOnly(readOnly)
     }
 
     public override func isReadOnly(): Bool {
         checkResourceAvailability()
-        var result = connection.sendQuery(QUERY_ACCESS_MODE_SQL)
-        if (!result.next() || result.rowSize != 1 || result.columnSize != 1) {
-            throw SqlException("Query transaction isolation level failed")
-        }
-        var accessMode: String = result.getString(1).getOrThrow()
-        match (accessMode) {
-            case "0" => false
-            case "1" => true
-            case _ => throw SqlException("Unkonw transaction access mode")
-        }
+        return transaction.isReadOnly()
     }
 
     public override func close() {

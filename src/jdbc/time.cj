@@ -62,6 +62,10 @@ public class Time <: ToString & Comparable<Time> & Hashable {
         return fromDateTime(delegate.addSeconds(seconds))
     }
 
+    public func raw(): DateTime {
+        return DateTime.of(year: 1970, month: 1, dayOfMonth: 1, hour: hour, minute: minute, second: second)
+    }
+
     public override func hashCode(): Int64 {
         return delegate.hashCode()
     }

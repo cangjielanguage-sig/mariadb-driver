@@ -16,19 +16,19 @@ import mysqlclient4cj.protocol.DB_DATE_TIME_FORMAT
 
 public class ClientPrepareStatement <: Statement {
 
-    private var _connection: ConnectionImpl
+    private var connection: ConnectionImpl
 
-    private var _originSql: String
+    private var originSql: String
 
-    private var _option: HashMap<String, String>
+    private var options: HashMap<String, String>
 
-    private var _closed: AtomicBool
+    private var closed: AtomicBool
 
     public ClientPrepareStatement(originSql: String, connection: ConnectionImpl) {
-        _connection = connection
-        _originSql = originSql
-        _closed = AtomicBool(false)
-        _option = HashMap<String, String>()
+        this.connection = connection
+        this.originSql = originSql
+        this.closed = AtomicBool(false)
+        this.options = HashMap<String, String>()
     }
 
     public override prop parameterColumnInfos: Array<ColumnInfo> {
@@ -38,23 +38,23 @@ public class ClientPrepareStatement <: Statement {
     }
 
     public override func close() {
-        _closed.store(true)
+        closed.store(true)
     }
 
     public override func isClosed(): Bool {
-        return _closed.load()
+        return closed.load()
     }
 
     public override func query(params: Array<SqlDbType>): QueryResult {
         checkResourceAvailability()
         var executeableSql = getExecuteableSql(params)
-        return QueryResultImpl(_connection.sendQuery(executeableSql))
+        return QueryResultImpl(connection.sendQuery(executeableSql))
     }
 
     public override func update(params: Array<SqlDbType>): UpdateResult {
         checkResourceAvailability()
         var executeableSql = getExecuteableSql(params)
-        var result = _connection.sendUpdate(executeableSql)
+        var result = connection.sendUpdate(executeableSql)
         var lastInsertId: Int64 = 0
         if (result.firstInsertId > 0) {
             lastInsertId += Int64(result.firstInsertId) + getInsertCount() - 1
@@ -64,14 +64,14 @@ public class ClientPrepareStatement <: Statement {
 
     public override func setOption(key: String, value: String): Unit {
         checkResourceAvailability()
-        _option.put(key, value)
+        options.put(key, value)
     }
 
     private func getExecuteableSql(params: Array<SqlDbType>): String {
-        if (params.size != _originSql.count("?")) {
+        if (params.size != originSql.count("?")) {
             throw SqlException("The number of placeholders does not match the number of parameters")
         }
-        var replacer = Matcher(Regex("?"), _originSql)
+        var replacer = Matcher(Regex("?"), originSql)
         for (i in 0..params.size) {
             match (params[i]) {
                 case v: SqlBool => setParamWithoutQuotation(replacer, v.value.toString())
@@ -191,7 +191,7 @@ public class ClientPrepareStatement <: Statement {
     }
 
     private func getInsertCount(): Int64 {
-        var matcher = Matcher(Regex("\\((.*?)\\)"), _originSql.split("values")[1])
+        var matcher = Matcher(Regex("\\((.*?)\\)"), originSql.split("values")[1])
         return matcher.findAll().getOrThrow().size
     }
 }

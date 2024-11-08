@@ -28,38 +28,36 @@ import mysqlclient4cj.protocol.DB_DATE_TIME_FORMAT
 
 public class ClientPrepareStatement <: AllocateStatement {
 
-    private var _connection: ConnectionImpl
+    private let connection: ConnectionImpl
 
-    private var _originSql: String
-
-    private var _closed: AtomicBool
+    private let closed: AtomicBool
 
     public ClientPrepareStatement(originSql: String, connection: ConnectionImpl) {
         super(originSql)
-        _connection = connection
-        _originSql = originSql
-        _closed = AtomicBool(false)
+        this.connection = connection
+        this.closed = AtomicBool(false)
     }
 
 
     public override func close() {
-        _closed.store(true)
+        checkResourceAvailability()
+        closed.store(true)
     }
 
     public override func isClosed(): Bool {
-        return _closed.load()
+        return closed.load()
     }
 
     public override func query(params: Array<Any>): QueryResult {
         checkResourceAvailability()
-        var executeableSql = getExecuteableSql(params)
-        return QueryResultImpl(_connection.sendQuery(executeableSql))
+        let executeableSql = getExecuteableSql(params)
+        return QueryResultImpl(connection.sendQuery(executeableSql))
     }
 
     public override func update(params: Array<Any>): UpdateResult {
         checkResourceAvailability()
-        var executeableSql = getExecuteableSql(params)
-        var result = _connection.sendUpdate(executeableSql)
+        let executeableSql = getExecuteableSql(params)
+        let result = connection.sendUpdate(executeableSql)
         var lastInsertId: Int64 = 0
         if (result.firstInsertId > 0) {
             lastInsertId += Int64(result.firstInsertId) + getInsertCount() - 1
@@ -69,14 +67,14 @@ public class ClientPrepareStatement <: AllocateStatement {
 
     public override func query(): QueryResult {
         checkResourceAvailability()
-        var executeableSql = getExecuteableSql(params)
-        return QueryResultImpl(_connection.sendQuery(executeableSql))
+        let executeableSql = getExecuteableSql(params)
+        return QueryResultImpl(connection.sendQuery(executeableSql))
     }
 
     public override func update(): UpdateResult {
         checkResourceAvailability()
-        var executeableSql = getExecuteableSql(params)
-        var result = _connection.sendUpdate(executeableSql)
+        let executeableSql = getExecuteableSql(params)
+        let result = connection.sendUpdate(executeableSql)
         var lastInsertId: Int64 = 0
         if (result.firstInsertId > 0) {
             lastInsertId += Int64(result.firstInsertId) + getInsertCount() - 1
@@ -85,10 +83,10 @@ public class ClientPrepareStatement <: AllocateStatement {
     }
 
     private func getExecuteableSql(params: Array<Any>): String {
-        if (params.size != _originSql.count("?")) {
+        if (params.size != originSql.count("?")) {
             throw SqlException("The number of placeholders does not match the number of parameters")
         }
-        var replacer = Matcher(Regex("?"), _originSql)
+        let replacer = Matcher(Regex("?"), originSql)
         for (i in 0..params.size) {
             match (params[i]) {
                 case v: Bool =>
@@ -159,7 +157,7 @@ public class ClientPrepareStatement <: AllocateStatement {
     }
 
     private func getInsertCount(): Int64 {
-        var matcher = Matcher(Regex("\\((.*?)\\)"), _originSql.split("values")[1])
+        let matcher = Matcher(Regex("\\((.*?)\\)"), originSql.split("values")[1])
         return matcher.findAll().getOrThrow().size
     }
 }

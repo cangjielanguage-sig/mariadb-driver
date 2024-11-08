@@ -15,11 +15,11 @@ import mysqlclient4cj.connection.Params
 
 public class MySqlDriver <: Driver {
 
-    private let _name: String = "CangjieMySqlDriver"
+    private let driverName: String = "CangjieMySqlDriver"
 
-    private let _version: String = "1.0.0"
+    private let driverVersion: String = "1.0.0"
 
-    private let _preferredPooling: Bool = true
+    private let supportPooling: Bool = true
 
     private static let INSTALCE = MySqlDriver()
 
@@ -34,19 +34,19 @@ public class MySqlDriver <: Driver {
 
     public override prop name: String {
         get() {
-            return _name
+            return driverName
         }
     }
 
     public override prop version: String {
         get() {
-            return _version
+            return driverVersion
         }
     }
 
     public override prop preferredPooling: Bool {
         get() {
-            return _preferredPooling
+            return supportPooling
         }
     }
 

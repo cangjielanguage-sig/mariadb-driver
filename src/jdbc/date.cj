@@ -77,6 +77,10 @@ public class Date <: ToString & Comparable<Date> & Hashable {
         return fromDateTime(delegate.addDays(days))
     }
 
+    public func raw(): DateTime {
+        return DateTime.of(year: year, month: month, dayOfMonth: dayOfMonth)
+    }
+
     public override func hashCode(): Int64 {
         return delegate.hashCode()
     }

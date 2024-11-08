@@ -65,11 +65,11 @@ protected class Handshake <: CommonResponse {
         super(length, buffer)
         // 协议: 1 byte
         this.protocol = buffer.readOneByte()
-        // 服务器版本: n byte,以空字符结束
+        // 服务器版本: null end
         this.version = buffer.readNullTerminatedString()
         // 线程id: 4 byte
         this.threadId = UInt32.fromLittleEndian(buffer.readBytes(4))
-        // 随机盐: n byte,以空字符结束
+        // 随机盐: null end
         this.salt1 = buffer.readNullTerminatedStringRaw()
         // 服务器权能标志: 2 byte
         this.serverCapabilities = UInt16.fromLittleEndian(buffer.readBytes(2))

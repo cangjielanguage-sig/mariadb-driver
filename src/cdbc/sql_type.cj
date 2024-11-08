@@ -9,48 +9,48 @@ import encoding.json.JsonValue
 
 public class SqlJson <: SqlDbType{
 
-    private let _name: String = "SqlJson"
+    private let typeName: String = "SqlJson"
 
-    private var _value: JsonValue
+    private var store: JsonValue
 
     public SqlJson(value: JsonValue){
-        _value = value
+        store = value
     }
     public prop name: String{
         get() {
-            _name
+            typeName
         }
     }
     public mut prop value: JsonValue{
         get() {
-            _value
+            store
         }
         set(value) {
-            _value = value
+            store = value
         }
     }
 }
 
 public class SqlNullableJson <: SqlNullableDbType{
 
-    private let _name: String = "SqlNullableJson"
+    private let typeName: String = "SqlNullableJson"
     
-    private var _value: ?JsonValue
+    private var store: ?JsonValue
 
     public SqlNullableJson(value: ?JsonValue){
-        _value = value
+        store = value
     }
     public prop name: String{
         get() {
-            _name
+            typeName
         }
     }
     public mut prop value: ?JsonValue{
         get() {
-            _value
+            store
         }
         set(value) {
-            _value = value
+            store = value
         }
     }
 }

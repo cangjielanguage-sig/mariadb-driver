@@ -7,25 +7,25 @@ import mysqlclient4cj.jdbc.UpdateResult
 
 public class UpdateResultImpl <: UpdateResult {
 
-    private var _effectRow: Int64 = 0
+    private let effectRows: Int64
     
-    private var _lastInsertId: Int64 = 0
+    private let lastIndex: Int64
 
-    public UpdateResultImpl(effectRowCount: Int64, lastInsertId: Int64){
-        _effectRow = effectRowCount
-        _lastInsertId = lastInsertId
+    public UpdateResultImpl(effectRows: Int64, lastIndex: Int64){
+        this.effectRows = effectRows
+        this.lastIndex = lastIndex
     }
 
 
     public override prop lastInsertId: Int64 {
         get() {
-            _lastInsertId
+            lastIndex
         }
     }
 
     public override prop effectRow: Int64 {
         get() {
-            _effectRow
+            effectRows
         }
     }
 

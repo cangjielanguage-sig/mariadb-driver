@@ -17,36 +17,34 @@ import mysqlclient4cj.jdbc.UpdateResult
 import mysqlclient4cj.result.PrepareResult
 import mysqlclient4cj.protocol.nothing
 
-
 public class ServerPrepareStatement <: AllocateStatement {
 
-    private var _id: UInt32
+    private let id: UInt32
 
-    private var _prepareResult: PrepareResult
+    private let prepareResult: PrepareResult
 
-    private var _connection: ConnectionImpl
+    private let connection: ConnectionImpl
 
-    private var _closed: AtomicBool
+    private let closed: AtomicBool
 
     public ServerPrepareStatement(originSql: String, connection: ConnectionImpl) {
         super(originSql)
-        _connection = connection
-        _prepareResult = _connection.sendPrepare(originSql)
-        _id = _prepareResult.id
-        _closed = AtomicBool(false)
+        this.connection = connection
+        this.prepareResult = connection.sendPrepare(originSql)
+        this.id = prepareResult.id
+        this.closed = AtomicBool(false)
     }
-
 
     public override func query(params: Array<Any>): QueryResult {
         checkResourceAvailability()
         for(i in 0..params.size){
             match(params[i]){
-                case v: Date => params[i] = DateTime.of(year: v.year, month: v.month, dayOfMonth: v.dayOfMonth)
-                case v: Time => params[i] = DateTime.of(year: 1970, month: 1, dayOfMonth: 1, hour: v.hour, minute: v.minute, second: v.second)
+                case v: Date => params[i] = v.raw()
+                case v: Time => params[i] = v.raw()
                 case _ => nothing(0)
             }
         }
-        var result = _connection.executeQueryPrepare(_prepareResult, params)
+        let result = connection.executeQueryPrepare(prepareResult, params)
         return QueryResultImpl(result)
     }
 
@@ -54,12 +52,12 @@ public class ServerPrepareStatement <: AllocateStatement {
         checkResourceAvailability()
         for(i in 0..params.size){
             match(params[i]){
-                case v: Date => params[i] = DateTime.of(year: v.year, month: v.month, dayOfMonth: v.dayOfMonth)
-                case v: Time => params[i] = DateTime.of(year: 1970, month: 1, dayOfMonth: 1, hour: v.hour, minute: v.minute, second: v.second)
+                case v: Date => params[i] = v.raw()
+                case v: Time => params[i] = v.raw()
                 case _ => nothing(0)
             }
         }
-        var result = _connection.executeUpdatePrepare(_prepareResult, params)
+        let result = connection.executeUpdatePrepare(prepareResult, params)
         var lastInsertId: Int64 = 0
         if (result.firstInsertId > 0) {
             lastInsertId += Int64(result.firstInsertId) + getInsertCount() - 1
@@ -77,16 +75,16 @@ public class ServerPrepareStatement <: AllocateStatement {
 
     public override func close() {
         checkResourceAvailability()
-        _connection.closePrepare(_prepareResult.id)
-        _closed.store(true)
+        connection.closePrepare(prepareResult.id)
+        closed.store(true)
     }
 
     public override func isClosed(): Bool {
-        return _closed.load()
+        return closed.load()
     }
 
     private func getInsertCount(): Int64 {
-        var matcher = Matcher(Regex("\\((.*?)\\)"), originSql.split("values")[1])
+        let matcher = Matcher(Regex("\\((.*?)\\)"), originSql.split("values")[1])
         return matcher.findAll().getOrThrow().size
     }
 

@@ -190,6 +190,10 @@ protected class MySqlConnection <: Resource {
         }
     } 
 
+    protected func createTransaction(): MySqlTransaction {
+        return MySqlTransaction(this)
+    }
+
     private func handleLongData(statementId: UInt32, params: Array<Any>){
         for(i in 0..params.size){
             var param = params[i]

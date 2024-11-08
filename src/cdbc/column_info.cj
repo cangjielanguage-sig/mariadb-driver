@@ -9,49 +9,48 @@ import mysqlclient4cj.protocol.ColumnType
 
 public class ColumnInfoImpl <: ColumnInfo {
 
-
     public ColumnInfoImpl(
-        private let _name: String,
-        private let _type: String, 
-        private let _displaySize: Int64, 
-        private let _length: Int64, 
-        private let _scale: Int64,
-        private let _nullable: Bool){}
+        private let cname: String,
+        private let ctype: String, 
+        private let csize: Int64, 
+        private let clength: Int64, 
+        private let cscale: Int64,
+        private let cnullable: Bool){}
 
 
     public override prop name: String {
         get() {
-            return _name
+            return cname
         }
     }
     
     public override prop typeName: String {
         get() {
-            return _type
+            return ctype
         }
     }
 
     public override prop displaySize: Int64 {
         get() {
-            return _displaySize
+            return csize
         }
     }
 
     public override prop length: Int64 {
         get() {
-            return _length
+            return clength
         }
     }
 
     public override prop scale: Int64 {
         get() {
-            return _scale
+            return cscale
         }
     }
 
     public override prop nullable: Bool {
         get() {
-            return _nullable
+            return cnullable
         }
     }
 }
