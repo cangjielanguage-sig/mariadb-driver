@@ -59,8 +59,8 @@ public class ServerPrepareStatement <: AllocateStatement {
         }
         let result = connection.executeUpdatePrepare(prepareResult, params)
         var lastInsertId: Int64 = 0
-        if (result.firstInsertId > 0) {
-            lastInsertId += Int64(result.firstInsertId) + getInsertCount() - 1
+        if (result.lastInsertId > 0) {
+            lastInsertId += Int64(result.lastInsertId) + getInsertCount() - 1
         }
         return UpdateResultImpl(Int64(result.effectRow), lastInsertId)
     }

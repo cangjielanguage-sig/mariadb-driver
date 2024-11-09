@@ -20,21 +20,21 @@ import mysqlclient4cj.protocol.response.*
  */
 protected class ExecuteCommand <: Command {
 
-    private var statementId: UInt32
+    private let statementId: UInt32
 
-    private var flags: CursorType
+    private let flags: CursorType
 
-    private var iterationCount: UInt32
+    private let iterationCount: UInt32
 
-    private var parameterCount: UInt64
+    private let parameterCount: UInt64
 
-    private var nullBitMap: Array<Byte>
+    private let nullBitMap: Array<Byte>
 
-    private var newParamsBindFlag: UInt8
+    private let newParamsBindFlag: UInt8
 
-    private var paramDefinitions: Array<ColumnDefinition>
+    private let paramDefinitions: Array<ColumnDefinition>
 
-    private var params: Array<Any>
+    private let params: Array<Any>
 
     private init(id: UInt32, flags: CursorType, iterationCount: UInt32, parameterCount: UInt64, boundFlag: UInt8, 
                 parameterDefinition: Array<ColumnDefinition>, params: Array<Any>) {
@@ -71,14 +71,14 @@ protected class ExecuteCommand <: Command {
         if (parameterCount > 0 || flags == ParameterCountAvailable) {
             if (HandshakeResponse.getDefault(0).hasCapability(QueryAttributes)) {
                 //parameter_count
-                var array = parameterCount.toLengthEncoded()
+                let array = parameterCount.toLengthEncoded()
                 buf.appendAll(array)
             }
 
             if (parameterCount > 0) {
                 // null_bitmap
                 for (i in 0..params.size) {
-                    var value = params[i]
+                    let value = params[i]
                     if (value is ?Any && (value as ?Any).getOrThrow().isNone()) {
                         nullBitMap[(i / 8)] |= 1u8 << (i % 8)
                     }
@@ -114,7 +114,7 @@ protected class ExecuteCommand <: Command {
 
                 //parameter_values
                 for (i in 0..params.size) {
-                    var value = params[i]
+                    let value = params[i]
                     match (value) {
                         case v: Bool => appendBool(i, buf, v)
                         case v: Int8 => appendInt8(i, buf, v)
@@ -339,7 +339,7 @@ protected class ExecuteCommand <: Command {
         let paramType = paramDefinitions[index].columnType
         match (paramType) {
             case Float =>
-                return appendFloat32(index, buf, Float32(value)) //possible loss of precision
+                buf.appendAll(Float64(value).toLittleEndian())
             case Double => 
                 buf.appendAll(value.toLittleEndian())
             case Tiny => 
@@ -354,7 +354,7 @@ protected class ExecuteCommand <: Command {
                 return appendString(index, buf, value.toString())
             case _ => 
                 throw IllegalArgumentException("The parameter type at position ${index + 1} does not match the required type: ${paramType}")
-            }
+        }
     }
 
     private func appendBigInt(index: Int64, buf: ArrayList<Byte>, value: BigInt): Unit {

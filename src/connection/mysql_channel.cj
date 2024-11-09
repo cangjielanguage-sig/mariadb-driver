@@ -37,32 +37,25 @@ protected class MySqlChannel <: Resource {
      * read a mysql package from socket
      */
     protected func read(): (UInt32, Array<Byte>) {
-        readFully(header, 0, 3)
+        readFully(header)
         let length = UInt32.fromLittleEndian(header)                                  
-        let bufferSize = Int64(length) + 1
-        let b = Array<Byte>(bufferSize, repeat: 0)
-        readFully(b, 0, bufferSize)
+        let b = Array<Byte>(Int64(length) + 1, repeat: 0)
+        readFully(b)
         return (length, b)
     }
 
-    private func readFully(b: Array<Byte>, offset: Int, len: Int): Int {
-        if(len == 0) {
-            return 0
-        }
-        if(b.size - offset < len) {
-            throw IOException("remaining size of buffer array is not enough")
-        }
+    private func readFully(b: Array<Byte>): Int {
         var i: Int = 0 //已经读取了的长度
-        while(i < len) {
-            let remaining = len - i
+        while(i < b.size) {
+            let remaining = b.size - i
             var readed = 0
             if(remaining >= 1024) {
                 readed = socket.read(buffer)
-                buffer.copyTo(b, 0, offset + i, readed)
+                buffer.copyTo(b, 0, i, readed)
             }else {
                 let temp = Array<Byte>(remaining, repeat: 0)
                 readed = socket.read(temp)
-                temp.copyTo(b, 0, offset + i, readed)
+                temp.copyTo(b, 0, i, readed)
             }
             i += readed
         }

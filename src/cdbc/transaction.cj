@@ -47,7 +47,7 @@ class TransactionImpl <: Transaction {
         }
         set(value) {
             checkResourceAvailability()
-            if (value != isoLevel) {
+            if (value != isolationLevel) {
                 synchronized(transaction.connection.mutex) {
                     let level = match (value) {
                         case ReadUncommitted => "READ-UNCOMMITTED"
@@ -57,6 +57,7 @@ class TransactionImpl <: Transaction {
                         case Unspecified => "REPEATABLE-READ"
                         case _ => throw UnsupportedException()
                     }
+                    transaction.setTransactionIsolation(level)
                     this.isolationLevel = value
                 }
             }
@@ -75,7 +76,7 @@ class TransactionImpl <: Transaction {
                     match(value){
                         case ReadWrite => transaction.setReadOnly(false)
                         case ReadOnly =>  transaction.setReadOnly(true)
-                        case Unspecified => transaction.setReadOnly(true)
+                        case Unspecified => transaction.setReadOnly(false)
                     }
                     accessPower = value
                 }

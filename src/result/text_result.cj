@@ -18,47 +18,47 @@ import mysqlclient4cj.protocol.response.*
 
 protected class TextResultSet <: ResultSet {
 
-    private let _columns: Array<ColumnDefinition>
+    private let columns: Array<ColumnDefinition>
 
-    private let _rows: Array<TextResult>
+    private let rows: Array<TextResult>
 
-    private let _indexMap: HashMap<String, Int64>
+    private let indexMap: HashMap<String, Int64>
 
-    private var _currentRow: Int64
+    private var currentRow: Int64
 
-    protected TextResultSet(fields: Array<ColumnDefinition>, rows: Array<TextResult>) {
-        _columns = fields
-        _rows = rows
-        _currentRow = 0
-        _indexMap = HashMap<String, Int64>()
-        for(i in 0.._columns.size){
-            _indexMap.put(_columns[i].name, i + 1)
+    protected TextResultSet(columns: Array<ColumnDefinition>, rows: Array<TextResult>) {
+        this.columns = columns
+        this.rows = rows
+        this.currentRow = 0
+        this.indexMap = HashMap<String, Int64>()
+        for(i in 0..columns.size){
+            indexMap.put(columns[i].name, i + 1)
         }
     }
     
     public override prop rowSize: Int64 {
         get() {
-            _rows.size
+            rows.size
         }
     }
 
     public override prop columnSize: Int64 {
         get() {
-            _columns.size
+            columns.size
         }
     }
 
     public func next(): Bool {
-        if (_currentRow >= rowSize) {
+        if (currentRow >= rowSize) {
             return false
         } else {
-            _currentRow++
+            currentRow++
             return true
         }
     }
 
     public override func getIndexByName(name: String): Int64 {
-        return _indexMap.get(name).getOrThrow()
+        return indexMap.get(name).getOrThrow()
     }
 
     public override func getBool(index: Int64): ?Bool {
@@ -202,7 +202,7 @@ protected class TextResultSet <: ResultSet {
     }
 
     public override func getArray(index: Int64): ?Array<Byte> {
-        return _rows[_currentRow - 1].row[index - 1]
+        return rows[currentRow - 1].row[index - 1]
     }
 
     public func getJsonValue(index: Int64): ?JsonValue {
@@ -213,31 +213,31 @@ protected class TextResultSet <: ResultSet {
     }
 
     public override func getFieldType(index: Int64): ColumnType {
-        return _columns[index - 1].columnType
+        return columns[index - 1].columnType
     }
 
     public override func getFieldName(index: Int64): String {
-        return _columns[index - 1].name
+        return columns[index - 1].name
     }
 
     public override func getFieldDecimal(index: Int64): Byte {
-        return _columns[index - 1].decimals
+        return columns[index - 1].decimals
     }
 
     public override func getFieldIsNotNull(index: Int64): Bool {
-        return _columns[index - 1].hasFlag(NotNull)
+        return columns[index - 1].hasFlag(NotNull)
     }
 
     public override func getFieldIsUnsigned(index: Int64): Bool {
-        return _columns[index - 1].hasFlag(Unsigned)
+        return columns[index - 1].hasFlag(Unsigned)
     }
 
     public override func getFieldCharset(index: Int64): Charset {
-        return _columns[index - 1].charset
+        return columns[index - 1].charset
     }
 
     public override func getFieldLength(index: Int64): UInt32 {
-        return _columns[index - 1].columnLength
+        return columns[index - 1].columnLength
     }
 
     private func stringParseToBool(str: String): Bool {

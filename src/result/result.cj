@@ -7,57 +7,46 @@ import mysqlclient4cj.protocol.response.*
 
 protected class ChangeResult {
     
-    private let _effectRow: UInt64
+    protected let effectRow: UInt64
 
-    private let _firstInsertId: UInt64
+    protected let lastInsertId: UInt64
 
-    public ChangeResult(effectRow: UInt64, firstInsertId: UInt64) {
-        _effectRow = effectRow
-        _firstInsertId = firstInsertId
+    public ChangeResult(effectRow: UInt64, lastInsertId: UInt64) {
+        this.effectRow = effectRow
+        this.lastInsertId = lastInsertId
     }
 
-    public prop effectRow: UInt64 {
-        get() {
-            _effectRow
-        }
-    }
-
-    public prop firstInsertId: UInt64 {
-        get() {
-            _firstInsertId
-        }
-    }
 }
 
 protected class PrepareResult {
 
-    private let _info: PrepareResposne
+    protected let info: PrepareResposne
 
-    private let _parames: Array<ColumnDefinition>
+    protected let params: Array<ColumnDefinition>
 
-    private let _columns: Array<ColumnDefinition>
+    protected let columns: Array<ColumnDefinition>
 
     protected PrepareResult(info: PrepareResposne, parameters: Array<ColumnDefinition>, columns: Array<ColumnDefinition>){
-        _info = info
-        _parames = parameters
-        _columns = columns
+        this.info = info
+        this.params = parameters
+        this.columns = columns
     }
 
     protected prop id: UInt32{
         get() {
-            _info.statementId
+            info.statementId
         }
     }
 
     protected prop paramDefinitions: Array<ColumnDefinition> {
         get() {
-            _parames
+            params
         }
     }
 
     protected prop columnDefinitions: Array<ColumnDefinition> {
         get() {
-            _columns
+            columns
         }
     }
 

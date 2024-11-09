@@ -96,7 +96,6 @@ protected class HandshakeResponse <: Request {
     }
 
     public override func pack(): Unit {
-        //put packet length and number placeholer
         super.pack()
         //put client Capabilities
         buf.appendAll(capabilities.toLittleEndian())
@@ -190,7 +189,7 @@ protected class RequestPublicKey <: Request{
  */
 protected class SendPassword <: Request{
 
-    private var authResponse: Array<Byte>
+    private let authResponse: Array<Byte>
 
     protected init(number: UInt8, password: Array<Byte>){
         super(number)
