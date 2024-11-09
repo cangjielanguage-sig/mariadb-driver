@@ -91,7 +91,7 @@ protected func toSqlType(filedType: ColumnType, isNotNull: Bool): String {
             case Float => "SqlNullableReal"
             case Double => "SqlNullableDouble"
             case NewDecimal => "SqlNullableDecimal"
-            case Date => "SqlNullableData"
+            case Date => "SqlNullableDate"
             case Time => "SqlNullableTime"
             case DateTime => "SqlNullableTimestamp"
             case Timestamp => "SqlNullableTimestamp"
