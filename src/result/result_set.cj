@@ -10,12 +10,11 @@ import std.math.numeric.BigInt
 import encoding.json.JsonValue
 import mysqlclient4cj.protocol.Charset
 import mysqlclient4cj.protocol.ColumnType
+import mysqlclient4cj.protocol.response.ColumnDefinition
 
 protected interface ResultSet {
 
-    prop rowSize: Int64
-
-    prop columnSize: Int64
+    prop columnDefinitions: Array<ColumnDefinition>
 
     func next(): Bool
 

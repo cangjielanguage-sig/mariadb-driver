@@ -13,7 +13,7 @@ import mysqlclient4cj.result.ResultSet
 
 public class QueryResultImpl <: QueryResult {
     
-    private var infos: Array<ColumnInfo> = []
+    private var infos: Array<ColumnInfo>
 
     private var result: ResultSet
 
@@ -30,13 +30,8 @@ public class QueryResultImpl <: QueryResult {
     protected QueryResultImpl(result: ResultSet) {
         this.result = result
         let arrayList = ArrayList<ColumnInfo>()
-        for(i in 1..=result.columnSize){
-            let name = result.getFieldName(i)
-            let fieldType = result.getFieldType(i)
-            let notNull = result.getFieldIsNotNull(i)
-            let length = result.getFieldLength(i)
-            let decimal = result.getFieldDecimal(i)
-            let info = ColumnInfoImpl(name, toSqlType(fieldType, notNull, Int64(length)), Int64(length), Int64(length), Int64(decimal), !notNull)
+        for(i in result.columnDefinitions){
+            let info = ColumnInfoImpl(i)
             arrayList.append(info)
         }
         this.infos = arrayList.toArray()
@@ -49,10 +44,10 @@ public class QueryResultImpl <: QueryResult {
             if(!result.next()){
                 return false
             }
-            for (i in 1..=min(values.size,result.columnSize)) {
+            for (i in 1..= values.size) {
                 match (values[i - 1]) {
                     case v: SqlBool => v.value = result.getBool(i).getOrThrow()
-                    case v: SqlByte => v.value = result.getInt8( i).getOrThrow()
+                    case v: SqlByte => v.value = result.getInt8(i).getOrThrow()
                     case v: SqlSmallInt => v.value = result.getInt16(i).getOrThrow()
                     case v: SqlInteger => v.value =result.getInt32(i).getOrThrow()
                     case v: SqlBigInt => v.value = result.getInt64(i).getOrThrow()

@@ -62,10 +62,9 @@ public class ConnectionImpl <: Connection{
             //return ServerPrepareStatement(sql, this)
             ServerPrepareStatement(sql, this)
         } else if (prepareMode == "client") {
-            //return ClientPrepareStatement(sql, this)
             return ClientPrepareStatement(sql, this)
         } else {
-            throw SqlException("Unknow prepare mode: ${prepareMode} option: auto, server or client")
+            throw SqlException("Unknow prepare mode: ${prepareMode} option: server or client")
         }
     }
 

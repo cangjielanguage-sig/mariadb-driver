@@ -38,16 +38,4 @@ protected class PrepareResult {
         }
     }
 
-    protected prop paramDefinitions: Array<ColumnDefinition> {
-        get() {
-            params
-        }
-    }
-
-    protected prop columnDefinitions: Array<ColumnDefinition> {
-        get() {
-            columns
-        }
-    }
-
 }

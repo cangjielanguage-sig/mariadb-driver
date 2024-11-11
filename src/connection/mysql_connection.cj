@@ -128,7 +128,7 @@ protected class MySqlConnection <: Resource {
     protected func executeQueryPrepare(prepare: PrepareResult, params: Array<Any>): ResultSet {
         synchronized(connectionMutex) {
             handleLongData(prepare.id, params)
-            writeRequest(ExecuteCommand.default(prepare.id, prepare.paramDefinitions, params))
+            writeRequest(ExecuteCommand.default(prepare.id, prepare.params, params))
             return readQueryPrepareResponse()
         }
     }
@@ -143,7 +143,7 @@ protected class MySqlConnection <: Resource {
     protected func executeQueryPrepareWithCurosr(prepare: PrepareResult, params: Array<Any>, fetchSize: UInt32): ResultSet {
         synchronized(connectionMutex) {
             handleLongData(prepare.id, params)
-            writeRequest(ExecuteCommand.withReadOnly(prepare.id, prepare.paramDefinitions, params))
+            writeRequest(ExecuteCommand.withReadOnly(prepare.id, prepare.params, params))
             return readQueryPrepareResponseWithCursor(prepare.id, fetchSize)
         }
     }
@@ -158,7 +158,7 @@ protected class MySqlConnection <: Resource {
     protected func executeUpdatePrepare(prepare: PrepareResult, params: Array<Any>): ChangeResult {
         synchronized(connectionMutex) {
             handleLongData(prepare.id, params)
-            writeRequest(ExecuteCommand.default(prepare.id, prepare.paramDefinitions, params))
+            writeRequest(ExecuteCommand.default(prepare.id, prepare.params, params))
             return readUpdateResponse()
         }
     }

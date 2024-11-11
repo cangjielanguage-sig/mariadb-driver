@@ -20,7 +20,7 @@ public class ServerPrepareStatement <: Statement {
 
     private var options: HashMap<String, String>
 
-    private var paramsInfo: Array<ColumnInfo> = []
+    private var paramsInfo: Array<ColumnInfo>
 
     private var prepareResult: PrepareResult
 
@@ -37,7 +37,11 @@ public class ServerPrepareStatement <: Statement {
         this.id = prepareResult.id
         this.originSql = originSql
         this.closed = AtomicBool(false)
-        this.paramsInfo = parseParamsInfo()
+        let array = ArrayList<ColumnInfo>()
+        for(i in prepareResult.columns) {
+            array.append(ColumnInfoImpl(i))
+        }
+        this.paramsInfo = array.toArray()
     }
 
     public override prop parameterColumnInfos: Array<ColumnInfo> {
@@ -219,15 +223,14 @@ public class ServerPrepareStatement <: Statement {
         return matcher.findAll().getOrThrow().size
     }
 
-    private func parseParamsInfo(): Array<ColumnInfo> {
-        let defines = prepareResult.paramDefinitions
-        let size = defines.size
-        let infos = ArrayList<ColumnInfo>(size)
-        for(i in defines) {
-            let nullable = i.hasFlag(NotNull)
-            let info = ColumnInfoImpl(i.name, toSqlType(i.columnType, nullable, Int64(i.columnLength)), Int64(i.columnLength), Int64(i.columnLength), Int64(i.decimals), nullable)
-            infos.append(info)
-        }
-        return infos.toArray()
-    }
+    // private func parseParamsInfo(): Array<ColumnInfo> {
+    //     let defines = prepareResult.paramDefinitions
+    //     let size = defines.size
+    //     let infos = ArrayList<ColumnInfo>(size)
+    //     for(i in defines) {
+    //         let info = ColumnInfoImpl(i)
+    //         infos.append(info)
+    //     }
+    //     return infos.toArray()
+    // }
 }

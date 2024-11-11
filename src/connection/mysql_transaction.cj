@@ -48,7 +48,7 @@ protected class MySqlTransaction {
 
     protected func getAutoCommit(): Bool {
         let result = connection.sendQuery(QUERY_AUTO_COMMIT)
-        if (!result.next() || result.rowSize != 1 || result.columnSize != 1) {
+        if (!result.next()) {
             throw ResponseErrorException("Query transaction isolation level failed")
         }
         let autoCommit: String = result.getString(1).getOrThrow()
@@ -69,7 +69,7 @@ protected class MySqlTransaction {
 
     public func getTransactionIsolation(): String {
         let result = connection.sendQuery(QUERY_ISO_LEVEL_SQL)
-        if (!result.next() || result.rowSize != 1 || result.columnSize != 1) {
+        if (!result.next()) {
             throw ResponseErrorException("Query transaction isolation level failed")
         }
         return result.getString(1).getOrThrow()
@@ -120,7 +120,7 @@ protected class MySqlTransaction {
 
     public func isReadOnly(): Bool {
         let result = connection.sendQuery(QUERY_ACCESS_MODE_SQL)
-        if (!result.next() || result.rowSize != 1 || result.columnSize != 1) {
+        if (!result.next()) {
             throw ResponseErrorException("Query transaction isolation level failed")
         }
         let accessMode: String = result.getString(1).getOrThrow()

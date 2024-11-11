@@ -36,20 +36,14 @@ protected class TextResultSet <: ResultSet {
         }
     }
     
-    public override prop rowSize: Int64 {
+    public prop columnDefinitions: Array<ColumnDefinition> {
         get() {
-            rows.size
-        }
-    }
-
-    public override prop columnSize: Int64 {
-        get() {
-            columns.size
+            columns
         }
     }
 
     public func next(): Bool {
-        if (currentRow >= rowSize) {
+        if (currentRow >= rows.size) {
             return false
         } else {
             currentRow++

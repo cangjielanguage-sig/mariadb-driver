@@ -57,8 +57,7 @@ public class ConnectionImpl <: Connection {
             //return ServerPrepareStatement(sql, this)
             ServerPrepareStatement(sql, this)
         } else if (prepareMode == "client") {
-            //return ClientPrepareStatement(sql, this)
-            ClientPrepareStatement(sql, this)
+            return ClientPrepareStatement(sql, this)
         } else {
             throw SqlException("Unknow prepare mode: ${prepareMode} option: server or client")
         }
@@ -152,7 +151,7 @@ public class ConnectionImpl <: Connection {
     public func getSchema(): String {
         checkResourceAvailability()
         var result = connection.sendQuery(GET_SCHEMA)
-        if (!result.next() || result.rowSize != 1 || result.columnSize != 1) {
+        if (!result.next()) {
             throw SqlException("Query the current database failed")
         }
         return result.getString(1).getOrThrow()

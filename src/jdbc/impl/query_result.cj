@@ -22,18 +22,6 @@ public class QueryResultImpl <: QueryResult {
         this.resultSet = resultSet
     }
 
-    override public prop rowSize: Int64 {
-        get() {
-            resultSet.rowSize
-        }
-    }
-
-    override public prop columnSize: Int64 {
-        get() {
-            resultSet.columnSize
-        }
-    }
-
     override public func next(): Bool {
         return resultSet.next()
     }

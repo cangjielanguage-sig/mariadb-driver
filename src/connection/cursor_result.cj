@@ -16,7 +16,7 @@ protected class CursorResultSet <: ResultSet {
 
     private let prepareId: UInt32
 
-    private let columnInfos: Array<ColumnDefinition>
+    private let columns: Array<ColumnDefinition>
 
     private let connection: MySqlConnection
 
@@ -24,30 +24,25 @@ protected class CursorResultSet <: ResultSet {
 
     private var resultSet: ResultSet
 
-    protected CursorResultSet(prepareId: UInt32, columnInfos: Array<ColumnDefinition>, fetchSize: UInt32, connection: MySqlConnection) {
+    protected CursorResultSet(prepareId: UInt32, columns: Array<ColumnDefinition>, fetchSize: UInt32, connection: MySqlConnection) {
         this.prepareId = prepareId
-        this.columnInfos = columnInfos
+        this.columns = columns
         this.connection = connection
         this.fetchSize = fetchSize
-        this.resultSet = connection.fetchRows(prepareId, columnInfos, fetchSize)
+        this.resultSet = connection.fetchRows(prepareId, columns, fetchSize)
     }
 
-    public override prop rowSize: Int64 {
-        get() {
-            resultSet.rowSize
-        }
-    }
 
-    public override prop columnSize: Int64 {
+    public prop columnDefinitions: Array<ColumnDefinition> {
         get() {
-            columnInfos.size
+            columns
         }
     }
 
     public override func next(): Bool {
         if(!resultSet.next()) {
             //如果当前拉取的结果集被读完, 尝试拉取下一个结果集
-            resultSet = connection.fetchRows(prepareId, columnInfos, fetchSize)
+            resultSet = connection.fetchRows(prepareId, columns, fetchSize)
             return resultSet.next()
         }
         return true

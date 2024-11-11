@@ -11,10 +11,6 @@ import encoding.json.JsonValue
 
 public interface QueryResult <: Resource {
 
-    prop rowSize: Int64
-
-    prop columnSize: Int64
-
     func next(): Bool
 
     func getBool(index: Int64): ?Bool
