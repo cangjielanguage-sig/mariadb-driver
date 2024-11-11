@@ -74,103 +74,140 @@ public class ClientPrepareStatement <: Statement {
         var replacer = Matcher(Regex("?"), originSql)
         for (i in 0..params.size) {
             match (params[i]) {
-                case v: SqlBool => setParamWithoutQuotation(replacer, v.value.toString())
-                case v: SqlByte => setParamWithoutQuotation(replacer, v.value.toString())
-                case v: SqlSmallInt => setParamWithoutQuotation(replacer, v.value.toString())
-                case v: SqlInteger => setParamWithoutQuotation(replacer, v.value.toString())
-                case v: SqlBigInt => setParamWithoutQuotation(replacer, v.value.toString())
-                case v: SqlReal => setParamWithoutQuotation(replacer, v.value.toString())
-                case v: SqlDouble => setParamWithoutQuotation(replacer, v.value.toString())
-                case v: SqlDecimal => setParamWithQuotation(replacer, v.value.toString())
-                case v: SqlChar => setParamWithQuotation(replacer, v.value.toString())
-                case v: SqlVarchar => setParamWithQuotation(replacer, v.value.toString())
-                case v: SqlClob => setParamWithoutQuotation(replacer, toArray(v.value).toHexStringWithPrefix())
-                case v: SqlBlob => setParamWithoutQuotation(replacer, toArray(v.value).toHexStringWithPrefix())
-                case v: SqlDate => setParamWithQuotation(replacer, v.value.toString(DB_DATE_FORMAT))
-                case v: SqlTime => setParamWithQuotation(replacer, v.value.toString(DB_TIME_FORMAT))
-                case v: SqlTimeTz => setParamWithQuotation(replacer, v.value.toString(DB_TIME_FORMAT))
-                case v: SqlTimestamp => setParamWithQuotation(replacer, v.value.toString(DB_DATE_TIME_FORMAT))
-                case v: SqlBinary => setParamWithoutQuotation(replacer, v.value.toHexStringWithPrefix())
-                case v: SqlVarBinary => setParamWithoutQuotation(replacer, v.value.toHexStringWithPrefix())
-                case v: SqlJson => setParamWithQuotation(replacer, v.value.toJsonString())
-
-                case v: SqlNullableBool => match (v.value) {
-                    case None => setParamWithoutQuotation(replacer, "NULL")
-                    case Some(s) => setParamWithoutQuotation(replacer, s.toString())
-                }
-                case v: SqlNullableByte => match (v.value) {
-                    case None => setParamWithoutQuotation(replacer, "NULL")
-                    case Some(s) => setParamWithoutQuotation(replacer, s.toString())
-                }
-                case v: SqlNullableSmallInt => match (v.value) {
-                    case None => setParamWithoutQuotation(replacer, "NULL")
-                    case Some(s) => setParamWithoutQuotation(replacer, s.toString())
-                }
-                case v: SqlNullableInteger => match (v.value) {
-                    case None => setParamWithoutQuotation(replacer, "NULL")
-                    case Some(s) => setParamWithoutQuotation(replacer, s.toString())
-                }
-                case v: SqlNullableBigInt => match (v.value) {
-                    case None => setParamWithoutQuotation(replacer, "NULL")
-                    case Some(s) => setParamWithoutQuotation(replacer, s.toString())
-                }
-                case v: SqlNullableReal => match (v.value) {
-                    case None => setParamWithoutQuotation(replacer, "NULL")
-                    case Some(s) => setParamWithoutQuotation(replacer, s.toString())
-                }
-                case v: SqlNullableDouble => match (v.value) {
-                    case None => setParamWithoutQuotation(replacer, "NULL")
-                    case Some(s) => setParamWithoutQuotation(replacer, s.toString())
-                }
+                case v: SqlBool => 
+                    setParamWithoutQuotation(replacer, v.value.toString())
+                case v: SqlByte => 
+                    setParamWithoutQuotation(replacer, v.value.toString())
+                case v: SqlSmallInt => 
+                    setParamWithoutQuotation(replacer, v.value.toString())
+                case v: SqlInteger => 
+                    setParamWithoutQuotation(replacer, v.value.toString())
+                case v: SqlBigInt => 
+                    setParamWithoutQuotation(replacer, v.value.toString())
+                case v: SqlReal => 
+                    setParamWithoutQuotation(replacer, v.value.toString())
+                case v: SqlDouble => 
+                    setParamWithoutQuotation(replacer, v.value.toString())
+                case v: SqlDecimal => 
+                    setParamWithQuotation(replacer, v.value.toString())
+                case v: SqlChar => 
+                    setParamWithQuotation(replacer, v.value.toString())
+                case v: SqlVarchar => 
+                    setParamWithQuotation(replacer, v.value.toString())
+                case v: SqlClob => 
+                    setParamWithoutQuotation(replacer, toArray(v.value).toHexStringWithPrefix())
+                case v: SqlBlob => 
+                    setParamWithoutQuotation(replacer, toArray(v.value).toHexStringWithPrefix())
+                case v: SqlDate => 
+                    setParamWithQuotation(replacer, v.value.toString(DB_DATE_FORMAT))
+                case v: SqlTime => 
+                    setParamWithQuotation(replacer, v.value.toString(DB_TIME_FORMAT))
+                case v: SqlTimeTz => 
+                    setParamWithQuotation(replacer, v.value.toString(DB_TIME_FORMAT))
+                case v: SqlTimestamp => 
+                    setParamWithQuotation(replacer, v.value.toString(DB_DATE_TIME_FORMAT))
+                case v: SqlBinary => 
+                    setParamWithoutQuotation(replacer, v.value.toHexStringWithPrefix())
+                case v: SqlVarBinary => 
+                    setParamWithoutQuotation(replacer, v.value.toHexStringWithPrefix())
+                case v: SqlJson => 
+                    setParamWithQuotation(replacer, v.value.toJsonString())
+                case v: SqlNullableBool => 
+                    match (v.value) {
+                        case None => setParamWithoutQuotation(replacer, "NULL")
+                        case Some(s) => setParamWithoutQuotation(replacer, s.toString())
+                    }
+                case v: SqlNullableByte => 
+                    match (v.value) {
+                        case None => setParamWithoutQuotation(replacer, "NULL")
+                        case Some(s) => setParamWithoutQuotation(replacer, s.toString())
+                    }
+                case v: SqlNullableSmallInt => 
+                    match (v.value) {
+                        case None => setParamWithoutQuotation(replacer, "NULL")
+                        case Some(s) => setParamWithoutQuotation(replacer, s.toString())
+                    }
+                case v: SqlNullableInteger => 
+                    match (v.value) {
+                        case None => setParamWithoutQuotation(replacer, "NULL")
+                        case Some(s) => setParamWithoutQuotation(replacer, s.toString())
+                    }
+                case v: SqlNullableBigInt => 
+                    match (v.value) {
+                        case None => setParamWithoutQuotation(replacer, "NULL")
+                        case Some(s) => setParamWithoutQuotation(replacer, s.toString())
+                    }
+                case v: SqlNullableReal => 
+                    match (v.value) {
+                        case None => setParamWithoutQuotation(replacer, "NULL")
+                        case Some(s) => setParamWithoutQuotation(replacer, s.toString())
+                    }
+                case v: SqlNullableDouble => 
+                    match (v.value) {
+                        case None => setParamWithoutQuotation(replacer, "NULL")
+                        case Some(s) => setParamWithoutQuotation(replacer, s.toString())
+                    }
                 case v: SqlNullableDecimal => match (v.value) {
-                    case None => setParamWithoutQuotation(replacer, "NULL")
-                    case Some(s) => setParamWithQuotation(replacer, s.toString())
-                }
-                case v: SqlNullableChar => match (v.value) {
-                    case None => setParamWithoutQuotation(replacer, "NULL")
-                    case Some(s) => setParamWithQuotation(replacer, s.toString())
-                }
-                case v: SqlNullableVarchar => match (v.value) {
-                    case None => setParamWithoutQuotation(replacer, "NULL")
-                    case Some(s) => setParamWithQuotation(replacer, s.toString())
-                }
-                case v: SqlNullableClob => match (v.value) {
-                    case None => setParamWithoutQuotation(replacer, "NULL")
-                    case Some(s) => setParamWithoutQuotation(replacer, toArray(s).toHexStringWithPrefix())
-                }
-                case v: SqlNullableBlob => match (v.value) {
-                    case None => setParamWithoutQuotation(replacer, "NULL")
-                    case Some(s) => setParamWithoutQuotation(replacer, toArray(s).toHexStringWithPrefix())
-                }
-                case v: SqlNullableDate => match (v.value) {
-                    case None => setParamWithoutQuotation(replacer, "NULL")
-                    case Some(s) => setParamWithQuotation(replacer, s.toString(DB_DATE_FORMAT))
-                }
-                case v: SqlNullableTime => match (v.value) {
-                    case None => setParamWithoutQuotation(replacer, "NULL")
-                    case Some(s) => setParamWithQuotation(replacer, s.toString(DB_TIME_FORMAT))
-                }
-                case v: SqlNullableTimeTz => match (v.value) {
-                    case None => setParamWithoutQuotation(replacer, "NULL")
-                    case Some(s) => setParamWithQuotation(replacer, s.toString(DB_TIME_FORMAT))
-                }
-                case v: SqlNullableTimestamp => match (v.value) {
-                    case None => setParamWithoutQuotation(replacer, "NULL")
-                    case Some(s) => setParamWithQuotation(replacer, s.toString(DB_DATE_TIME_FORMAT))
-                }
-                case v: SqlNullableBinary => match (v.value) {
-                    case None => setParamWithoutQuotation(replacer, "NULL")
-                    case Some(s) => setParamWithoutQuotation(replacer, s.toHexStringWithPrefix())
-                }
-                case v: SqlNullableVarBinary => match (v.value) {
-                    case None => setParamWithoutQuotation(replacer, "NULL")
-                    case Some(s) => setParamWithoutQuotation(replacer, s.toHexStringWithPrefix())
-                }
-                case v: SqlNullableJson => match (v.value) {
-                    case None => setParamWithoutQuotation(replacer, "NULL")
-                    case Some(s) => setParamWithQuotation(replacer, s.toJsonString())
-                }
-                case _ => throw UnsupportedException("An unsupported input type")
+                        case None => setParamWithoutQuotation(replacer, "NULL")
+                        case Some(s) => setParamWithQuotation(replacer, s.toString())
+                    }
+                case v: SqlNullableChar => 
+                    match (v.value) {
+                        case None => setParamWithoutQuotation(replacer, "NULL")
+                        case Some(s) => setParamWithQuotation(replacer, s.toString())
+                    }
+                case v: SqlNullableVarchar => 
+                    match (v.value) {
+                        case None => setParamWithoutQuotation(replacer, "NULL")
+                        case Some(s) => setParamWithQuotation(replacer, s.toString())
+                    }
+                case v: SqlNullableClob => 
+                    match (v.value) {
+                        case None => setParamWithoutQuotation(replacer, "NULL")
+                        case Some(s) => setParamWithoutQuotation(replacer, toArray(s).toHexStringWithPrefix())
+                    }
+                case v: SqlNullableBlob => 
+                    match (v.value) {
+                        case None => setParamWithoutQuotation(replacer, "NULL")
+                        case Some(s) => setParamWithoutQuotation(replacer, toArray(s).toHexStringWithPrefix())
+                    }
+                case v: SqlNullableDate => 
+                    match (v.value) {
+                        case None => setParamWithoutQuotation(replacer, "NULL")
+                        case Some(s) => setParamWithQuotation(replacer, s.toString(DB_DATE_FORMAT))
+                    }
+                case v: SqlNullableTime => 
+                    match (v.value) {
+                        case None => setParamWithoutQuotation(replacer, "NULL")
+                        case Some(s) => setParamWithQuotation(replacer, s.toString(DB_TIME_FORMAT))
+                    }
+                case v: SqlNullableTimeTz => 
+                    match (v.value) {
+                        case None => setParamWithoutQuotation(replacer, "NULL")
+                        case Some(s) => setParamWithQuotation(replacer, s.toString(DB_TIME_FORMAT))
+                    }
+                case v: SqlNullableTimestamp => 
+                    match (v.value) {
+                        case None => setParamWithoutQuotation(replacer, "NULL")
+                        case Some(s) => setParamWithQuotation(replacer, s.toString(DB_DATE_TIME_FORMAT))
+                    }
+                case v: SqlNullableBinary => 
+                    match (v.value) {
+                        case None => setParamWithoutQuotation(replacer, "NULL")
+                        case Some(s) => setParamWithoutQuotation(replacer, s.toHexStringWithPrefix())
+                    }
+                case v: SqlNullableVarBinary => 
+                    match (v.value) {
+                        case None => setParamWithoutQuotation(replacer, "NULL")
+                        case Some(s) => setParamWithoutQuotation(replacer, s.toHexStringWithPrefix())
+                    }
+                case v: SqlNullableJson => 
+                    match (v.value) {
+                        case None => setParamWithoutQuotation(replacer, "NULL")
+                        case Some(s) => setParamWithQuotation(replacer, s.toJsonString())
+                    }
+                case _ => 
+                    throw UnsupportedException("An unsupported input type")
             }
         }
         return replacer.replace("?")

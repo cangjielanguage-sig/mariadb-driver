@@ -54,9 +54,11 @@ public class ConnectionImpl <: Connection {
         checkEmptySql(sql)
         let prepareMode = options.get(Params.PrepareMode).getOrDefault({=> "client"})
         if (prepareMode == "server") {
-            return ServerPrepareStatement(sql, this)
+            //return ServerPrepareStatement(sql, this)
+            ServerPrepareStatement(sql, this)
         } else if (prepareMode == "client") {
-            return ClientPrepareStatement(sql, this)
+            //return ClientPrepareStatement(sql, this)
+            ClientPrepareStatement(sql, this)
         } else {
             throw SqlException("Unknow prepare mode: ${prepareMode} option: server or client")
         }

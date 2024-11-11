@@ -36,7 +36,7 @@ public class QueryResultImpl <: QueryResult {
             let notNull = result.getFieldIsNotNull(i)
             let length = result.getFieldLength(i)
             let decimal = result.getFieldDecimal(i)
-            let info = ColumnInfoImpl(name, toSqlType(fieldType, notNull), Int64(length), Int64(length), Int64(decimal), !notNull)
+            let info = ColumnInfoImpl(name, toSqlType(fieldType, notNull, Int64(length)), Int64(length), Int64(length), Int64(decimal), !notNull)
             arrayList.append(info)
         }
         this.infos = arrayList.toArray()

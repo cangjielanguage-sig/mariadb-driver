@@ -55,9 +55,10 @@ public class ColumnInfoImpl <: ColumnInfo {
     }
 }
 
-protected func toSqlType(filedType: ColumnType, isNotNull: Bool): String {
+protected func toSqlType(filedType: ColumnType, isNotNull: Bool, dispalySize: Int): String {
     if (isNotNull) {
         match (filedType) {
+            case Tiny where dispalySize == 1 =>  "SqlBool"
             case Tiny => "SqlByte"
             case Short => "SqlSmallInt"
             case Int24 => "SqlInteger"
@@ -83,6 +84,7 @@ protected func toSqlType(filedType: ColumnType, isNotNull: Bool): String {
         }
     } else {
         match (filedType) {
+            case Tiny where dispalySize == 1 =>  "SqlNullableBool"
             case Tiny => "SqlNullableByte"
             case Short => "SqlNullableSmallInt"
             case Int24 => "SqlNullableInteger"

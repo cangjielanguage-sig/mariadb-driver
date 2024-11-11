@@ -196,7 +196,7 @@ protected class MySqlConnection <: Resource {
 
     private func handleLongData(statementId: UInt32, params: Array<Any>){
         for(i in 0..params.size){
-            var param = params[i]
+            let param = params[i]
             match (param) {
                 case v:InputStream => writeRequest(SendLongDataCommand(statementId, UInt16(i), (toArray(v))))
                 case v:Array<Byte> => writeRequest(SendLongDataCommand(statementId, UInt16(i), v))
@@ -244,7 +244,7 @@ protected class MySqlConnection <: Resource {
         let fields = ArrayList<ColumnDefinition>()
         for (_ in 0..filedsCount.count) {
             let (length, payload) = read()
-            var field = ColumnDefinition(length, ByteBuffer(payload))
+            let field = ColumnDefinition(length, ByteBuffer(payload))
             fields.append(field)
         }
         //丢弃Eof包
@@ -306,7 +306,7 @@ protected class MySqlConnection <: Resource {
      */
     internal func readResponse(): Response {
         let (length, payload) = read()
-        var code = ResponseCode.get(payload[1])
+        let code = ResponseCode.get(payload[1])
         match (code) {
             case ResponseCode.Ok =>
                 return OkResponse(length, ByteBuffer(payload))
@@ -318,7 +318,7 @@ protected class MySqlConnection <: Resource {
     }
 
     private func getEofResponse(length: UInt32, payload: Array<Byte>): AbstractEOF {
-        var stream = ByteBuffer(payload)
+        let stream = ByteBuffer(payload)
         if (payload.size > 9) {
             return AuthSwitch(length, stream)
         } else {
@@ -327,8 +327,8 @@ protected class MySqlConnection <: Resource {
     }
 
     private func getAuthMoreData(length: UInt32, payload: Array<Byte>): AuthMoreData {
-        var authCode = payload[2]
-        var stream = ByteBuffer(payload)
+        let authCode = payload[2]
+        let stream = ByteBuffer(payload)
         if (payload.size == 3 && (authCode == AuthState.FastAuthSuccess.value() || authCode == AuthState.PerformFullAuthentication.value())) {
             return AuthStatus(length, stream)
         } else {
@@ -348,7 +348,7 @@ protected class MySqlConnection <: Resource {
     private func readCommandResponse(): Unit {
         var response = readResponse()
         if (response is ErrorResponse) {
-            var error = response as ErrorResponse
+            let error = response as ErrorResponse
             throw ResponseErrorException(error.getOrThrow().message)
         }
     }
@@ -363,16 +363,15 @@ protected class MySqlConnection <: Resource {
         let fields = ArrayList<ColumnDefinition>()
         for (_ in 0..columnCount.count) {
             let (length, payload) = channel.read()
-            var field = ColumnDefinition(length, ByteBuffer(payload))
+            let field = ColumnDefinition(length, ByteBuffer(payload))
             fields.append(field)
         }
         //丢弃Eof包
         read()
         (length, payload) = read()
-        var rowPackets = ArrayList<TextResult>()
+        let rowPackets = ArrayList<TextResult>()
         while (payload[1] != ResponseCode.Eof.value() || payload.size > 6) {
-            var row: TextResult
-            row = TextResult(length, ByteBuffer(payload), Int64(columnCount.count))
+            let row = TextResult(length, ByteBuffer(payload), Int64(columnCount.count))
             rowPackets.append(row)
             (length, payload) = channel.read()
         }
@@ -385,7 +384,7 @@ protected class MySqlConnection <: Resource {
     private func readUpdateResponse(): ChangeResult {
         let(length, payload) = read()
         checkError(length, payload)
-        var ok = OkResponse(length, ByteBuffer(payload))
+        let ok = OkResponse(length, ByteBuffer(payload))
         return ChangeResult(ok.effectRows, ok.index)
     }
 

@@ -225,7 +225,7 @@ public class ServerPrepareStatement <: Statement {
         let infos = ArrayList<ColumnInfo>(size)
         for(i in defines) {
             let nullable = i.hasFlag(NotNull)
-            let info = ColumnInfoImpl(i.name, toSqlType(i.columnType, nullable), Int64(i.columnLength), Int64(i.columnLength), Int64(i.decimals), nullable)
+            let info = ColumnInfoImpl(i.name, toSqlType(i.columnType, nullable, Int64(i.columnLength)), Int64(i.columnLength), Int64(i.columnLength), Int64(i.decimals), nullable)
             infos.append(info)
         }
         return infos.toArray()
