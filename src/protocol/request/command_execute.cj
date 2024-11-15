@@ -116,23 +116,23 @@ protected class ExecuteCommand <: Command {
                 for (i in 0..params.size) {
                     let value = params[i]
                     match (value) {
-                        case v: Bool => appendBool(i, buf, v)
-                        case v: Int8 => appendInt8(i, buf, v)
-                        case v: UInt8 => appendUInt8(i, buf, v)
-                        case v: Int16 => appendInt16(i, buf, v)
-                        case v: UInt16 => appendUInt16(i, buf, v)
-                        case v: Int32 => appendInt32(i, buf, v)
-                        case v: UInt32 => appendUInt32(i, buf, v)
-                        case v: Int64 => appendInt64(i, buf, v)
-                        case v: UInt64 => appendUInt64(i, buf, v)
-                        case v: Float16 => appendFloat16(i, buf, v)
-                        case v: Float32 => appendFloat32(i, buf, v)
-                        case v: Float64 => appendFloat64(i, buf, v)
-                        case v: BigInt => appendBigInt(i, buf, v)
-                        case v: Decimal => appendDecimal(i, buf, v)
-                        case v: String => appendString(i, buf, v)
-                        case v: DateTime => appendDateTime(i, buf, v)
-                        case v: JsonValue => appendJsonValue(i, buf, v)
+                        case v: Bool => appendBool(i, v)
+                        case v: Int8 => appendInt8(i, v)
+                        case v: UInt8 => appendUInt8(i, v)
+                        case v: Int16 => appendInt16(i, v)
+                        case v: UInt16 => appendUInt16(i, v)
+                        case v: Int32 => appendInt32(i, v)
+                        case v: UInt32 => appendUInt32(i, v)
+                        case v: Int64 => appendInt64(i, v)
+                        case v: UInt64 => appendUInt64(i, v)
+                        case v: Float16 => appendFloat16(i, v)
+                        case v: Float32 => appendFloat32(i, v)
+                        case v: Float64 => appendFloat64(i, v)
+                        case v: BigInt => appendBigInt(i, v)
+                        case v: Decimal => appendDecimal(i, v)
+                        case v: String => appendString(i, v)
+                        case v: DateTime => appendDateTime(i, v)
+                        case v: JsonValue => appendJsonValue(i, v)
                         case v: Array<Byte> => nothing(v)
                         case v: InputStream => nothing(v)
                         case v: ?Any => nothing(v) // means null
@@ -143,199 +143,199 @@ protected class ExecuteCommand <: Command {
         }
     }
 
-    private func appendBool(index: Int64, buf: ArrayList<Byte>, value: Bool): Unit {
-        return appendUInt8(index, buf, value.toInteger())
+    private func appendBool(index: Int64, value: Bool): Unit {
+        appendUInt8(index, value.toInteger())
     }
 
     @OverflowWrapping
-    private func appendInt8(index: Int64, buf: ArrayList<Byte>, value: Int8): Unit {
+    private func appendInt8(index: Int64, value: Int8): Unit {
         let paramType = paramDefinitions[index].columnType
         match (paramType) {
             case Tiny => 
-                return appendUInt8(index, buf, UInt8(value))
+                appendUInt8(index, UInt8(value))
             case Short => 
-                return appendUInt16(index, buf, UInt16(value))
+                appendUInt16(index, UInt16(value))
             case Int24 | Long | Year => 
-                return appendUInt32(index, buf, UInt32(value))
+                appendUInt32(index, UInt32(value))
             case LongLong => 
-                return appendUInt64(index, buf, UInt64(value))
+                appendUInt64(index, UInt64(value))
             case Float => 
-                return appendFloat32(index, buf, Float32(value))
+                appendFloat32(index, Float32(value))
             case Double => 
-                return appendFloat64(index, buf, Float64(value))
-            case String | VarString | NewDecimal => 
-                return appendString(index, buf, value.toString())
+                appendFloat64(index, Float64(value))
+            case String | VarString | NewDecimal | Blob => 
+                appendString(index, value.toString())
             case _ => 
                 throw IllegalArgumentException("The parameter as position ${index + 1} is Int8 type, don't match the required type ${paramType}")
             }
     }
 
-    private func appendUInt8(index: Int64, buf: ArrayList<Byte>, value: UInt8): Unit {
+    private func appendUInt8(index: Int64, value: UInt8): Unit {
         let paramType = paramDefinitions[index].columnType
         match (paramType) {
             case Tiny => 
                 buf.append(value)
             case Short => 
-                return appendUInt16(index, buf, UInt16(value))
+                appendUInt16(index, UInt16(value))
             case Long | Int24 | Year => 
-                return appendUInt32(index, buf, UInt32(value))
+                appendUInt32(index, UInt32(value))
             case LongLong => 
-                return appendUInt64(index, buf, UInt64(value))
+                appendUInt64(index, UInt64(value))
             case Float => 
-                return appendFloat32(index, buf, Float32(value))
+                appendFloat32(index, Float32(value))
             case Double => 
-                return appendFloat64(index, buf, Float64(value))
-            case String | VarString | NewDecimal => 
-                return appendString(index, buf, value.toString())
+                appendFloat64(index, Float64(value))
+            case String | VarString | NewDecimal | Blob => 
+                appendString(index, value.toString())
             case _ => 
                 throw IllegalArgumentException("The parameter as position ${index + 1} is Int8 type, don't match the required type ${paramType}")
             }
     }
 
     @OverflowWrapping
-    private func appendInt16(index: Int64, buf: ArrayList<Byte>, value: Int16): Unit {
+    private func appendInt16(index: Int64, value: Int16): Unit {
         let paramType = paramDefinitions[index].columnType
         match (paramType) {
             case Tiny => 
-                return appendUInt8(index, buf, UInt8(value))
+                appendUInt8(index, UInt8(value))
             case Short => 
-                return appendUInt16(index, buf, UInt16(value))
+                appendUInt16(index, UInt16(value))
             case Int24 | Long | Year => 
-                return appendUInt32(index, buf, UInt32(value))
+                appendUInt32(index, UInt32(value))
             case LongLong => 
-                return appendUInt64(index, buf, UInt64(value))
+                appendUInt64(index, UInt64(value))
             case Float => 
-                return appendFloat32(index, buf, Float32(value))
+                appendFloat32(index, Float32(value))
             case Double => 
-                return appendFloat64(index, buf, Float64(value))
-            case String | VarString | NewDecimal => 
-                return appendString(index, buf, value.toString())
+                appendFloat64(index, Float64(value))
+            case String | VarString | NewDecimal | Blob => 
+                appendString(index, value.toString())
             case _ => 
                 throw IllegalArgumentException("The parameter as position ${index + 1} is Int8 type, don't match the required type ${paramType}")
             }
     }
 
-    private func appendUInt16(index: Int64, buf: ArrayList<Byte>, value: UInt16): Unit {
+    private func appendUInt16(index: Int64, value: UInt16): Unit {
         let paramType = paramDefinitions[index].columnType
         match (paramType) {
             case Tiny => 
-                return appendUInt8(index, buf, UInt8(value)) // possible overflow
+                appendUInt8(index, UInt8(value)) // possible overflow
             case Short => 
                 buf.appendAll(value.toLittleEndian())
             case Long | Int24 | Year => 
-                return appendUInt32(index, buf, UInt32(value))
+                appendUInt32(index, UInt32(value))
             case LongLong => 
-                return appendUInt64(index, buf, UInt64(value))
+                appendUInt64(index, UInt64(value))
             case Float => 
-                return appendFloat32(index, buf, Float32(value))
+                appendFloat32(index, Float32(value))
             case Double => 
-                return appendFloat64(index, buf, Float64(value))
-            case String | VarString | NewDecimal => 
-                return appendString(index, buf, value.toString())
+                appendFloat64(index, Float64(value))
+            case String | VarString | NewDecimal | Blob => 
+                appendString(index, value.toString())
             case _ => 
                 throw IllegalArgumentException("The parameter type at position ${index + 1} does not match the required type: ${paramType}")
             }
     }
 
     @OverflowWrapping
-    private func appendInt32(index: Int64, buf: ArrayList<Byte>, value: Int32): Unit {
+    private func appendInt32(index: Int64, value: Int32): Unit {
         let paramType = paramDefinitions[index].columnType
         match (paramType) {
             case Tiny => 
-                return appendUInt8(index, buf, UInt8(value))
+                appendUInt8(index, UInt8(value))
             case Short => 
-                return appendUInt16(index, buf, UInt16(value))
+                appendUInt16(index, UInt16(value))
             case Int24 | Long | Year => 
-                return appendUInt32(index, buf, UInt32(value))
+                appendUInt32(index, UInt32(value))
             case LongLong => 
-                return appendUInt64(index, buf, UInt64(value))
+                appendUInt64(index, UInt64(value))
             case Float => 
-                return appendFloat32(index, buf, Float32(value))
+                appendFloat32(index, Float32(value))
             case Double => 
-                return appendFloat64(index, buf, Float64(value))
-            case String | VarString | NewDecimal => 
-                return appendString(index, buf, value.toString())
+                appendFloat64(index, Float64(value))
+            case String | VarString | NewDecimal | Blob => 
+                appendString(index, value.toString())
             case _ => 
                 throw IllegalArgumentException("The parameter type at position ${index + 1} does not match the required type: ${paramType}")      
             }
     }
 
-    private func appendUInt32(index: Int64, buf: ArrayList<Byte>, value: UInt32): Unit {
+    private func appendUInt32(index: Int64, value: UInt32): Unit {
         let paramType = paramDefinitions[index].columnType
         match (paramType) {
             case Tiny => 
-                return appendUInt8(index, buf, UInt8(value)) // possible overflow
+                appendUInt8(index, UInt8(value)) // possible overflow
             case Short =>
-                return appendUInt16(index, buf, UInt16(value)) // possible overflow
+                appendUInt16(index, UInt16(value)) // possible overflow
             case Int24 | Long | Year => 
                 buf.appendAll(value.toLittleEndian())
             case LongLong => 
-                return appendUInt64(index, buf, UInt64(value))
+                appendUInt64(index, UInt64(value))
             case Float => 
-                return appendFloat32(index, buf, Float32(value))
+                appendFloat32(index, Float32(value))
             case Double => 
-                return appendFloat64(index, buf, Float64(value))
-            case String | VarString | NewDecimal => 
-                return appendString(index, buf, value.toString())
+                appendFloat64(index, Float64(value))
+            case String | VarString | NewDecimal | Blob => 
+                appendString(index, value.toString())
             case _ => 
                 throw IllegalArgumentException("The parameter type at position ${index + 1} does not match the required type: ${paramType}")
             }
     }
 
     @OverflowWrapping
-    private func appendInt64(index: Int64, buf: ArrayList<Byte>, value: Int64): Unit {
+    private func appendInt64(index: Int64, value: Int64): Unit {
         let paramType = paramDefinitions[index].columnType
         match (paramType) {
             case Tiny => 
-                return appendUInt8(index, buf, UInt8(value))
+                appendUInt8(index, UInt8(value))
             case Short => 
-                return appendUInt16(index, buf, UInt16(value))
+                appendUInt16(index, UInt16(value))
             case Int24 | Long | Year => 
-                return appendUInt32(index, buf, UInt32(value))
+                appendUInt32(index, UInt32(value))
             case LongLong => 
-                return appendUInt64(index, buf, UInt64(value))
+                appendUInt64(index, UInt64(value))
             case Float => 
-                return appendFloat32(index, buf, Float32(value))
+                appendFloat32(index, Float32(value))
             case Double => 
-                return appendFloat64(index, buf, Float64(value))
-            case String | VarString | NewDecimal => 
-                return appendString(index, buf, value.toString())
+                appendFloat64(index, Float64(value))
+            case String | VarString | NewDecimal | Blob => 
+                appendString(index, value.toString())
             case _ => 
                 throw IllegalArgumentException("The parameter type at position ${index + 1} does not match the required type: ${paramType}")
             }
     }
 
-    private func appendUInt64(index: Int64, buf: ArrayList<Byte>, value: UInt64): Unit {
+    private func appendUInt64(index: Int64, value: UInt64): Unit {
         let paramType = paramDefinitions[index].columnType
         match (paramType) {
             case Tiny => 
-                return appendUInt8(index, buf, UInt8(value)) // possible overflow
+                appendUInt8(index, UInt8(value)) // possible overflow
             case Short => 
-                return appendUInt16(index, buf, UInt16(value)) // possible overflow
+                appendUInt16(index, UInt16(value)) // possible overflow
             case Int24 | Long | Year => 
-                return appendUInt32(index, buf, UInt32(value)) // possible overflow
+                appendUInt32(index, UInt32(value)) // possible overflow
             case LongLong => 
                 buf.appendAll(value.toLittleEndian())
             case Float => 
-                return appendFloat32(index, buf, Float32(value))
+                appendFloat32(index, Float32(value))
             case Double => 
-                return appendFloat64(index, buf, Float64(value))
-            case String | VarString | NewDecimal => 
-                return appendString(index, buf, value.toString())
+                appendFloat64(index, Float64(value))
+            case String | VarString | NewDecimal | Blob => 
+                appendString(index, value.toString())
             case _ => 
                 throw IllegalArgumentException("The parameter type at position ${index + 1} does not match the required type: ${paramType}")
             }
     }
 
-    private func appendFloat16(index: Int64, buf: ArrayList<Byte>, value: Float16): Unit {
-        return appendFloat64(index, buf, Float64(value))
+    private func appendFloat16(index: Int64, value: Float16): Unit {
+        appendFloat64(index, Float64(value))
     }
 
-    private func appendFloat32(index: Int64, buf: ArrayList<Byte>, value: Float32): Unit {
-        return appendFloat64(index, buf, Float64(value))
+    private func appendFloat32(index: Int64, value: Float32): Unit {
+        appendFloat64(index, Float64(value))
     }
 
-    private func appendFloat64(index: Int64, buf: ArrayList<Byte>, value: Float64): Unit {
+    private func appendFloat64(index: Int64, value: Float64): Unit {
         let paramType = paramDefinitions[index].columnType
         match (paramType) {
             case Float =>
@@ -343,60 +343,60 @@ protected class ExecuteCommand <: Command {
             case Double => 
                 buf.appendAll(value.toLittleEndian())
             case Tiny => 
-                return appendInt8(index, buf, Int8(value))
+                appendInt8(index, Int8(value))
             case Short =>
-                return appendInt16(index, buf, Int16(value))
+                appendInt16(index, Int16(value))
             case Int24 | Long  => 
-                return appendInt32(index, buf, Int32(value))
+                appendInt32(index, Int32(value))
             case LongLong => 
-                return appendInt64(index, buf, Int64(value))
-            case String | VarString | NewDecimal  => 
-                return appendString(index, buf, value.toString())
+                appendInt64(index, Int64(value))
+            case String | VarString | NewDecimal | Blob => 
+                appendString(index, value.toString())
             case _ => 
                 throw IllegalArgumentException("The parameter type at position ${index + 1} does not match the required type: ${paramType}")
         }
     }
 
-    private func appendBigInt(index: Int64, buf: ArrayList<Byte>, value: BigInt): Unit {
-        return appendString(index, buf, value.toString())
+    private func appendBigInt(index: Int64, value: BigInt): Unit {
+        appendString(index, value.toString())
     }
 
-    private func appendDecimal(index: Int64, buf: ArrayList<Byte>, value: Decimal): Unit {
-        return appendString(index, buf, value.toString())
+    private func appendDecimal(index: Int64, value: Decimal): Unit {
+        appendString(index, value.toString())
     }
 
-    private func appendString(index: Int64, buf: ArrayList<Byte>, value: String): Unit {
+    private func appendString(index: Int64, value: String): Unit {
         let paramType = paramDefinitions[index].columnType
         match (paramType) {
             case String | VarString | NewDecimal | Json | TinyBlob | Blob | MediumBlob | LongBlob =>
                 buf.appendAll(value.toLengthEncoded())
             case Tiny | Short | Year | Int24 | Long | LongLong => 
                 try {
-                    return appendInt64(index, buf, Int64.parse(value))
+                    appendInt64(index, Int64.parse(value))
                 }catch (e: IllegalArgumentException) {
                     throw ParameterConvertException("parameter convert to integer failed: index : ${index + 1}, raw value: ${value}")
                 }
             case Float | Double => 
                 try {
-                    return appendFloat64(index, buf, Float64.parse(value))
+                    appendFloat64(index, Float64.parse(value))
                 }catch (e: IllegalArgumentException) {
                     throw ParameterConvertException("parameter convert to float/double failed: index : ${index + 1}, raw value: ${value}")
                 }
             case Date => 
                 try {
-                    return appendDateTime(index, buf, DateTime.parse(value, DB_DATE_FORMAT))
+                    appendDateTime(index, DateTime.parse(value, DB_DATE_FORMAT))
                 }catch(e: TimeParseException) {
                     throw ParameterConvertException("parameter convert to date failed: index : ${index + 1}, raw value: ${value}")
                 }
             case Time =>
                 try {
-                    return appendDateTime(index, buf, DateTime.parse(DB_TIME_PREFIX + value, DB_DATE_TIME_FORMAT))
+                    appendDateTime(index, DateTime.parse(DB_TIME_PREFIX + value, DB_DATE_TIME_FORMAT))
                 }catch (e: TimeParseException) {
                     throw ParameterConvertException("parameter convert to time failed: index : ${index + 1}, raw value: ${value}")
                 }
             case DateTime | Timestamp =>
                 try {
-                    return appendDateTime(index, buf, DateTime.parse(value, DB_DATE_TIME_FORMAT))
+                    appendDateTime(index, DateTime.parse(value, DB_DATE_TIME_FORMAT))
                 }catch (e: TimeParseException) {
                     throw ParameterConvertException("parameter convert to datetime/timestamp failed: index : ${index + 1}, raw value: ${value}")
                 }
@@ -405,22 +405,24 @@ protected class ExecuteCommand <: Command {
             }
     }
 
-    private func appendDateTime(index: Int64, buf: ArrayList<Byte>, value: DateTime): Unit {
+    private func appendDateTime(index: Int64, value: DateTime): Unit {
         let paramType = paramDefinitions[index].columnType
         match (paramType) {
-            case Timestamp | DateTime => 
-                buf.appendAll(value.toBinaryDateTime())
+            case Year =>
+                appendInt32(index, Int32(value.year))
             case Date => 
                 buf.appendAll(value.toBinaryDate())
             case Time =>
                 buf.appendAll(value.toBinaryTime())
-            case Year =>
-                appendInt32(index, buf, Int32(value.year))
+            case Timestamp | DateTime => 
+                buf.appendAll(value.toBinaryDateTime())
+            case String | VarString | Blob => 
+                appendString(index, value.toString(DB_DATE_TIME_FORMAT))
             case _ => throw IllegalArgumentException("The parameter type at position ${index + 1} does not match the required type: ${paramType}")
         }
     }
 
-    private func appendJsonValue(index: Int64, buf: ArrayList<Byte>, value: JsonValue): Unit {
-        return appendString(index, buf, value.toJsonString())
+    private func appendJsonValue(index: Int64, value: JsonValue): Unit {
+        appendString(index, value.toJsonString())
     }
 }
