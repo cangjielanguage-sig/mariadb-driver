@@ -12,7 +12,7 @@ protected class MySqlTransaction {
 
     private static const QUERY_AUTO_COMMIT = "SELECT @@autocommit"
 
-    private static const QUERY_ISO_LEVEL_SQL: String = "SELECT @@transaction_isolation"
+    private static const QUERY_ISO_LEVEL_SQL = "SELECT @@transaction_isolation"
 
     private static const QUERY_ACCESS_MODE_SQL = "SELECT @@transaction_read_only"
 
@@ -39,6 +39,16 @@ protected class MySqlTransaction {
     private static const CHANGE_TO_READ_WRITE_SQL = "SET SESSION transaction_read_only = OFF"
 
     private static const CHANGE_TO_READ_ONLY_SQL = "SET SESSION transaction_read_only = ON"
+
+    private static const XA_START = "XA START"
+
+    private static const XA_END = "XA END"
+
+    private static const XA_PREPARE = "XA PREPARE"
+
+    private static const XA_COMMIT = "XA COMMIT"
+
+    private static const XA_ROLLBACK = "XA ROLLBACK"
 
     protected let connection: MySqlConnection
 
@@ -131,4 +141,23 @@ protected class MySqlTransaction {
         }
     }
 
+    public func xaStart(gtid: String): Unit {
+        connection.sendCommand("${XA_START} ${gtid}")
+    }
+
+    public func xaEnd(gtid: String): Unit {
+        connection.sendCommand("${XA_END} ${gtid}")
+    }
+
+    public func xaPrepare(gtid: String): Unit {
+        connection.sendCommand("${XA_PREPARE} ${gtid}")
+    }
+
+    public func xaCommit(gtid: String): Unit {
+        connection.sendCommand("${XA_COMMIT} ${gtid}")
+    }
+
+    public func xaRollback(gtid: String): Unit {
+        connection.sendCommand("${XA_ROLLBACK} ${gtid}")
+    }
 }

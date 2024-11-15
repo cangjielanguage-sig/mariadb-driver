@@ -200,8 +200,6 @@ protected class MySqlConnection <: Resource {
             match (param) {
                 case v:InputStream => writeRequest(SendLongDataCommand(statementId, UInt16(i), (toArray(v))))
                 case v:Array<Byte> => writeRequest(SendLongDataCommand(statementId, UInt16(i), v))
-                case v:?InputStream => if(!v.isNone()){writeRequest(SendLongDataCommand(statementId, UInt16(i), toArray(v.getOrThrow())))}
-                case v:?Array<Byte> => if(!v.isNone()){writeRequest(SendLongDataCommand(statementId, UInt16(i), v.getOrThrow()))}
                 case _ => nothing(0)
             }
         }

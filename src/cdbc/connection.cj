@@ -57,7 +57,7 @@ public class ConnectionImpl <: Connection{
     override public func prepareStatement(sql: String): Statement{
         checkResourceAvailability()
         checkEmptySql(sql)
-        let prepareMode = options.get(Params.PrepareMode).getOrDefault({=> "client"})
+        let prepareMode = options.get(Params.PrepareMode) ?? "client"
         if (prepareMode == "server") {
             //return ServerPrepareStatement(sql, this)
             ServerPrepareStatement(sql, this)

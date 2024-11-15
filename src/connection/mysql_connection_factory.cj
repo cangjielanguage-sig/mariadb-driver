@@ -37,21 +37,22 @@ public class MySqlConnectionFactory {
         // 1. 建立TCP连接,设置参数
         let socket = connectToServer(option)
 
-        // 2. 准备认证报文
+        // 2. 读取握手报文
         let connection = MySqlConnection(socket)
         let handshake = connection.readHandhake()
-        let sslModel = option.get(Params.SSLMode).getOrDefault({=> "preferred"})
+
+        let sslMode = option.get(Params.SSLMode) ?? "preferred"
         let sslable = handshake.hasCapability(Capability.SSL)
-        if (!sslable && sslModel != "disabled" && sslModel != "preferred") {
+        if (!sslable && sslMode != "disabled" && sslMode != "preferred") {
             throw ConnectFailedException("Can't Switch to SSL after handshake")
         }
 
         // 3. 建立安全连接
-        let sslEnabled = sslable && sslModel != "disabled"
+        let sslEnabled = sslable && sslMode != "disabled"
         let authReq = prepareAuthRequest(handshake, option, sslEnabled)
         if (sslEnabled) {
             connection.write(authReq.setCapability(SSL).sslRequest())
-            sslHandshake(connection, option)
+            sslHandshake(connection, sslMode, option)
             authReq.clear()
             authReq.setNumber(authReq.number + 1)
         }
@@ -96,11 +97,11 @@ public class MySqlConnectionFactory {
     }
 
     private static func connectToServer(option: Map<String, String>): TcpSocket {
-        let host = option.get(Params.Host).getOrThrow({=> IllegalArgumentException("Required connection parameters: host")})
-        let port = option.get(Params.Port).getOrThrow({=> IllegalArgumentException("Required connection parameters: port")})
-        let connectionTimeout = option.get(Params.ConnectionTimeout)
+        let host = option.get(Params.Host).getOrThrow(){=> IllegalArgumentException("Required connection parameters: host")}
+        let port = option.get(Params.Port).getOrThrow(){=> IllegalArgumentException("Required connection parameters: port")}
         let socket = TcpSocket(host, UInt16.parse(port))
-        match (connectionTimeout) {
+        let timeout = option.get(Params.ConnectionTimeout)
+        match (timeout) {
             case None => 
                 try {
                     socket.connect()
@@ -127,7 +128,7 @@ public class MySqlConnectionFactory {
         let originPassword = option.get(Params.Password).getOrThrow() {
             => IllegalArgumentException("Required connection parameters: password")
         }
-        let database = option.get(Params.Database).getOrDefault({=> ""})
+        let database = option.get(Params.Database) ?? ""
         let authReq = HandshakeResponse.getDefault(handshake.number + 1)
         let encryptedPassword: Array<Byte>
         match (handshake.authPlugin) {
@@ -152,23 +153,22 @@ public class MySqlConnectionFactory {
         return authReq
     }
 
-    private static func sslHandshake(connection: MySqlConnection, option: Map<String, String>) {
+    private static func sslHandshake(connection: MySqlConnection, sslMode: String, option: Map<String, String>) {
         var config = TlsClientConfig()
-        let sslMode = option.get(Params.SSLMode).getOrDefault({=> "preferred"})
         if (sslMode == "preferred" || sslMode == "required") {
             config.verifyMode = CertificateVerifyMode.TrustAll
         } else if (sslMode == "verify_ca") {
-            let sslCA = option.get(Params.SSLCA)
-            if (sslCA.isNone()) {
-                throw ConnectFailedException("ssl.mode=verify_ca must set ssl.ca")
+            match (option.get(Params.SSLCA)) {
+                case None => throw ConnectFailedException("ssl.mode=verify_ca must set ssl.ca")
+                case Some(v) => 
+                    let certificates = X509Certificate.decodeFromPem(String.fromUtf8(File.readFrom(v)))
+                    config.verifyMode = CertificateVerifyMode.CustomCA(certificates)
             }
-            let certificates = X509Certificate.decodeFromPem(String.fromUtf8(File.readFrom(sslCA.getOrThrow())))
-            config.verifyMode = CertificateVerifyMode.CustomCA(certificates)
         }
         config.clientCertificate = getClientCertificate(option)
         config.domain = option.get(Params.SSLSni)
-        config.cipherSuitesV1_2 = option.get(Params.Tls12Ciphersuites).getOrDefault({=> ""}).split(":",removeEmpty: true)
-        config.cipherSuitesV1_3 = option.get(Params.Tls13Ciphersuites).getOrDefault({=> ""}).split(":",removeEmpty: true)
+        config.cipherSuitesV1_2 = (option.get(Params.Tls12Ciphersuites) ?? "").split(":", removeEmpty: true)
+        config.cipherSuitesV1_3 = (option.get(Params.Tls13Ciphersuites) ?? "").split(":", removeEmpty: true)
         //(config.minVersion, config.maxVersion) = getMinAndMaxTlsVersion(option.get(Params.TlsVersion))
         let lastSession: ?TlsSession = None
         try {
@@ -217,7 +217,7 @@ public class MySqlConnectionFactory {
     private static func requestPublicKey(connection: MySqlConnection, requestKeyCode: Byte, lastPacketNumber: UInt8): (String, UInt8) {
         let requestkey = RequestPublicKey(lastPacketNumber + 1, requestKeyCode)
         connection.writeRequest(requestkey)
-        let response = connection.readResponse();
+        let response = connection.readResponse()
         if (response is ErrorResponse) {
             let error = (response as ErrorResponse).getOrThrow()
             throw ConnectFailedException(error.message)

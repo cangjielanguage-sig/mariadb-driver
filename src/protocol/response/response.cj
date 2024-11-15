@@ -13,7 +13,7 @@ import mysqlclient4cj.protocol.*
 */
 protected open class Response <: CommonResponse {
 
-    protected var code: ResponseCode
+    protected let code: ResponseCode
 
     protected init(length: UInt32, buffer: ByteBuffer){
         super(length, buffer)
@@ -28,17 +28,17 @@ protected open class Response <: CommonResponse {
 */
 protected class OkResponse <: Response {
 
-    protected var effectRows: UInt64
+    protected let effectRows: UInt64
 
-    protected var index: UInt64
+    protected let index: UInt64
 
-    protected var serverStatus: UInt16
+    protected let serverStatus: UInt16
 
-    protected var waringCount: UInt16
+    protected let waringCount: UInt16
 
-    //protected var message: String
+    //protected let message: String
 
-    //protected var sessionInfo: String
+    //protected let sessionInfo: String
 
     protected init(length: UInt32, buffer: ByteBuffer) {
         super(length, buffer)
@@ -76,13 +76,13 @@ protected class OkResponse <: Response {
 */
 protected class ErrorResponse <: Response{
 
-    protected var errorCode: UInt16
+    protected let errorCode: UInt16
 
-    protected var serverStatusFlag: Byte
+    protected let serverStatusFlag: Byte
 
-    protected var sqlStatus: Array<Byte>
+    protected let sqlStatus: Array<Byte>
 
-    protected var message: String
+    protected let message: String
 
     protected init(length: UInt32,buffer: ByteBuffer){
         super(length, buffer)
@@ -114,9 +114,9 @@ protected open class AbstractEOF <: Response{
 */
 protected class AuthSwitch <: AbstractEOF{
 
-    protected var pluginName: String
+    protected let pluginName: String
 
-    protected var salt: Array<Byte>
+    protected let salt: Array<Byte>
 
     protected init(length: UInt32, buffer: ByteBuffer){
         super(length, buffer)
@@ -133,9 +133,9 @@ protected class AuthSwitch <: AbstractEOF{
 */
 protected class EofResponse <: AbstractEOF{
 
-    protected var waringCount: UInt16
+    protected let waringCount: UInt16
 
-    protected var status: UInt16
+    protected let status: UInt16
 
     protected init(length: UInt32, buffer: ByteBuffer){
         super(length, buffer)
@@ -153,15 +153,15 @@ protected class EofResponse <: AbstractEOF{
 */
 protected class PrepareResposne <: Response{
 
-    protected var statementId: UInt32
+    protected let statementId: UInt32
 
-    protected var numColumns: UInt16
+    protected let numColumns: UInt16
 
-    protected var numParams: UInt16
+    protected let numParams: UInt16
 
-    protected var reserved: UInt8
+    protected let reserved: UInt8
 
-    protected var warningCount: UInt16
+    protected let warningCount: UInt16
 
     protected init(length: UInt32, buffer: ByteBuffer){
         super(length, buffer)

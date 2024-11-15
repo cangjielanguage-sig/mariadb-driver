@@ -131,7 +131,7 @@ public class MySqlTest{
         stream.write([145,67,34,12,45,32,76,90,62,145,24,56,234,34,235,56,67,145,67,34,12,45,32,76,90,62,145,24,56,234,34,235,56,67,145,67,34,12,45,32,76,90,62,145,24,56,234,34,235,56,67,145,67,34,12,45,32,76,90,62,145,24,56,234,34,235,56,67])
         prepare.setInputStream(27, stream)
         //longblob
-        var file = File("C:\\Users\\30247\\Desktop\\mysqlclient4cj\\doc\\1.jpg",  OpenOption.Open(true, true))
+        var file = File("C:\\Users\\30247\\Desktop\\mysqlclient4cj\\doc\\1.jpg",  OpenMode.Read)
         var array = readToEnd(file)
         var image = ByteBuffer()
         image.write(array)
