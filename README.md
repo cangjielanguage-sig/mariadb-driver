@@ -258,7 +258,7 @@ main(): Unit {
 
 ### 3.4目前已知的一些问题
 
-- 使用该驱动操作TIDB以及OceanBase暂不支持使用服务端预编译(prepare.mode=server)
+- 使用该驱动操作OceanBase暂不支持使用服务端预编译(prepare.mode=server)
 
 ## <img alt="" src="./doc/readme-image/readme-icon-contribute.png" style="display: inline-block;" width=3%/> 4 参与贡献
 
