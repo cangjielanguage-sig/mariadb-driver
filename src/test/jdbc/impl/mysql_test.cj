@@ -22,7 +22,7 @@ public class MySqlTest{
     static init() {
         var driver = MySqlDriver.instance
         var property1 = ("username","root")
-        var property2= ("password","MySql123!")
+        var property2= ("password","123456")
         var property3 = ("database","driver_test")
         var property4 = ("ssl.mode","disabled")
         //var property5 = ("prepare.mode","server")

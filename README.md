@@ -3,8 +3,8 @@
 </div>
 
 <p align="center">
-<img alt="" src="https://img.shields.io/badge/release-v0.6.0-brightgreen" style="display: inline-block;" />
-<img alt="" src="https://img.shields.io/badge/cjc-v0.56.4-brightgreen" style="display: inline-block;" />
+<img alt="" src="https://img.shields.io/badge/release-v0.6.1-brightgreen" style="display: inline-block;" />
+<img alt="" src="https://img.shields.io/badge/cjc-v0.57.3-brightgreen" style="display: inline-block;" />
 </p>
 
 ## <img alt="" src="./doc/readme-image/readme-icon-introduction.png" style="display: inline-block;" width=3%/> 1 介绍
@@ -27,7 +27,8 @@ mysqlclient4cj是为Cangjie编程语言提供MySql原生驱动程序,基于MySql
     ├── jdbc 		//jdbc接口以及实现
     ├── protocol 	//对协议的封装
     ├── result 		//对结果集的封装
-    └── test 		//测试
+    ├── test 		//测试
+    └── xa          //xa协议实现
 ├── CHANGELOG
 ├── cjpm.lock
 ├── cjpm.toml

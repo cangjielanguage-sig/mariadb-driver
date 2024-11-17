@@ -1,5 +1,5 @@
 [package]
-  cjc-version = "0.56.4"
+  cjc-version = "0.57.3"
   compile-option = "--incremental-compile --diagnostic-format=noColor"
   description = ""
   link-option = ""
@@ -7,5 +7,5 @@
   output-type = "static"
   src-dir = ""
   target-dir = ""
-  version = "0.6.0"
+  version = "0.6.1"
 [package.package-configuration]
