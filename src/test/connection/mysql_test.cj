@@ -35,8 +35,8 @@ public class MySqlTest {
     @TestCase
     public func case1(): Unit {
         var attr = HashMap<String, String>()
-        attr.put(Params.Username, "root")
-        attr.put(Params.Password, "123456")
+        attr.put(Params.Username, "caching_user")
+        attr.put(Params.Password, "caching_user")
         attr.put(Params.Host, "localhost")
         attr.put(Params.Port, "3306")
         attr.put(Params.SSLMode, "disabled")
@@ -71,8 +71,8 @@ public class MySqlTest {
     @TestCase
     public func case4(): Unit {
         var attr = HashMap<String, String>()
-        attr.put(Params.Username, "root")
-        attr.put(Params.Password, "123456")
+        attr.put(Params.Username, "caching_user")
+        attr.put(Params.Password, "caching_user")
         attr.put(Params.Host, "localhost")
         attr.put(Params.Port, "3306")
         var conn = MySqlConnectionFactory.createAuthedConnection(attr)

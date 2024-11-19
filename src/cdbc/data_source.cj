@@ -4,11 +4,10 @@
 package mysqlclient4cj.cdbc
 
 
+import std.database.sql.*
 import std.sync.AtomicBool
 import std.collection.HashMap
-import std.database.sql.Datasource
-import std.database.sql.Connection
-import std.database.sql.SqlException
+
 
 public class DatasourceImpl <: Datasource {
 
@@ -28,12 +27,12 @@ public class DatasourceImpl <: Datasource {
 
     /*返回一个可用的连接*/
     public override func connect(): Connection {
-        checkResourceAvailability()
+        checkResource()
         return ConnectionImpl(optinos)
     }
 
     public override func close() {
-        checkResourceAvailability()
+        checkResource()
         closed.store(true)
     }
 
@@ -41,7 +40,7 @@ public class DatasourceImpl <: Datasource {
         return closed.load()
     }
 
-    private func checkResourceAvailability(){
+    private func checkResource(){
         if(isClosed()){
             throw SqlException("The data Source has been closed")
         }

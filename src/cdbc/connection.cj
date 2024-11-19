@@ -6,13 +6,7 @@ package mysqlclient4cj.cdbc
 import std.collection.*
 import std.sync.*
 import std.convert.*
-import std.database.sql.Connection
-import std.database.sql.ConnectionState
-import std.database.sql.Transaction
-import std.database.sql.Statement
-import std.database.sql.QueryResult
-import std.database.sql.UpdateResult
-import std.database.sql.SqlException
+import std.database.sql.*
 import mysqlclient4cj.result.*
 import mysqlclient4cj.protocol.ParameterConvertException
 import mysqlclient4cj.connection.*
@@ -47,19 +41,16 @@ public class ConnectionImpl <: Connection{
         this.currentState = ConnectionState.Connected
     }
 
-    /*返回连接到的数据源元数据*/
     override public func getMetaData(): Map<String,String>{
-        checkResourceAvailability()
+        checkResource()
         return options
     }
     
-    /*通过传入的 sql 语句，返回一个预执行的 Statement 对象实例。*/
     override public func prepareStatement(sql: String): Statement{
-        checkResourceAvailability()
+        checkResource()
         checkEmptySql(sql)
         let prepareMode = options.get(Params.PrepareMode) ?? "client"
         if (prepareMode == "server") {
-            //return ServerPrepareStatement(sql, this)
             ServerPrepareStatement(sql, this)
         } else if (prepareMode == "client") {
             return ClientPrepareStatement(sql, this)
@@ -68,19 +59,22 @@ public class ConnectionImpl <: Connection{
         }
     }
 
-    /*创建事务对象*/
     override public func createTransaction(): Transaction{
-        checkResourceAvailability()
-        synchronized(getConnectionMutex()){
-            if(transaction.isNone()){
-                transaction = TransactionImpl(this.connection.createTransaction())
+        checkResource()
+        if(let Some(v) <- transaction) {
+            return v
+        }else {
+            synchronized(getConnectionMutex()){
+                if(transaction.isNone()){
+                    transaction = TransactionImpl(this.connection.createTransaction())
+                }
+                return transaction.getOrThrow()
             }
-            return transaction.getOrThrow()
         }
     }
 
     override public func close(){
-        checkResourceAvailability()
+        checkResource()
         synchronized(getConnectionMutex()){
             currentState = ConnectionState.Closed
             connection.close()
@@ -91,7 +85,6 @@ public class ConnectionImpl <: Connection{
         return connection.isClosed()
     }
 
-    //protected---
     protected func sendCommand(sql: String) {
         try {
             return connection.sendCommand(sql)
@@ -156,32 +149,30 @@ public class ConnectionImpl <: Connection{
         return connection.mutex
     }
 
-    //private---
-    private func checkEmptySql(sql: String){
+    private func checkEmptySql(sql: String) {
         if(sql.size == 0){
             throw SqlException("Empty SQL")
         }
     }
     
-    private func checkResourceAvailability(){
+    private func checkResource() {
         if(isClosed()){
             throw SqlException("The database Connection has been closed")
         }
     }
 
     private func applyOptions(){
-        var queryTimeout = options.get(Params.QueryTimeout)
-        if(!queryTimeout.isNone()){
+        let queryTimeout = options.get(Params.QueryTimeout)
+        if(let Some(v) <- queryTimeout){
             try {
-                var timeout = Int64.parse(queryTimeout.getOrThrow())
+                var timeout = Int64.parse(v)
                 sendCommand("set session max_execution_time = ${timeout}")
             }catch (e: IllegalArgumentException) {
                 throw IllegalArgumentException("parse query_timeout failed")
             }
         }
-
-        var updateTimeout = options.get(Params.UpdateTimeout)
-        if(!updateTimeout.isNone()){
+        let updateTimeout = options.get(Params.UpdateTimeout)
+        if(let Some(v) <- updateTimeout){
              try {
                 var timeout = Int64.parse(updateTimeout.getOrThrow())
                 sendCommand("set session lock_wait_timeout = ${timeout}")

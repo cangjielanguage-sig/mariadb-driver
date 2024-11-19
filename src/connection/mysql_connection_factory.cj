@@ -97,8 +97,8 @@ public class MySqlConnectionFactory {
     }
 
     private static func connectToServer(option: Map<String, String>): TcpSocket {
-        let host = option.get(Params.Host).getOrThrow(){=> IllegalArgumentException("Required connection parameters: host")}
-        let port = option.get(Params.Port).getOrThrow(){=> IllegalArgumentException("Required connection parameters: port")}
+        let host = option.get(Params.Host) ?? "localhost"
+        let port = option.get(Params.Port) ?? "3306"
         let socket = TcpSocket(host, UInt16.parse(port))
         let timeout = option.get(Params.ConnectionTimeout)
         match (timeout) {

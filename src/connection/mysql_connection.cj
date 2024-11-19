@@ -195,7 +195,7 @@ protected class MySqlConnection <: Resource {
     }
 
     private func handleLongData(statementId: UInt32, params: Array<Any>){
-        for(i in 0..params.size){
+        for (i in 0..params.size) {
             let param = params[i]
             match (param) {
                 case v:InputStream => writeRequest(SendLongDataCommand(statementId, UInt16(i), (toArray(v))))
