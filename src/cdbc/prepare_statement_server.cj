@@ -2,7 +2,7 @@
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
 
-package mysqlclient4cj.cdbc
+package mysql.cdbc
 
 import std.database.sql.*
 import std.convert.Parsable
@@ -11,24 +11,24 @@ import std.collection.ArrayList
 import std.collection.HashMap
 import std.regex.Regex
 import std.regex.Matcher
-import mysqlclient4cj.result.PrepareResult
-import mysqlclient4cj.protocol.ColumnFlag
+import mysql.result.PrepareResult
+import mysql.protocol.ColumnFlag
 
 public class ServerPrepareStatement <: Statement {
 
-    private var id: UInt32
+    private let id: UInt32
 
-    private var options: HashMap<String, String>
+    private let options: HashMap<String, String>
 
-    private var paramsInfo: Array<ColumnInfo>
+    private let paramsInfo: Array<ColumnInfo>
 
-    private var prepareResult: PrepareResult
+    private let prepareResult: PrepareResult
 
-    private var connection: ConnectionImpl
+    private let connection: ConnectionImpl
 
-    private var originSql: String
+    private let originSql: String
 
-    private var closed: AtomicBool
+    private let closed: AtomicBool
 
     public ServerPrepareStatement(originSql: String, connection: ConnectionImpl) {
         this.connection = connection
@@ -64,8 +64,8 @@ public class ServerPrepareStatement <: Statement {
 
     public override func update(params: Array<SqlDbType>): UpdateResult {
         checkResource()
-        var parameters = getBasicValues(params)
-        var result = connection.executeUpdatePrepare(prepareResult, parameters)
+        let parameters = getBasicValues(params)
+        let result = connection.executeUpdatePrepare(prepareResult, parameters)
         var lastInsertId: Int64 = 0
         if (result.lastInsertId > 0) {
             lastInsertId += Int64(result.lastInsertId) + getInsertCount() - 1
@@ -74,7 +74,7 @@ public class ServerPrepareStatement <: Statement {
     }
 
     private func getBasicValues(params: Array<SqlDbType>): Array<Any> {
-        var parameters = ArrayList<Any>()
+        let parameters = ArrayList<Any>()
         for (i in 0..params.size) {
             match (params[i]) {
                 case v: SqlBool => 
@@ -238,7 +238,7 @@ public class ServerPrepareStatement <: Statement {
     }
 
     private func getInsertCount(): Int64 {
-        var matcher = Matcher(Regex("\\((.*?)\\)"), originSql.split("values")[1])
+        let matcher = Matcher(Regex("\\((.*?)\\)"), originSql.split("values")[1])
         return matcher.findAll().getOrThrow().size
     }
     

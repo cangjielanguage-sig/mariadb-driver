@@ -1,14 +1,14 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-protected package mysqlclient4cj.connection
+protected package mysql.connection
 
 
 import std.io.IOException
 import std.collection.ArrayList
 import std.net.TcpSocket
 import std.net.StreamingSocket
-import mysqlclient4cj.protocol.LittleEndian
+import mysql.protocol.LittleEndian
 
 /*
 * mysql channl reads complete mysql packages from the socket
@@ -17,7 +17,7 @@ protected class MySqlChannel <: Resource {
 
     private let header: Array<Byte> = Array<Byte>(3, repeat: 0)
 
-    private let buffer = Array<Byte>(1024, repeat: 0)
+    private let buffer: Array<Byte> = Array<Byte>(1024, repeat: 0)
 
     protected var socket: StreamingSocket
 

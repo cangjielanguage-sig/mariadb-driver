@@ -104,3 +104,10 @@
 ## Feature
 
 - 新增了操作xa协议的api
+
+# [v0.7.0]
+2024-11-17
+
+## Rename
+
+- 更名为项目更名为mysql-driver

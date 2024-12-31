@@ -1,11 +1,11 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-protected package mysqlclient4cj.protocol.response
+protected package mysql.protocol.response
 
 import std.io.ByteBuffer
-import mysqlclient4cj.protocol.ReadFixedByte
-import mysqlclient4cj.protocol.InvalidPacketException
+import mysql.protocol.FixedByteReader
+import mysql.protocol.InvalidPacketException
 /*
 * MySQL Packet
 * referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_basic_packets.html

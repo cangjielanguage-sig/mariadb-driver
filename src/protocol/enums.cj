@@ -1,7 +1,7 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-protected package mysqlclient4cj.protocol
+protected package mysql.protocol
 
 
 /*
@@ -12,7 +12,7 @@ protected enum AuthState {
     | FastAuthSuccess
     | PerformFullAuthentication
 
-    public static func get(value: Byte): AuthState {
+    public static func of(value: Byte): AuthState {
         match (value) {
             case 0x03 => return FastAuthSuccess
             case 0x04 => return PerformFullAuthentication
@@ -50,7 +50,7 @@ protected enum ResponseCode {
             case Error => return 0xFF
         }
     }
-    public static func get(value: Byte): ResponseCode {
+    public static func of(value: Byte): ResponseCode {
         match (value) {
             case 0x00 => return Ok
             case 0xFF => return Error

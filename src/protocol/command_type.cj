@@ -1,7 +1,7 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-protected package mysqlclient4cj.protocol
+protected package mysql.protocol
 
 /*
 * A list of all MySQL protocol commands.
@@ -83,7 +83,7 @@ protected enum CommandType {
         }
     }
 
-    public static func get(value: Byte): CommandType{
+    public static func of(value: Byte): CommandType{
         match(value){
             case 0x00 => Sleep
             case 0x01 => Quit

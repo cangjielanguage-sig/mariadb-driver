@@ -1,16 +1,16 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-protected package mysqlclient4cj.connection
+protected package mysql.connection
 
 import std.time.DateTime
 import std.io.InputStream
 import std.math.numeric.Decimal
 import std.math.numeric.BigInt
 import encoding.json.JsonValue
-import mysqlclient4cj.result.ResultSet
-import mysqlclient4cj.protocol.*
-import mysqlclient4cj.protocol.response.*
+import mysql.result.ResultSet
+import mysql.protocol.*
+import mysql.protocol.response.*
 
 protected class CursorResultSet <: ResultSet {
 
@@ -140,31 +140,8 @@ protected class CursorResultSet <: ResultSet {
         return resultSet.getJsonValue(index)
     }
 
-    public override func getFieldType(index: Int64): ColumnType {
-        return resultSet.getFieldType(index)
+    public override func metadata(index: Int64): ColumnDefinition {
+        return columns[index - 1]
     }
 
-    public override func getFieldName(index: Int64): String {
-        return resultSet.getFieldName(index)
-    }
-
-    public override func getFieldDecimal(index: Int64): Byte {
-        return resultSet.getFieldDecimal(index)
-    }
-
-    public override func getFieldIsNotNull(index: Int64): Bool {
-        return resultSet.getFieldIsNotNull(index)
-    }
-
-    public override func getFieldIsUnsigned(index: Int64): Bool {
-        return resultSet.getFieldIsUnsigned(index)
-    }
-
-    public override func getFieldLength(index: Int64): UInt32 {
-        return resultSet.getFieldLength(index)
-    }
-
-    public override func getFieldCharset(index: Int64): Charset {
-        return resultSet.getFieldCharset(index)
-    }
 }

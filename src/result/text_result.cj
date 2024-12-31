@@ -1,7 +1,7 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-protected package mysqlclient4cj.result
+protected package mysql.result
 
 import std.time.DateTime
 import std.time.TimeParseException
@@ -10,11 +10,10 @@ import std.io.InputStream
 import std.math.numeric.BigInt
 import std.math.numeric.Decimal
 import std.convert.Parsable
-
 import std.collection.HashMap
 import encoding.json.JsonValue
-import mysqlclient4cj.protocol.*
-import mysqlclient4cj.protocol.response.*
+import mysql.protocol.*
+import mysql.protocol.response.*
 
 protected class TextResultSet <: ResultSet {
 
@@ -206,32 +205,8 @@ protected class TextResultSet <: ResultSet {
         }
     }
 
-    public override func getFieldType(index: Int64): ColumnType {
-        return columns[index - 1].columnType
-    }
-
-    public override func getFieldName(index: Int64): String {
-        return columns[index - 1].name
-    }
-
-    public override func getFieldDecimal(index: Int64): Byte {
-        return columns[index - 1].decimals
-    }
-
-    public override func getFieldIsNotNull(index: Int64): Bool {
-        return columns[index - 1].hasFlag(NotNull)
-    }
-
-    public override func getFieldIsUnsigned(index: Int64): Bool {
-        return columns[index - 1].hasFlag(Unsigned)
-    }
-
-    public override func getFieldCharset(index: Int64): Charset {
-        return columns[index - 1].charset
-    }
-
-    public override func getFieldLength(index: Int64): UInt32 {
-        return columns[index - 1].columnLength
+    public override func metadata(index: Int64): ColumnDefinition {
+        return columns[index - 1]
     }
 
     private func stringParseToBool(str: String): Bool {
@@ -246,7 +221,7 @@ protected class TextResultSet <: ResultSet {
         try {
             return Int8.parse(str)
         } catch (e: IllegalArgumentException) {
-            throw ValueConvertException("Parse to Int8 failed: column name is '${getFieldName(index)}', raw value is ${str}")
+            throw ValueConvertException("Parse to Int8 failed: column name is '${metadata(index).name}', raw value is ${str}")
         }
     }
 
@@ -254,7 +229,7 @@ protected class TextResultSet <: ResultSet {
         try {
             return UInt8.parse(str)
         } catch (e: IllegalArgumentException) {
-            throw ValueConvertException("Parse to UInt8 failed: column name is '${getFieldName(index)}', raw value is ${str}")
+            throw ValueConvertException("Parse to UInt8 failed: column name is '${metadata(index).name}', raw value is ${str}")
         }
     }
 
@@ -262,7 +237,7 @@ protected class TextResultSet <: ResultSet {
         try {
             return Int16.parse(str)
         } catch (e: IllegalArgumentException) {
-            throw ValueConvertException("Parse to Int16 failed: column name is '${getFieldName(index)}', raw value is ${str}")
+            throw ValueConvertException("Parse to Int16 failed: column name is '${metadata(index).name}', raw value is ${str}")
         }
     }
 
@@ -270,7 +245,7 @@ protected class TextResultSet <: ResultSet {
         try {
             return UInt16.parse(str)
         } catch (e: IllegalArgumentException) {
-            throw ValueConvertException("Parse to UInt16 failed: column name is '${getFieldName(index)}', raw value is ${str}")
+            throw ValueConvertException("Parse to UInt16 failed: column name is '${metadata(index).name}', raw value is ${str}")
         }
     }
 
@@ -278,7 +253,7 @@ protected class TextResultSet <: ResultSet {
         try {
             return Int32.parse(str)
         } catch (e: IllegalArgumentException) {
-            throw ValueConvertException("Parse to Int32 failed: column name is '${getFieldName(index)}', raw value is ${str}")
+            throw ValueConvertException("Parse to Int32 failed: column name is '${metadata(index).name}', raw value is ${str}")
         }
     }
 
@@ -286,7 +261,7 @@ protected class TextResultSet <: ResultSet {
         try {
             return UInt32.parse(str)
         } catch (e: IllegalArgumentException) {
-            throw ValueConvertException("Parse to UInt32 failed: column name is '${getFieldName(index)}', raw value is ${str}")
+            throw ValueConvertException("Parse to UInt32 failed: column name is '${metadata(index).name}', raw value is ${str}")
         }
     }
 
@@ -294,7 +269,7 @@ protected class TextResultSet <: ResultSet {
         try {
             return Int64.parse(str)
         } catch (e: IllegalArgumentException) {
-            throw ValueConvertException("Parse to Int64 failed: column name is '${getFieldName(index)}', raw value is ${str}")
+            throw ValueConvertException("Parse to Int64 failed: column name is '${metadata(index).name}', raw value is ${str}")
         }
     }
 
@@ -302,7 +277,7 @@ protected class TextResultSet <: ResultSet {
         try {
             return UInt64.parse(str)
         } catch (e: IllegalArgumentException) {
-            throw ValueConvertException("Parse to UInt64 failed: column name is '${getFieldName(index)}', raw value is ${str}")
+            throw ValueConvertException("Parse to UInt64 failed: column name is '${metadata(index).name}', raw value is ${str}")
         }
     }
 
@@ -310,7 +285,7 @@ protected class TextResultSet <: ResultSet {
         try {
             return Float16.parse(str)
         } catch (e: IllegalArgumentException) {
-            throw ValueConvertException("Parse to Float16 failed: column name is '${getFieldName(index)}', raw value is ${str}")
+            throw ValueConvertException("Parse to Float16 failed: column name is '${metadata(index).name}', raw value is ${str}")
         }
     }
 
@@ -318,7 +293,7 @@ protected class TextResultSet <: ResultSet {
         try {
             return Float32.parse(str)
         } catch (e: IllegalArgumentException) {
-            throw ValueConvertException("Parse to Float32 failed: column name is '${getFieldName(index)}', raw value is ${str}")
+            throw ValueConvertException("Parse to Float32 failed: column name is '${metadata(index).name}', raw value is ${str}")
         }
     }
 
@@ -326,7 +301,7 @@ protected class TextResultSet <: ResultSet {
         try {
             return Float64.parse(str)
         } catch (e: IllegalArgumentException) {
-            throw ValueConvertException("Parse to Float64 failed: column name is '${getFieldName(index)}', raw value is ${str}")
+            throw ValueConvertException("Parse to Float64 failed: column name is '${metadata(index).name}', raw value is ${str}")
         }
     }
 
@@ -334,7 +309,7 @@ protected class TextResultSet <: ResultSet {
         try {
             return BigInt(str)
         } catch (e: IllegalArgumentException) {
-            throw ValueConvertException("Parse to BigInt failed: column name is '${getFieldName(index)}', raw value is ${str}")
+            throw ValueConvertException("Parse to BigInt failed: column name is '${metadata(index).name}', raw value is ${str}")
         }
     }
 
@@ -342,7 +317,7 @@ protected class TextResultSet <: ResultSet {
         try {
             return Decimal(str)
         } catch (e: IllegalArgumentException) {
-            throw ValueConvertException("Parse to Float64 failed: column name is '${getFieldName(index)}', raw value is ${str}")
+            throw ValueConvertException("Parse to Float64 failed: column name is '${metadata(index).name}', raw value is ${str}")
         }
     }
 
@@ -350,7 +325,7 @@ protected class TextResultSet <: ResultSet {
         try {
             return DateTime.parse(str, DB_DATE_FORMAT)
         } catch (e: TimeParseException) {
-            throw ValueConvertException("Parse to Date failed: column name is '${getFieldName(index)}', raw value is ${str}")
+            throw ValueConvertException("Parse to Date failed: column name is '${metadata(index).name}', raw value is ${str}")
         }
     }
 
@@ -358,7 +333,7 @@ protected class TextResultSet <: ResultSet {
         try {
             return DateTime.parse(DB_TIME_PREFIX + str, DB_DATE_TIME_FORMAT)
         } catch (e: TimeParseException) {
-            throw ValueConvertException("Parse to Time failed: column name is '${getFieldName(index)}', raw value is ${str}")
+            throw ValueConvertException("Parse to Time failed: column name is '${metadata(index).name}', raw value is ${str}")
         }
     }
 
@@ -366,7 +341,7 @@ protected class TextResultSet <: ResultSet {
         try {
             return DateTime.parse(str, DB_DATE_TIME_FORMAT)
         } catch (e: TimeParseException) {
-            throw ValueConvertException("Parse to DateTime failed: column name is '${getFieldName(index)}', raw value is ${str}")
+            throw ValueConvertException("Parse to DateTime failed: column name is '${metadata(index).name}', raw value is ${str}")
         }
     } 
 }

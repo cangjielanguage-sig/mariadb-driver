@@ -1,19 +1,19 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-protected package mysqlclient4cj.test.cdbc
+protected package mysql.test.cdbc
 
 
 import std.unittest.*
 import std.unittest.testmacro.*
 import std.database.sql.*
-import mysqlclient4cj.cdbc.*
+import mysql.cdbc.*
 import std.time.*
 import std.sync.*
 import std.fs.*
 import std.io.*
 import std.math.numeric.*
-import mysqlclient4cj.protocol.*
+import mysql.protocol.*
 import encoding.json.*
 // @Test
 // public class OceanBaseTest{
@@ -131,7 +131,7 @@ import encoding.json.*
 //         stream3.write([145,67,34,12,45,32,76,90,62,145,24,56,234,34,235,56,67,145,67,34,12,45,32,76,90,62,145,24,56,234,34,235,56,67,145,67,34,12,45,32,76,90,62,145,24,56,234,34,235,56,67,145,67,34,12,45,32,76,90,62,145,24,56,234,34,235,56,67])
 //         var p27 = SqlBlob(stream3)
 //         //longblob
-//         var file = File("C:\\Users\\30247\\Desktop\\mysqlclient4cj\\doc\\1.jpg",  OpenOption.Open(true, true))
+//         var file = File("C:\\Users\\30247\\Desktop\\mysql\\doc\\1.jpg",  OpenOption.Open(true, true))
 //         var array = readToEnd(file)
 //         var stream4 = ByteBuffer()
 //         stream4.write(array)

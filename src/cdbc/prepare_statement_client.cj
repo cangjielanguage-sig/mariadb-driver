@@ -1,28 +1,24 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-package mysqlclient4cj.cdbc
+package mysql.cdbc
 
 import std.database.sql.*
 import std.collection.HashMap
 import std.sync.AtomicBool
 import std.regex.Regex
 import std.regex.Matcher
-import mysqlclient4cj.protocol.toArray
-import mysqlclient4cj.protocol.ToHexString
-import mysqlclient4cj.protocol.DB_DATE_FORMAT
-import mysqlclient4cj.protocol.DB_TIME_FORMAT
-import mysqlclient4cj.protocol.DB_DATE_TIME_FORMAT
+import mysql.protocol.*
 
 public class ClientPrepareStatement <: Statement {
 
-    private var connection: ConnectionImpl
+    private let connection: ConnectionImpl
 
-    private var originSql: String
+    private let originSql: String
 
-    private var options: HashMap<String, String>
+    private let options: HashMap<String, String>
 
-    private var closed: AtomicBool
+    private let closed: AtomicBool
 
     public ClientPrepareStatement(originSql: String, connection: ConnectionImpl) {
         this.connection = connection
@@ -47,14 +43,14 @@ public class ClientPrepareStatement <: Statement {
 
     public override func query(params: Array<SqlDbType>): QueryResult {
         checkResourceAvailability()
-        var executeableSql = getExecuteableSql(params)
+        let executeableSql = getExecuteableSql(params)
         return QueryResultImpl(connection.sendQuery(executeableSql))
     }
 
     public override func update(params: Array<SqlDbType>): UpdateResult {
         checkResourceAvailability()
-        var executeableSql = getExecuteableSql(params)
-        var result = connection.sendUpdate(executeableSql)
+        let executeableSql = getExecuteableSql(params)
+        let result = connection.sendUpdate(executeableSql)
         var lastInsertId: Int64 = 0
         if (result.lastInsertId > 0) {
             lastInsertId += Int64(result.lastInsertId) + getInsertCount() - 1
@@ -71,7 +67,7 @@ public class ClientPrepareStatement <: Statement {
         if (params.size != originSql.count("?")) {
             throw SqlException("The number of placeholders does not match the number of parameters")
         }
-        var replacer = Matcher(Regex("?"), originSql)
+        let replacer = Matcher(Regex("?"), originSql)
         for (i in 0..params.size) {
             match (params[i]) {
                 case v: SqlBool => 
@@ -228,7 +224,7 @@ public class ClientPrepareStatement <: Statement {
     }
 
     private func getInsertCount(): Int64 {
-        var matcher = Matcher(Regex("\\((.*?)\\)"), originSql.split("values")[1])
+        let matcher = Matcher(Regex("\\((.*?)\\)"), originSql.split("values")[1])
         return matcher.findAll().getOrThrow().size
     }
 }

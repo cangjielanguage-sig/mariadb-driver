@@ -1,11 +1,11 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-protected package mysqlclient4cj.protocol.response
+protected package mysql.protocol.response
 
 import std.io.ByteBuffer
 import std.collection.ArrayList
-import mysqlclient4cj.protocol.*
+import mysql.protocol.*
 
 /*
 * Generic Response Packets
@@ -17,7 +17,7 @@ protected open class Response <: CommonResponse {
 
     protected init(length: UInt32, buffer: ByteBuffer){
         super(length, buffer)
-        code = ResponseCode.get(buffer.readOneByte())
+        code = ResponseCode.of(buffer.readOneByte())
     }
 }
 

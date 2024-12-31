@@ -1,7 +1,7 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-protected package mysqlclient4cj.protocol
+protected package mysql.protocol
 
 
 protected interface ToInteger {
@@ -11,8 +11,6 @@ protected interface ToInteger {
 }
 
 extend Bool <: ToInteger {
-
-
 
     public func toInteger(): UInt8 {
         match (this) {

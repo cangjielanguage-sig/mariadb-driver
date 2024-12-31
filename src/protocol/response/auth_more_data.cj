@@ -1,10 +1,10 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-protected package mysqlclient4cj.protocol.response
+protected package mysql.protocol.response
 
 import std.io.ByteBuffer
-import mysqlclient4cj.protocol.*
+import mysql.protocol.*
 /*
 * AuthMoreData Packet
 * referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_connection_phase_packets_protocol_auth_more_data.html
@@ -47,7 +47,7 @@ protected class AuthStatus <: AuthMoreData {
 
     protected prop state: AuthState {
         get() {
-            AuthState.get(authRep[0])
+            AuthState.of(authRep[0])
         }
     }
 

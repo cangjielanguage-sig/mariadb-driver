@@ -3,7 +3,7 @@
   compile-option = "--incremental-compile --diagnostic-format=noColor"
   description = ""
   link-option = ""
-  name = "mysqlclient4cj"
+  name = "mysql"
   output-type = "static"
   src-dir = ""
   target-dir = ""

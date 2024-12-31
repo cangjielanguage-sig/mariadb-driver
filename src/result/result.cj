@@ -1,9 +1,9 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-protected package mysqlclient4cj.result
+protected package mysql.result
 
-import mysqlclient4cj.protocol.response.*
+import mysql.protocol.response.*
 
 protected class ChangeResult {
     

@@ -1,7 +1,7 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-protected package mysqlclient4cj.result
+protected package mysql.result
 
 import std.time.DateTime
 import std.time.TimeParseException
@@ -12,9 +12,8 @@ import std.math.numeric.Decimal
 import std.convert.Parsable
 import std.collection.HashMap
 import encoding.json.JsonValue
-import mysqlclient4cj.protocol.*
-import mysqlclient4cj.protocol.response.*
-
+import mysql.protocol.*
+import mysql.protocol.response.*
 
 protected class BinaryResultSet <: ResultSet {
     
@@ -119,7 +118,7 @@ protected class BinaryResultSet <: ResultSet {
         match (getBinaryData(index)) {
             case None => return None
             case Some(v) => 
-                let columnType = getFieldType(index)
+                let columnType = metadata(index).columnType
                 match (columnType) {
                     case Tiny => 
                         return UInt64(v[0])
@@ -138,7 +137,7 @@ protected class BinaryResultSet <: ResultSet {
                         try {
                             return UInt64.parse(str)
                         } catch (e: IllegalArgumentException) {
-                            throw ValueConvertException("Parse to Integer failed: column name is '${getFieldName(index)}', raw value is ${str}")
+                            throw ValueConvertException("Parse to Integer failed: column name is '${metadata(index).name}', raw value is ${str}")
                         }
                     case _ => throw ValueConvertException("Unsupported conversion from ${columnType} to Integer")
                 }
@@ -157,7 +156,7 @@ protected class BinaryResultSet <: ResultSet {
         match (getBinaryData(index)) {
             case None => return None
             case Some(v) => 
-                let columnType = getFieldType(index)
+                let columnType = metadata(index).columnType
                 match (columnType) {
                     case Float => 
                         return Float32.fromLittleEndian(v)
@@ -175,7 +174,7 @@ protected class BinaryResultSet <: ResultSet {
         match(getBinaryData(index)) {
             case None => return None
             case Some(v) => 
-                let columnType = getFieldType(index)
+                let columnType = metadata(index).columnType
                 match (columnType) {
                     case Float => 
                         return Float64(getFloat32(index).getOrThrow())
@@ -193,7 +192,7 @@ protected class BinaryResultSet <: ResultSet {
         match (getBinaryData(index)) {
             case None => return None
             case Some(v) => 
-                let columnType = getFieldType(index)
+                let columnType = metadata(index).columnType
                 match (columnType) {
                     case Tiny => 
                         return BigInt(getInt8(index).getOrThrow())
@@ -215,7 +214,7 @@ protected class BinaryResultSet <: ResultSet {
         match (getBinaryData(index)) {
             case None => return None
             case Some(v) => 
-                let columnType = getFieldType(index)
+                let columnType = metadata(index).columnType
                 match (columnType) {
                     case Float => 
                         return Decimal(getFloat32(index).getOrThrow())
@@ -246,7 +245,7 @@ protected class BinaryResultSet <: ResultSet {
         match(getBinaryData(index)) {
             case None => return None
             case Some(v) => 
-                let columnType = getFieldType(index)
+                let columnType = metadata(index).columnType
                 match (columnType) {
                     case Date => 
                         return DateTime.fromBinaryDateTime(v)
@@ -274,8 +273,8 @@ protected class BinaryResultSet <: ResultSet {
         match (getBinaryData(index)) {
             case None => return None
             case Some(v) => 
-                let columnType = getFieldType(index)
-                let unsigned = getFieldIsUnsigned(index)
+                let columnType = metadata(index).columnType
+                let unsigned = metadata(index).hasFlag(Unsigned)
                 match (columnType) {
                     case Tiny =>
                         if (!unsigned) {
@@ -331,7 +330,7 @@ protected class BinaryResultSet <: ResultSet {
         match (getBinaryData(index)) {
             case None => return None
             case Some(v) => 
-                let columnType = getFieldType(index)
+                let columnType = metadata(index).columnType
                 match (columnType) {
                     case String | VarString | Json | Enum | Set | TinyBlob | Blob | MediumBlob | LongBlob => 
                         return v
@@ -348,32 +347,8 @@ protected class BinaryResultSet <: ResultSet {
         }
     }
 
-    public override func getFieldType(index: Int64): ColumnType {
-        return columns[index - 1].columnType
-    }
-
-    public override func getFieldName(index: Int64): String {
-        return columns[index - 1].name
-    }
-
-    public override func getFieldDecimal(index: Int64): Byte {
-        return columns[index - 1].decimals
-    }
-
-    public override func getFieldIsNotNull(index: Int64): Bool {
-        return columns[index - 1].hasFlag(NotNull)
-    }
-
-    public override func getFieldIsUnsigned(index: Int64): Bool {
-        return columns[index - 1].hasFlag(Unsigned)
-    }
-
-    public override func getFieldLength(index: Int64): UInt32 {
-        return columns[index - 1].columnLength
-    }
-
-    public override func getFieldCharset(index: Int64): Charset {
-        return columns[index - 1].charset
+    public override func metadata(index: Int64): ColumnDefinition {
+        return columns[index - 1]
     }
 
     private func getBinaryData(index: Int64): ?Array<Byte> {

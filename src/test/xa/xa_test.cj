@@ -1,13 +1,13 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-protected package mysqlclient4cj.test.xa
+protected package mysql.test.xa
 
 
 import std.unittest.*
 import std.unittest.testmacro.*
 import std.collection.HashMap
-import mysqlclient4cj.xa.*
+import mysql.xa.*
 
 @Test
 public class XATest {

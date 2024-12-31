@@ -1,7 +1,7 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-protected package mysqlclient4cj.protocol
+protected package mysql.protocol
 
 import std.io.InputStream
 import std.collection.ArrayList

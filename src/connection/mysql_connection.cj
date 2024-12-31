@@ -1,7 +1,7 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-protected package mysqlclient4cj.connection
+protected package mysql.connection
 
 import std.io.ByteBuffer
 import std.io.InputStream
@@ -9,14 +9,10 @@ import std.sync.ReentrantMutex
 import std.collection.ArrayList
 import std.net.TcpSocket
 import std.net.StreamingSocket
-import mysqlclient4cj.result.ResultSet
-import mysqlclient4cj.result.ChangeResult
-import mysqlclient4cj.result.PrepareResult
-import mysqlclient4cj.result.TextResultSet
-import mysqlclient4cj.result.BinaryResultSet
-import mysqlclient4cj.protocol.*
-import mysqlclient4cj.protocol.request.*
-import mysqlclient4cj.protocol.response.*
+import mysql.result.*
+import mysql.protocol.*
+import mysql.protocol.request.*
+import mysql.protocol.response.*
 
 
 /**
@@ -304,7 +300,7 @@ protected class MySqlConnection <: Resource {
      */
     internal func readResponse(): Response {
         let (length, payload) = read()
-        let code = ResponseCode.get(payload[1])
+        let code = ResponseCode.of(payload[1])
         match (code) {
             case ResponseCode.Ok =>
                 return OkResponse(length, ByteBuffer(payload))

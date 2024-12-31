@@ -1,13 +1,13 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-package mysqlclient4cj.xa
+package mysql.xa
 
 import std.collection.Map
 import std.collection.ArrayList
-import mysqlclient4cj.protocol.ToHexString
-import mysqlclient4cj.connection.MySqlConnection
-import mysqlclient4cj.connection.MySqlConnectionFactory
+import mysql.protocol.ToHexString
+import mysql.connection.MySqlConnection
+import mysql.connection.MySqlConnectionFactory
 
 public class MySqlXaResouce <: Resource {
 

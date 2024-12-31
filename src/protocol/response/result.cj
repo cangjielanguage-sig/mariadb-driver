@@ -1,11 +1,11 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-protected package mysqlclient4cj.protocol.response
+protected package mysql.protocol.response
 
 import std.io.ByteBuffer
 import std.collection.ArrayList
-import mysqlclient4cj.protocol.*
+import mysql.protocol.*
 /*
  * Field Count packet
  * referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_com_query_response.html

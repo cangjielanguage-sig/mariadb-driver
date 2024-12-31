@@ -1,11 +1,11 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-protected package mysqlclient4cj.protocol.response
+protected package mysql.protocol.response
 
 import std.io.ByteBuffer
 import std.collection.ArrayList
-import mysqlclient4cj.protocol.*
+import mysql.protocol.*
 /*
 * Initial handshake packet for protocol version 10.
 * referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_connection_phase_packets_protocol_handshake_v10.html

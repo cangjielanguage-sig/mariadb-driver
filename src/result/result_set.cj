@@ -1,16 +1,16 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-protected package mysqlclient4cj.result
+protected package mysql.result
 
 import std.time.DateTime
 import std.io.InputStream
 import std.math.numeric.Decimal
 import std.math.numeric.BigInt
 import encoding.json.JsonValue
-import mysqlclient4cj.protocol.Charset
-import mysqlclient4cj.protocol.ColumnType
-import mysqlclient4cj.protocol.response.ColumnDefinition
+import mysql.protocol.Charset
+import mysql.protocol.ColumnType
+import mysql.protocol.response.ColumnDefinition
 
 protected interface ResultSet {
 
@@ -64,17 +64,6 @@ protected interface ResultSet {
 
     func getJsonValue(index: Int64): ?JsonValue
 
-    func getFieldType(index: Int64): ColumnType
+    func metadata(index: Int64): ColumnDefinition
 
-    func getFieldName(index: Int64): String
-
-    func getFieldDecimal(index: Int64): Byte
-
-    func getFieldIsNotNull(index: Int64): Bool
-
-    func getFieldIsUnsigned(index: Int64): Bool
-
-    func getFieldLength(index: Int64): UInt32
-
-    func getFieldCharset(index: Int64): Charset
 }

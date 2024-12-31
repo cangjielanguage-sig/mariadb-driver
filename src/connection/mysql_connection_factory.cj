@@ -1,7 +1,7 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-protected package mysqlclient4cj.connection
+protected package mysql.connection
 
 import std.fs.File
 import std.collection.Map
@@ -19,9 +19,9 @@ import crypto.x509.X509Certificate
 import crypto.x509.PublicKeyAlgorithm
 import crypto.keys.RSAPrivateKey
 import crypto.keys.ECDSAPrivateKey
-import mysqlclient4cj.protocol.*
-import mysqlclient4cj.protocol.request.*
-import mysqlclient4cj.protocol.response.*
+import mysql.protocol.*
+import mysql.protocol.request.*
+import mysql.protocol.response.*
 
 public class MySqlConnectionFactory {
 

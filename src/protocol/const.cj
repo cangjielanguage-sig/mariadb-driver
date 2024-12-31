@@ -1,4 +1,4 @@
-protected package mysqlclient4cj.protocol
+protected package mysql.protocol
 
 //mysql datetime类型的默认格式
 protected const DB_DATE_TIME_FORMAT: String = "yyyy-MM-dd HH:mm:ss"

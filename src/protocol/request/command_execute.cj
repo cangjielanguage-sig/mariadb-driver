@@ -1,7 +1,7 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-protected package mysqlclient4cj.protocol.request
+protected package mysql.protocol.request
 
 import std.io.InputStream
 import std.time.DateTime
@@ -11,8 +11,8 @@ import std.convert.Parsable
 import std.math.numeric.Decimal
 import std.math.numeric.BigInt
 import encoding.json.JsonValue
-import mysqlclient4cj.protocol.*
-import mysqlclient4cj.protocol.response.*
+import mysql.protocol.*
+import mysql.protocol.response.*
 
 /*
  * It sends the values for the placeholders of the prepared statement (if it contained any) in Binary Protocol Value form.

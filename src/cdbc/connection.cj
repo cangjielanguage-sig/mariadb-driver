@@ -1,15 +1,15 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-package mysqlclient4cj.cdbc
+package mysql.cdbc
 
 import std.collection.*
 import std.sync.*
 import std.convert.*
 import std.database.sql.*
-import mysqlclient4cj.result.*
-import mysqlclient4cj.protocol.ParameterConvertException
-import mysqlclient4cj.connection.*
+import mysql.result.*
+import mysql.protocol.ParameterConvertException
+import mysql.connection.*
 
 public class ConnectionImpl <: Connection{
     

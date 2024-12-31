@@ -1,10 +1,10 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-protected package mysqlclient4cj.protocol.request
+protected package mysql.protocol.request
 
 import std.collection.ArrayList
-import mysqlclient4cj.protocol.LittleEndian
+import mysql.protocol.LittleEndian
 
 protected open class Request {
 

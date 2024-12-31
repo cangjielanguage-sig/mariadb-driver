@@ -1,9 +1,9 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-protected package mysqlclient4cj.protocol.request
+protected package mysql.protocol.request
 
-import mysqlclient4cj.protocol.*
+import mysql.protocol.*
 
 /*
  * Tells the server that the client wants it to close the connection.

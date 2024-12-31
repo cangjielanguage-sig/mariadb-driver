@@ -1,7 +1,7 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-package mysqlclient4cj.xa
+package mysql.xa
 
 public class MySqlXid <: Hashable & Equatable<MySqlXid> {
 

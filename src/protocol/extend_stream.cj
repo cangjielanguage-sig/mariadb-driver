@@ -1,11 +1,11 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-protected package mysqlclient4cj.protocol
+protected package mysql.protocol
 
 import std.io.ByteBuffer
 import std.collection.ArrayList
-protected interface ReadLengthEncoded {
+protected interface LengthEncodedReader {
     
     func readLengthEncodedString(): ?String
 
@@ -16,7 +16,7 @@ protected interface ReadLengthEncoded {
     func readLengthEncodedIntegerRaw(): ?Array<Byte>
 }
 
-protected interface ReadFixedByte {
+protected interface FixedByteReader {
 
     func readOneByte(): Byte 
 
@@ -24,7 +24,7 @@ protected interface ReadFixedByte {
 
 }
 
-protected interface ReadNullTerminatedString {
+protected interface NullTerminatedStringReader {
 
     func readNullTerminatedString(): String
 
@@ -32,7 +32,7 @@ protected interface ReadNullTerminatedString {
 
 }
 
-extend ByteBuffer <: ReadLengthEncoded & ReadFixedByte & ReadNullTerminatedString {
+extend ByteBuffer <: LengthEncodedReader & FixedByteReader & NullTerminatedStringReader {
 
     public func readLengthEncodedString(): ?String {
         match (readLengthEncodedStringRaw()) {

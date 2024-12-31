@@ -1,6 +1,7 @@
 <div align="center">
-<h1>mysqlclient4cj</h1>
+<h1>mysql-driver</h1>
 </div>
+
 
 <p align="center">
 <img alt="" src="https://img.shields.io/badge/release-v0.6.1-brightgreen" style="display: inline-block;" />
@@ -11,7 +12,7 @@
 
 ### 1.1 项目特性
 
-mysqlclient4cj是为Cangjie编程语言提供MySql原生驱动程序,基于MySql协议. 同时适配TIDB等国产数据库
+mysql-driver是使用Cangjie编写的mysql原生驱动程序，基于mysql客户端协议。同时适配TIDB、OceanBase等国产数据库。
 
 ## <img alt="" src="./doc/readme-image/readme-icon-framework.png" style="display: inline-block;" width=3%/> 2 架构
 
@@ -50,9 +51,11 @@ mysqlclient4cj是为Cangjie编程语言提供MySql原生驱动程序,基于MySql
 
 ### 3.1 编译构建（Win/Linux/Mac）
 
+cjpm.toml文件添加以下配置后，再执行cjpm update，即可在项目中引入mysqlclient4cj。
+
 ```toml
 [dependencies]
-  mysqlclient4cj = {git = "https://gitcode.com/weixin_64400442/mysqlclient4cj.git", branch="master"}
+  mysql-driver = {git = "https://gitcode.com/weixin_64400442/mysql-driver.git", branch="master"}
 ```
 
 ### 3.2 功能示例
@@ -77,7 +80,7 @@ PRIMARY KEY (`id`)
 
 ```cangjie
 import std.database.sql.*
-import mysqlclient4cj.cdbc.*
+import mysql.cdbc.*
 
 main(): Unit {
   
@@ -110,7 +113,7 @@ main(): Unit {
 
 ```cangjie
 import std.database.sql.*
-import mysqlclient4cj.cdbc.*
+import mysql.cdbc.*
 import std.time.DateTime
 import std.math.numeric.Decimal
 
@@ -142,7 +145,7 @@ main(): Unit {
 ##### 获取事务对象
 
 ```cangjie
-import mysqlclient4cj.cdbc.*
+import mysql.cdbc.*
 import std.database.sql.*
 
 main(){
@@ -163,8 +166,8 @@ main(){
 ##### 查询数据(Query)
 
 ```cangjie
-import mysqlclient4cj.jdbc.*
-import mysqlclient4cj.jdbc.impl.*
+import mysql.jdbc.*
+import mysql.jdbc.impl.*
 
 main(): Unit {
   
@@ -197,8 +200,8 @@ main(): Unit {
 ##### 更新数据(Insert、Update、Delete)
 
 ```cangjie
-import mysqlclient4cj.jdbc.*
-import mysqlclient4cj.jdbc.impl.*
+import mysql.jdbc.*
+import mysql.jdbc.impl.*
 import std.math.numeric.*
 
 
@@ -257,8 +260,6 @@ main(): Unit {
 | prepare.mode            | 预编译模式                                                               | auto: 自动选择, server: 服务端预编译                       | client    | No                                |
 
 ### 3.4目前已知的一些问题
-
-- 使用该驱动操作OceanBase暂不支持使用服务端预编译(prepare.mode=server)
 
 ## <img alt="" src="./doc/readme-image/readme-icon-contribute.png" style="display: inline-block;" width=3%/> 4 参与贡献
 

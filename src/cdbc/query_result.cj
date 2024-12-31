@@ -1,7 +1,7 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-package mysqlclient4cj.cdbc
+package mysql.cdbc
 
 import std.database.sql.*
 import std.convert.Parsable
@@ -9,7 +9,7 @@ import std.time.DateTime
 import std.sync.ReentrantMutex
 import std.sync.AtomicBool
 import std.collection.ArrayList
-import mysqlclient4cj.result.ResultSet
+import mysql.result.ResultSet
 
 public class QueryResultImpl <: QueryResult {
     

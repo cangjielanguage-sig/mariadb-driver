@@ -1,13 +1,13 @@
 /*
  * Copyright (c) Yesokim. 2024-2024. All rights reserved.
  */
-package mysqlclient4cj.cdbc
+package mysql.cdbc
 
 import std.convert.*
 import encoding.url.*
 import std.collection.*
 import std.database.sql.*
-import mysqlclient4cj.connection.Params
+import mysql.connection.Params
 
 public class MySqlDriver <: Driver {
 
