@@ -50,7 +50,7 @@ mysql-driver是使用Cangjie编写的mysql原生驱动程序，基于mysql客户
 
 ### 3.1 编译构建（Win/Linux/Mac）
 
-cjpm.toml文件添加以下配置后，再执行cjpm update，即可在项目中引入mysqlclient4cj。
+cjpm.toml文件添加以下配置后，再执行cjpm update，即可在项目中引入mysql-driver。
 
 ```toml
 [dependencies]
