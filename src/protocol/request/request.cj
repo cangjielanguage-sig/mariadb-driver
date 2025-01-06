@@ -10,7 +10,7 @@ protected open class Request {
 
     private static let Header: Array<Byte> = [0x00, 0x00, 0x00]
 
-    internal let buf: ArrayList<Byte> = ArrayList<Byte>()
+    private let buf: ArrayList<Byte> = ArrayList<Byte>()
 
     protected var number: UInt8
 
@@ -27,7 +27,17 @@ protected open class Request {
         buf.append(number)
     }
 
-    protected func setHeader(): Unit {
+    protected func pack(data: Array<Byte>): Unit {
+        buf.appendAll(data)
+    }
+
+    protected func toByteArray(): Array<Byte> {
+        pack()
+        setHeader()
+        return buf.toArray()
+    }
+    
+    private func setHeader(): Unit {
         try {
             let header = UInt32(buf.size - 4).toLittleEndian()
             buf.set(0, header[0])
@@ -37,10 +47,4 @@ protected open class Request {
             throw Exception("current package size is to large")
         }
     }
-
-    protected func toByteArray(): Array<Byte> {
-        setHeader()
-        return buf.toArray()
-    }
-    
 }

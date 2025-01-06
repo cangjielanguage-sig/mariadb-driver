@@ -32,7 +32,7 @@ protected class InitDbCommand <: Command {
 
     protected override func pack(): Unit {
         super.pack()
-        buf.appendAll(database.toArray())
+        database.toArray() |> pack
     }
 }
 
@@ -93,7 +93,7 @@ protected class SetOptionCommand <: Command {
 
     protected override func pack(): Unit {
         super.pack()
-        buf.appendAll(operation.value().toLittleEndian())
+        operation.value().toLittleEndian() |> pack
     }
 
 }

@@ -3,7 +3,6 @@
  */
 protected package mysql.connection
 
-
 import std.io.IOException
 import std.collection.ArrayList
 import std.net.TcpSocket

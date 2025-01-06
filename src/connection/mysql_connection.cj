@@ -14,7 +14,6 @@ import mysql.protocol.*
 import mysql.protocol.request.*
 import mysql.protocol.response.*
 
-
 /**
 * The mysql connection object facilitates the upper-layer driver to interact with the database
 */
@@ -331,7 +330,6 @@ protected class MySqlConnection <: Resource {
     }
 
     internal func writeRequest(req: Request): Unit {
-        req.pack()
         write(req.toByteArray())
     }
 

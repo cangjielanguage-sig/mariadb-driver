@@ -25,7 +25,6 @@ mysql-driver是使用Cangjie编写的mysql原生驱动程序，基于mysql客户
 └── src
     ├── cdbc 		//cdbc接口实现
     ├── connection 	//驱动内部使用的mysql连接对象
-    ├── jdbc 		//jdbc接口以及实现
     ├── protocol 	//对协议的封装
     ├── result 		//对结果集的封装
     ├── test 		//测试
@@ -74,9 +73,7 @@ PRIMARY KEY (`id`)
 ) 
 ```
 
-#### 3.2.1 官方数据库接口
-
-##### 查询数据(Query)
+####  查询数据(Query)
 
 ```cangjie
 import std.database.sql.*
@@ -109,7 +106,7 @@ main(): Unit {
 }
 ```
 
-##### 更新数据(Insert、Update、Delete)
+#### 更新数据(Insert、Update、Delete)
 
 ```cangjie
 import std.database.sql.*
@@ -142,7 +139,7 @@ main(): Unit {
 }
 ```
 
-##### 获取事务对象
+#### 获取事务对象
 
 ```cangjie
 import mysql.cdbc.*
@@ -161,73 +158,7 @@ main(){
 }
 ```
 
-#### 3.2.2 类JDBC接口
 
-##### 查询数据(Query)
-
-```cangjie
-import mysql.jdbc.*
-import mysql.jdbc.impl.*
-
-main(): Unit {
-  
-    var driver = DriverManager.getDriver("mysql").getOrThrow()
-    var property1 = ("username", "root")
-    var property2 = ("password", "MySql123!")
-    var property3 = ("database", "driver_test")
-    var dataSource = driver.open("mysql://localhost", [property1, property2, property3])
-    var connection = dataSource.connect()
-
-    var statemnt = connection.prepareStatement("select * from simple")
-
-    var result = statemnt.query()
-
-    while (result.next()) {
-        println(result.getInt64(1))
-        println(result.getString(2))
-        println(result.getInt32(3))
-        println(result.getFloat64(4))
-        println(result.getDecimal(5))
-        println(result.getDate(6))
-        println(result.getTime(7))
-        println(result.getDateTime(8))
-        println("---------")
-    }
-  
-}
-```
-
-##### 更新数据(Insert、Update、Delete)
-
-```cangjie
-import mysql.jdbc.*
-import mysql.jdbc.impl.*
-import std.math.numeric.*
-
-
-main(): Unit {
-  
-    var driver = DriverManager.getDriver("mysql").getOrThrow()
-    var property1 = ("username", "root")
-    var property2 = ("password", "MySql123!")
-    var property3 = ("database", "driver_test")
-    var dataSource = driver.open("mysql://localhost", [property1, property2, property3])
-    var connection = dataSource.connect()
-
-    var statemnt = connection.prepareStatement("insert into simple values (?, ?, ?, ?, ?, ?, ?, ?)")
-    statemnt.setInt64(1, 34567)
-    statemnt.setString(2, "jdbc")
-    statemnt.setNull(3)
-    statemnt.setFloat64(4, 123.456)
-    statemnt.setDecimal(5, Decimal("123.4456789"))
-    statemnt.setDate(6, Date(2024, 2, 10))
-    statemnt.setTime(7, Time(12, 12, 12))
-
-    var result = statemnt.update()
-    println("effect row: ${result.effectRow} lastInsertId: ${result.lastInsertId}")
-  
-}
-```
 
 ## 3.3 连接参数
 

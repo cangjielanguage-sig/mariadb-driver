@@ -21,7 +21,7 @@ protected abstract class Command <: Request {
 
     protected open override func pack(): Unit {
         super.pack()
-        buf.append(commandType.value())
+        this.commandType.value() |> pack
     }
 
 }
@@ -41,7 +41,7 @@ protected class QueryCommand <: Command {
 
     protected override func pack(): Unit {
         super.pack()
-        buf.appendAll(query.toArray())
+        this.query.toArray() |> pack
     }
 
 }
@@ -61,7 +61,7 @@ protected class PrepareCommand <: Command {
 
     public override func pack(): Unit{
         super.pack()
-        buf.appendAll(sql.toArray())
+        this.sql.toArray() |> pack
     }
 
 }
@@ -85,8 +85,8 @@ protected class FetchCommand <: Command {
 
     protected override func pack(): Unit {
         super.pack()
-        buf.appendAll(statemetnId.toLittleEndian())
-        buf.appendAll(numRows.toLittleEndian())
+        this.statemetnId.toLittleEndian() |> pack
+        this.numRows.toLittleEndian() |> pack
     }
 
 }
@@ -106,7 +106,7 @@ protected class CloseCommand <: Command {
 
     protected override func pack(): Unit {
         super.pack()
-        buf.appendAll(statementId.toLittleEndian())
+        this.statementId.toLittleEndian() |> pack
     }
 }
 
@@ -125,7 +125,7 @@ protected class ResetCommand <: Command {
 
     public override func pack(): Unit {
         super.pack()
-        buf.appendAll(statementId.toLittleEndian())
+        this.statementId.toLittleEndian() |> pack
     }
 }
 
@@ -150,9 +150,9 @@ protected class SendLongDataCommand <: Command {
 
     public override func pack(): Unit {
         super.pack()
-        buf.appendAll(statemetnId.toLittleEndian())
-        buf.appendAll(parameterId.toLittleEndian())
-        buf.appendAll(data)
+        this.statemetnId.toLittleEndian() |> pack
+        this.parameterId.toLittleEndian() |> pack
+        this.data |> pack
     }
 
 }

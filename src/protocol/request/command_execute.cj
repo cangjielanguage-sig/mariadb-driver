@@ -63,18 +63,16 @@ protected class ExecuteCommand <: Command {
     public override func pack(): Unit {
         super.pack()
         // id
-        buf.appendAll(statementId.toLittleEndian())
+        this.statementId.toLittleEndian() |> pack
         // flag
-        buf.append(flags.value())
+        this.flags.value() |> pack
         // iteration_count
-        buf.appendAll(iterationCount.toLittleEndian())
+        this.iterationCount.toLittleEndian() |> pack
         if (parameterCount > 0 || flags == ParameterCountAvailable) {
             if (HandshakeResponse.getDefault(0).hasCapability(QueryAttributes)) {
                 //parameter_count
-                let array = parameterCount.toLengthEncoded()
-                buf.appendAll(array)
+                this.parameterCount.toLengthEncoded() |> pack
             }
-
             if (parameterCount > 0) {
                 // null_bitmap
                 for (i in 0..params.size) {
@@ -83,9 +81,9 @@ protected class ExecuteCommand <: Command {
                         nullBitMap[(i / 8)] |= 1u8 << (i % 8)
                     }
                 }
-                buf.appendAll(nullBitMap)
+                this.nullBitMap |> pack
                 // new_params_bind_flag
-                buf.append(newParamsBindFlag)
+                this.newParamsBindFlag |> pack
                 if (newParamsBindFlag == 1) {
                     //parameter_type
                     for (i in 0..paramDefinitions.size) {
@@ -93,21 +91,21 @@ protected class ExecuteCommand <: Command {
                         let paramType = paramDefinitions[i].columnType
                         if (value is ?Any && (value as ?Any).getOrThrow().isNone()) {
                             //buf.append(ColumnType.Null.value())
-                            buf.append(0x06)
+                            0x06 |> pack
                         }else {
                             if(paramType == Year){
-                                buf.append(ColumnType.Long.value())
+                               ColumnType.Long.value() |> pack
                             }else{
-                                buf.append(paramType.value())
+                                paramType.value() |> pack
                             }
                         }
                         if (paramDefinitions[i].hasFlag(Unsigned)) {
-                            buf.append(0x80)
+                            0x80 |> pack
                         } else {
-                            buf.append(0x00)
+                            0x00 |> pack
                         }
                         if (HandshakeResponse.getDefault(0).hasCapability(QueryAttributes)) {
-                            buf.append(0x00) //paramter name: default null
+                            0x00 |> pack//paramter name: default null
                         }
                     }
                 }
@@ -174,7 +172,7 @@ protected class ExecuteCommand <: Command {
         let paramType = paramDefinitions[index].columnType
         match (paramType) {
             case Tiny => 
-                buf.append(value)
+                value |> pack
             case Short => 
                 appendUInt16(index, UInt16(value))
             case Long | Int24 | Year => 
@@ -221,7 +219,7 @@ protected class ExecuteCommand <: Command {
             case Tiny => 
                 appendUInt8(index, UInt8(value)) // possible overflow
             case Short => 
-                buf.appendAll(value.toLittleEndian())
+                value.toLittleEndian() |> pack
             case Long | Int24 | Year => 
                 appendUInt32(index, UInt32(value))
             case LongLong => 
@@ -268,7 +266,7 @@ protected class ExecuteCommand <: Command {
             case Short =>
                 appendUInt16(index, UInt16(value)) // possible overflow
             case Int24 | Long | Year => 
-                buf.appendAll(value.toLittleEndian())
+                value.toLittleEndian() |> pack
             case LongLong => 
                 appendUInt64(index, UInt64(value))
             case Float => 
@@ -315,7 +313,7 @@ protected class ExecuteCommand <: Command {
             case Int24 | Long | Year => 
                 appendUInt32(index, UInt32(value)) // possible overflow
             case LongLong => 
-                buf.appendAll(value.toLittleEndian())
+                value.toLittleEndian() |> pack
             case Float => 
                 appendFloat32(index, Float32(value))
             case Double => 
@@ -339,9 +337,9 @@ protected class ExecuteCommand <: Command {
         let paramType = paramDefinitions[index].columnType
         match (paramType) {
             case Float =>
-                buf.appendAll(Float64(value).toLittleEndian())
+                Float64(value).toLittleEndian() |> pack
             case Double => 
-                buf.appendAll(value.toLittleEndian())
+                value.toLittleEndian() |> pack
             case Tiny => 
                 appendInt8(index, Int8(value))
             case Short =>
@@ -369,7 +367,7 @@ protected class ExecuteCommand <: Command {
         let paramType = paramDefinitions[index].columnType
         match (paramType) {
             case String | VarString | NewDecimal | Json | TinyBlob | Blob | MediumBlob | LongBlob =>
-                buf.appendAll(value.toLengthEncoded())
+                value.toLengthEncoded() |> pack
             case Tiny | Short | Year | Int24 | Long | LongLong => 
                 try {
                     appendInt64(index, Int64.parse(value))
@@ -411,11 +409,11 @@ protected class ExecuteCommand <: Command {
             case Year =>
                 appendInt32(index, Int32(value.year))
             case Date => 
-                buf.appendAll(value.toBinaryDate())
+                value.toBinaryDate() |> pack
             case Time =>
-                buf.appendAll(value.toBinaryTime())
+                value.toBinaryTime() |> pack
             case Timestamp | DateTime => 
-                buf.appendAll(value.toBinaryDateTime())
+                value.toBinaryDateTime() |> pack
             case String | VarString | Blob => 
                 appendString(index, value.toString(DB_DATE_TIME_FORMAT))
             case _ => throw IllegalArgumentException("The parameter type at position ${index + 1} does not match the required type: ${paramType}")

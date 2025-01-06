@@ -9,4 +9,5 @@ build
 output
 cov_output
 tmpFile*
-.idea
+.idea/
+.devbrain/

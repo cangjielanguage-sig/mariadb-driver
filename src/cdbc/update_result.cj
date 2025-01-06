@@ -15,15 +15,13 @@ public class UpdateResultImpl <: UpdateResult{
         this.effectRows= effectRowCount
         this.lastIndex = lastInsertId
     }
-    
-    /*获取执行 Insert, Update, Delete 语句影响的行数*/
+
     override public prop rowCount: Int64{
         get() {
             return effectRows
         }
     }
 
-    /*获取执行 Insert 语句自动生成的最后 row ID ，如果不支持则为 0*/
     override public prop lastInsertId: Int64{
         get() {
             return lastIndex

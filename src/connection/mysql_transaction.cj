@@ -3,7 +3,6 @@
  */
 protected package mysql.connection
 
-
 protected class MySqlTransaction {
 
     private static const CLOSE_AUTO_COMMIT = "SET SESSION autocommit = 0"

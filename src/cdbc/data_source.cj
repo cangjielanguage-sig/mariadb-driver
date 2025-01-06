@@ -3,11 +3,9 @@
  */
 package mysql.cdbc
 
-
 import std.database.sql.*
 import std.sync.AtomicBool
 import std.collection.HashMap
-
 
 public class DatasourceImpl <: Datasource {
 
@@ -20,12 +18,10 @@ public class DatasourceImpl <: Datasource {
         closed = AtomicBool(false)
     }
     
-    /*设置连接选项*/
     public override func setOption(key: String, value: String): Unit {
         optinos.put(key, value)
     }
 
-    /*返回一个可用的连接*/
     public override func connect(): Connection {
         checkResource()
         return ConnectionImpl(optinos)

@@ -17,7 +17,7 @@ public class ConnectionImpl <: Connection{
     
     private var connection: MySqlConnection
 
-    private var transaction: ?Transaction
+    private var transaction: Transaction
 
     private var options: Map<String, String>
 
@@ -30,15 +30,15 @@ public class ConnectionImpl <: Connection{
     public ConnectionImpl(options: Map<String, String>){
         this.currentState = ConnectionState.Connecting
         this.options = options
-        this.transaction = None
         try {
              this.connection = MySqlConnectionFactory.createAuthedConnection(options)
-             applyOptions()
         }catch (e: ConnectFailedException) {
             currentState = ConnectionState.Broken
             throw e
         }
+        this.transaction = TransactionImpl(connection.createTransaction())
         this.currentState = ConnectionState.Connected
+        applyOptions()
     }
 
     override public func getMetaData(): Map<String,String>{
@@ -61,16 +61,7 @@ public class ConnectionImpl <: Connection{
 
     override public func createTransaction(): Transaction{
         checkResource()
-        if(let Some(v) <- transaction) {
-            return v
-        }else {
-            synchronized(getConnectionMutex()){
-                if(transaction.isNone()){
-                    transaction = TransactionImpl(this.connection.createTransaction())
-                }
-                return transaction.getOrThrow()
-            }
-        }
+        return transaction
     }
 
     override public func close(){

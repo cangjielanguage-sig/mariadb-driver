@@ -37,7 +37,6 @@ class TransactionImpl <: Transaction {
         } 
     }
 
-    /*获取数据库事务隔离级别*/
     public mut override prop isoLevel: TransactionIsoLevel {
         get() {
             return isolationLevel
@@ -61,7 +60,6 @@ class TransactionImpl <: Transaction {
         }
     }
 
-    /*获取数据库事务访问模式*/
     public mut override prop accessMode: TransactionAccessMode {
         get() {
             return accessPower
@@ -81,7 +79,6 @@ class TransactionImpl <: Transaction {
         }
     }
 
-    /*获取数据库事务延迟模式。*/
     public mut override prop deferrableMode: TransactionDeferrableMode {
         get() {
             return deferrableMode
@@ -91,37 +88,31 @@ class TransactionImpl <: Transaction {
         }
     }
 
-    /*开始数据库事务。*/
     public override func begin(): Unit {
         checkResource()
         transaction.begin()
     }
 
-    /*提交数据库事务。*/
     public override func commit(): Unit {
         checkResource()
         transaction.commit()
     }
 
-    /*从挂起状态回滚事务。*/
     public override func rollback(): Unit {
         checkResource()
         transaction.rollback()
     }
 
-    /*在事务中创建一个指定名称的保存点，可用于回滚此保存点之后的事务。*/
     public override func save(savePointName: String): Unit {
         checkResource()
         transaction.setSavepoint(savePointName)
     }
 
-    /*回滚事务至指定保存点名称。*/
     public override func rollback(savePointName: String): Unit {
         checkResource()
         transaction.rollback(savePointName)
     }
 
-    /*销毁先前在当前事务中定义的保存点。这允许系统在事务结束之前回收一些资源。*/
     public override func release(savePointName: String): Unit {
         checkResource()
         transaction.releaseSavepoint(savePointName)

@@ -111,3 +111,4 @@
 ## Rename
 
 - 更名为项目更名为mysql-driver
+- 移除jdbc接口实现

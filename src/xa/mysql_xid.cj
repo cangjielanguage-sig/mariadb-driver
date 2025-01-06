@@ -19,7 +19,6 @@ public class MySqlXid <: Hashable & Equatable<MySqlXid> {
         this.formatId = formatId
     }
 
-
     public override operator func == (right: MySqlXid): Bool {
         return this.globalTransactionId == right.globalTransactionId && 
                this.branchQualifier == right.branchQualifier && 
@@ -28,7 +27,7 @@ public class MySqlXid <: Hashable & Equatable<MySqlXid> {
 
     public override func hashCode(): Int64 {
         if (this.hash == 0) {
-            for (i in 0l..this.globalTransactionId.size) {
+            for (i in 1..this.globalTransactionId.size) {
                 this.hash = 33 * this.hash + Int64(this.globalTransactionId[i])
             }
         }

@@ -37,7 +37,6 @@ public class QueryResultImpl <: QueryResult {
         this.infos = arrayList.toArray()
     }   
 
-    /*向后移动一行，必须先调用一次 next 才能移动到第一行，第二次调用移动到第二行，依此类推。当返回 true 时，驱动会在 values 中填入行数据；当返回 false 时结束，且不会修改 values 的内容。*/
     public override func next(values: Array<SqlDbType>): Bool {
         checkResourceAvailability()
         synchronized(resultSetMutext){

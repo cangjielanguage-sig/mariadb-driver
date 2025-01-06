@@ -98,45 +98,46 @@ protected class HandshakeResponse <: Request {
     public override func pack(): Unit {
         super.pack()
         //put client Capabilities
-        buf.appendAll(capabilities.toLittleEndian())
+        this.capabilities.toLittleEndian() |> pack
         //put max packet
-        buf.appendAll(maxPacket.toLittleEndian())
+        this.maxPacket.toLittleEndian() |> pack
         //put charset
-        buf.append(charset)
+        this.charset.toLittleEndian() |> pack
         //put unused
-        buf.appendAll(unused)
+        this.unused |> pack
         //put username
-        buf.appendAll(username.toNullTerminated())
+        this.username.toNullTerminated() |> pack
         //put auth response
         if(hasCapability(PluginAuthLenencClientData)){
-            buf.appendAll(authResponse.toLengthEncoded())
+            this.authResponse.toLengthEncoded() |> pack
         }else{
-            buf.append(UInt8(authResponse.size))
-            buf.appendAll(authResponse.toLengthEncoded())
+            UInt8(this.authResponse.size).toLittleEndian() |> pack
+            this.authResponse.toLengthEncoded() |> pack
         }
         // put schema if 'Connect With DB' are set
         if(hasCapability(ConnectWithDB)){
-            buf.appendAll(schema.toNullTerminated())
+            this.schema.toNullTerminated() |> pack
         }
         //put client auth plguin
         if(hasCapability(PluginAuth)){
-            buf.appendAll(clientAuthPlugin.toNullTerminated())
+            this.clientAuthPlugin.toNullTerminated() |> pack
         }
         //put attributes
         if(hasCapability(ConnectAttrs)) {
             let temp = ArrayList<Byte>()
-            for((k,v) in attributes) {
+            for((k,v) in this.attributes) {
                 let key = k.toNullTerminated()
                 temp.appendAll(key)
                 let value = v.toNullTerminated()
                 temp.appendAll(value)
             }
-            buf.appendAll(UInt64(temp.size).toLengthEncoded())
-            buf.appendAll(temp)
+            UInt64(temp.size).toLengthEncoded() |> pack
+            temp.toArray() |> pack
         }
         if(hasCapability(ZSTDCompressionAlgorithm)) {
-            buf.append(zstdCompressionLevel)
+            this.zstdCompressionLevel.toLittleEndian() |> pack
         }
+        
     }
 
     /*
@@ -146,15 +147,14 @@ protected class HandshakeResponse <: Request {
     protected func sslRequest(): Array<Byte> {
         super.pack()
         //put client Capabilities
-        buf.appendAll(capabilities.toLittleEndian())
+        this.capabilities.toLittleEndian() |> pack
         //put max packet
-        buf.appendAll(maxPacket.toLittleEndian())
+        this.maxPacket.toLittleEndian() |> pack
         //put charset
-        buf.append(charset)
+        this.charset |> pack
         //put unused
-        buf.appendAll(unused)
-        setHeader()
-        return buf.toArray()
+        this.unused |> pack
+        return toByteArray()
     }
 
     protected static func getDefault(number: UInt8): HandshakeResponse{
@@ -163,6 +163,7 @@ protected class HandshakeResponse <: Request {
                             .setCharset(33)
                             .setMaxPacket(1073741824)
     }
+
 }
 
 /*
@@ -179,7 +180,7 @@ protected class RequestPublicKey <: Request{
 
     protected override func pack(): Unit {
         super.pack()
-        buf.append(code)
+        this.code |> pack
     }
 
 }
@@ -198,9 +199,8 @@ protected class SendPassword <: Request{
 
     protected override func pack(): Unit {
         super.pack()
-        buf.appendAll(authResponse)
+        this.authResponse |> pack
     }
-
 
 }
 
