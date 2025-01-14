@@ -16,11 +16,11 @@ public class XATest {
     @TestCase
     public func case1(): Unit {
         let map = HashMap<String, String>()
-        map.put("host", "localhost")
-        map.put("username", "root")
-        map.put("port", "3306")
-        map.put("password", "123456")
-        map.put("ssl.mode", "disabled")
+        map.add("host", "localhost")
+        map.add("username", "root")
+        map.add("port", "3306")
+        map.add("password", "123456")
+        map.add("ssl.mode", "disabled")
         let xaResource = MySqlXaResouce(map)
         let xid = MySqlXid("yesokim".toArray(), branchQualifier: "brach1".toArray())
         xaResource.start(xid)

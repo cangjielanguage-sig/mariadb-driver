@@ -212,7 +212,7 @@ protected class MySqlConnection <: Resource {
         if(prepareResponse.numParams > 0){
             for (_ in 0..prepareResponse.numParams) {
                 let (length, payload) = read()
-                parameters.append(ColumnDefinition(length, ByteBuffer(payload)))
+                parameters.add(ColumnDefinition(length, ByteBuffer(payload)))
             }
             read()
         }
@@ -220,7 +220,7 @@ protected class MySqlConnection <: Resource {
         if(prepareResponse.numColumns > 0) {
             for (_ in 0..prepareResponse.numColumns) {
                 let (length, payload) = read()
-                columns.append(ColumnDefinition(length, ByteBuffer(payload)))
+                columns.add(ColumnDefinition(length, ByteBuffer(payload)))
             }
             read()
         }
@@ -238,7 +238,7 @@ protected class MySqlConnection <: Resource {
         for (_ in 0..filedsCount.count) {
             let (length, payload) = read()
             let field = ColumnDefinition(length, ByteBuffer(payload))
-            fields.append(field)
+            fields.add(field)
         }
         //丢弃Eof包
         read()
@@ -246,7 +246,7 @@ protected class MySqlConnection <: Resource {
         let rows = ArrayList<Array<?Array<Byte>>>()
         while (payload[1] != ResponseCode.Eof.value() || payload.size > 6) {
             let row = BinaryResult(length, ByteBuffer(payload), fields.toArray())
-            rows.append(row.binaryData)
+            rows.add(row.binaryData)
             (length, payload) = read()
         }
         return BinaryResultSet(fields.toArray(), rows.toArray())
@@ -261,7 +261,7 @@ protected class MySqlConnection <: Resource {
         let rows = ArrayList<Array<?Array<Byte>>>()
         while (payload[1] != ResponseCode.Eof.value() || payload.size > 6) {
             let row = BinaryResult(length, ByteBuffer(payload), columnInfos)
-            rows.append(row.binaryData)
+            rows.add(row.binaryData)
             (length, payload) = read()
         }
         return BinaryResultSet(columnInfos, rows.toArray())
@@ -278,7 +278,7 @@ protected class MySqlConnection <: Resource {
         for (_ in 0..filedsCount.count) {
             let (length, payload) = read()
             let field = ColumnDefinition(length, ByteBuffer(payload))
-            fields.append(field)
+            fields.add(field)
         }
         //drop eof package
         read()
@@ -356,7 +356,7 @@ protected class MySqlConnection <: Resource {
         for (_ in 0..columnCount.count) {
             let (length, payload) = channel.read()
             let field = ColumnDefinition(length, ByteBuffer(payload))
-            fields.append(field)
+            fields.add(field)
         }
         //丢弃Eof包
         read()
@@ -364,7 +364,7 @@ protected class MySqlConnection <: Resource {
         let rowPackets = ArrayList<TextResult>()
         while (payload[1] != ResponseCode.Eof.value() || payload.size > 6) {
             let row = TextResult(length, ByteBuffer(payload), Int64(columnCount.count))
-            rowPackets.append(row)
+            rowPackets.add(row)
             (length, payload) = channel.read()
         }
         return TextResultSet(fields.toArray(), rowPackets.toArray())

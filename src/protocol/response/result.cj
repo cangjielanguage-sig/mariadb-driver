@@ -15,7 +15,7 @@ protected class ColumnCount <: CommonResponse {
     protected let count: UInt64
 
     protected init(length: UInt32, buffer: ByteBuffer) {
-        super(length, buffer) 
+        super(length, buffer)
         //列的数量: lenenc
         this.count = UInt64.fromLittleEndian(buffer.readLengthEncodedIntegerRaw().getOrThrow())
     }
@@ -94,11 +94,10 @@ protected class TextResult <: CommonResponse {
 
     protected init(length: UInt32, buffer: ByteBuffer, columnCount: Int64) {
         super(length, buffer)
-        let columns = ArrayList<?Array<Byte>>(columnCount)
-        for (_ in 0..columnCount) {
-            columns.append(buffer.readLengthEncodedStringRaw())
+        this.row = Array<?Array<Byte>>(columnCount, repeat: None)
+        for(i in 0..columnCount) {
+            row[i] = buffer.readLengthEncodedStringRaw()
         }
-        this.row = columns.toArray()
     }
 }
 
@@ -141,8 +140,8 @@ protected class BinaryResult <: Response {
                         let flag = buffer.readOneByte()
                         let temp = buffer.readBytes(Int64(flag))
                         let list = ArrayList<Byte>(Int64(1 + flag))
-                        list.append(flag)
-                        list.appendAll(temp)
+                        list.add(flag)
+                        list.add(all: temp)
                         binaryData[i] = list.toArray()
                     //case _ => throw Exception("Unsupport MySQL binary type")
                 }

@@ -4,6 +4,7 @@
 package mysql.cdbc
 
 import std.database.sql.*
+import std.time.*
 import std.collection.HashMap
 import std.sync.AtomicBool
 import std.regex.Regex
@@ -60,7 +61,7 @@ public class ClientPrepareStatement <: Statement {
 
     public override func setOption(key: String, value: String): Unit {
         checkResourceAvailability()
-        options.put(key, value)
+        options.add(key, value)
     }
 
     private func getExecuteableSql(params: Array<SqlDbType>): String {
@@ -95,13 +96,13 @@ public class ClientPrepareStatement <: Statement {
                 case v: SqlBlob => 
                     setParamWithoutQuotation(replacer, toArray(v.value).toHexStringWithPrefix())
                 case v: SqlDate => 
-                    setParamWithQuotation(replacer, v.value.toString(DB_DATE_FORMAT))
+                    setParamWithQuotation(replacer, v.value.toString(DateTimeFormat.of(DB_DATE_FORMAT)))
                 case v: SqlTime => 
-                    setParamWithQuotation(replacer, v.value.toString(DB_TIME_FORMAT))
+                    setParamWithQuotation(replacer, v.value.toString(DateTimeFormat.of(DB_TIME_FORMAT)))
                 case v: SqlTimeTz => 
-                    setParamWithQuotation(replacer, v.value.toString(DB_TIME_FORMAT))
+                    setParamWithQuotation(replacer, v.value.toString(DateTimeFormat.of(DB_TIME_FORMAT)))
                 case v: SqlTimestamp => 
-                    setParamWithQuotation(replacer, v.value.toString(DB_DATE_TIME_FORMAT))
+                    setParamWithQuotation(replacer, v.value.toString(DateTimeFormat.of(DB_DATE_TIME_FORMAT)))
                 case v: SqlBinary => 
                     setParamWithoutQuotation(replacer, v.value.toHexStringWithPrefix())
                 case v: SqlVarBinary => 
@@ -170,22 +171,22 @@ public class ClientPrepareStatement <: Statement {
                 case v: SqlNullableDate => 
                     match (v.value) {
                         case None => setParamWithoutQuotation(replacer, "NULL")
-                        case Some(s) => setParamWithQuotation(replacer, s.toString(DB_DATE_FORMAT))
+                        case Some(s) => setParamWithQuotation(replacer, s.toString(DateTimeFormat.of(DB_DATE_FORMAT)))
                     }
                 case v: SqlNullableTime => 
                     match (v.value) {
                         case None => setParamWithoutQuotation(replacer, "NULL")
-                        case Some(s) => setParamWithQuotation(replacer, s.toString(DB_TIME_FORMAT))
+                        case Some(s) => setParamWithQuotation(replacer, s.toString(DateTimeFormat.of(DB_TIME_FORMAT)))
                     }
                 case v: SqlNullableTimeTz => 
                     match (v.value) {
                         case None => setParamWithoutQuotation(replacer, "NULL")
-                        case Some(s) => setParamWithQuotation(replacer, s.toString(DB_TIME_FORMAT))
+                        case Some(s) => setParamWithQuotation(replacer, s.toString(DateTimeFormat.of(DB_TIME_FORMAT)))
                     }
                 case v: SqlNullableTimestamp => 
                     match (v.value) {
                         case None => setParamWithoutQuotation(replacer, "NULL")
-                        case Some(s) => setParamWithQuotation(replacer, s.toString(DB_DATE_TIME_FORMAT))
+                        case Some(s) => setParamWithQuotation(replacer, s.toString(DateTimeFormat.of(DB_DATE_TIME_FORMAT)))
                     }
                 case v: SqlNullableBinary => 
                     match (v.value) {

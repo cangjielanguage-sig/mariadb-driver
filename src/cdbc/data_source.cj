@@ -19,7 +19,7 @@ public class DatasourceImpl <: Datasource {
     }
     
     public override func setOption(key: String, value: String): Unit {
-        optinos.put(key, value)
+        optinos.add(key, value)
     }
 
     public override func connect(): Connection {

@@ -31,7 +31,7 @@ protected class TextResultSet <: ResultSet {
         this.currentRow = 0
         this.indexMap = HashMap<String, Int64>()
         for(i in 0..columns.size){
-            indexMap.put(columns[i].name, i + 1)
+            indexMap.add(columns[i].name, i + 1)
         }
     }
     

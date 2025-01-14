@@ -23,12 +23,12 @@ protected open class Request {
     }
     
     protected open func pack(): Unit {
-        buf.appendAll(Header)
-        buf.append(number)
+        buf.add(all: Header)
+        buf.add(number)
     }
 
     protected func pack(data: Array<Byte>): Unit {
-        buf.appendAll(data)
+        buf.add(all: data)
     }
 
     protected func toByteArray(): Array<Byte> {
@@ -40,9 +40,9 @@ protected open class Request {
     private func setHeader(): Unit {
         try {
             let header = UInt32(buf.size - 4).toLittleEndian()
-            buf.set(0, header[0])
-            buf.set(1, header[1])
-            buf.set(2, header[2])
+            buf[0] = header[0]
+            buf[1] = header[1]
+            buf[2] = header[2]
         }catch (e: OverflowException) {
             throw Exception("current package size is to large")
         }

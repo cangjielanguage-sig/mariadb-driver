@@ -3,9 +3,8 @@
  */
 protected package mysql.protocol.request
 
-import std.io.InputStream
-import std.time.DateTime
-import std.time.TimeParseException
+import std.io.*
+import std.time.*
 import std.collection.ArrayList
 import std.convert.Parsable
 import std.math.numeric.Decimal
@@ -415,7 +414,7 @@ protected class ExecuteCommand <: Command {
             case Timestamp | DateTime => 
                 value.toBinaryDateTime() |> pack
             case String | VarString | Blob => 
-                appendString(index, value.toString(DB_DATE_TIME_FORMAT))
+                appendString(index, value.toString(DateTimeFormat.of(DB_DATE_TIME_FORMAT)))
             case _ => throw IllegalArgumentException("The parameter type at position ${index + 1} does not match the required type: ${paramType}")
         }
     }

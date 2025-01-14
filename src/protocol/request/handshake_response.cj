@@ -72,7 +72,7 @@ protected class HandshakeResponse <: Request {
     }
 
     protected func addAttrbiture(name: String, value: String): HandshakeResponse {
-        this.attributes.put(name, value)
+        this.attributes.add(name, value)
         return this
     }
 
@@ -127,9 +127,9 @@ protected class HandshakeResponse <: Request {
             let temp = ArrayList<Byte>()
             for((k,v) in this.attributes) {
                 let key = k.toNullTerminated()
-                temp.appendAll(key)
+                temp.add(all: key)
                 let value = v.toNullTerminated()
-                temp.appendAll(value)
+                temp.add(all: value)
             }
             UInt64(temp.size).toLengthEncoded() |> pack
             temp.toArray() |> pack

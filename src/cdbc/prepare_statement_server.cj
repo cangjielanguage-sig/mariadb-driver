@@ -39,7 +39,7 @@ public class ServerPrepareStatement <: Statement {
         this.closed = AtomicBool(false)
         let array = ArrayList<ColumnInfo>()
         for(i in prepareResult.columns) {
-            array.append(ColumnInfoImpl(i))
+            array.add(ColumnInfoImpl(i))
         }
         this.paramsInfo = array.toArray()
     }
@@ -78,137 +78,137 @@ public class ServerPrepareStatement <: Statement {
         for (i in 0..params.size) {
             match (params[i]) {
                 case v: SqlBool => 
-                    parameters.append(v.value)
+                    parameters.add(v.value)
                 case v: SqlByte => 
-                    parameters.append(v.value)
+                    parameters.add(v.value)
                 case v: SqlSmallInt => 
-                    parameters.append(v.value)
+                    parameters.add(v.value)
                 case v: SqlInteger => 
-                    parameters.append(v.value)
+                    parameters.add(v.value)
                 case v: SqlBigInt => 
-                    parameters.append(v.value)
+                    parameters.add(v.value)
                 case v: SqlReal => 
-                    parameters.append(v.value)
+                    parameters.add(v.value)
                 case v: SqlDouble => 
-                    parameters.append(v.value)
+                    parameters.add(v.value)
                 case v: SqlDecimal => 
-                    parameters.append(v.value)
+                    parameters.add(v.value)
                 case v: SqlChar => 
-                    parameters.append(v.value)
+                    parameters.add(v.value)
                 case v: SqlVarchar => 
-                    parameters.append(v.value)
+                    parameters.add(v.value)
                 case v: SqlClob => 
-                    parameters.append(v.value)
+                    parameters.add(v.value)
                 case v: SqlBlob => 
-                    parameters.append(v.value)
+                    parameters.add(v.value)
                 case v: SqlDate => 
-                    parameters.append(v.value)
+                    parameters.add(v.value)
                 case v: SqlTime => 
-                    parameters.append(v.value)
+                    parameters.add(v.value)
                 case v: SqlTimeTz => 
-                    parameters.append(v.value)
+                    parameters.add(v.value)
                 case v: SqlTimestamp => 
-                    parameters.append(v.value)
+                    parameters.add(v.value)
                 case v: SqlBinary => 
-                    parameters.append(v.value)
+                    parameters.add(v.value)
                 case v: SqlVarBinary => 
-                    parameters.append(v.value)
+                    parameters.add(v.value)
                 case v: SqlJson => 
-                    parameters.append(v.value)
+                    parameters.add(v.value)
                 case v: SqlNullableBool => 
                     match (v.value) {
-                        case None => parameters.append(Option<Any>.None)
-                        case Some(s) => parameters.append(s)
+                        case None => parameters.add(Option<Any>.None)
+                        case Some(s) => parameters.add(s)
                     }
                 case v: SqlNullableByte => 
                     match (v.value) {
-                        case None => parameters.append(Option<Any>.None)
-                        case Some(s) => parameters.append(s)
+                        case None => parameters.add(Option<Any>.None)
+                        case Some(s) => parameters.add(s)
                     }
                 case v: SqlNullableSmallInt => 
                     match (v.value) {
-                        case None => parameters.append(Option<Any>.None)
-                        case Some(s) => parameters.append(s)
+                        case None => parameters.add(Option<Any>.None)
+                        case Some(s) => parameters.add(s)
                     }
                 case v: SqlNullableInteger => 
                     match (v.value) {
-                        case None => parameters.append(Option<Any>.None)
-                        case Some(s) => parameters.append(s)
+                        case None => parameters.add(Option<Any>.None)
+                        case Some(s) => parameters.add(s)
                     }
                 case v: SqlNullableBigInt => 
                     match (v.value) {
-                        case None => parameters.append(Option<Any>.None)
-                        case Some(s) => parameters.append(s)
+                        case None => parameters.add(Option<Any>.None)
+                        case Some(s) => parameters.add(s)
                     }
                 case v: SqlNullableReal => 
                     match (v.value) {
-                        case None => parameters.append(Option<Any>.None)
-                        case Some(s) => parameters.append(s)
+                        case None => parameters.add(Option<Any>.None)
+                        case Some(s) => parameters.add(s)
                     }
                 case v: SqlNullableDouble => 
                     match (v.value) {
-                        case None => parameters.append(Option<Any>.None)
-                        case Some(s) => parameters.append(s)
+                        case None => parameters.add(Option<Any>.None)
+                        case Some(s) => parameters.add(s)
                     }
                 case v: SqlNullableDecimal => 
                     match (v.value) {
-                        case None => parameters.append(Option<Any>.None)
-                        case Some(s) => parameters.append(s)
+                        case None => parameters.add(Option<Any>.None)
+                        case Some(s) => parameters.add(s)
                     }
                 case v: SqlNullableChar => 
                     match (v.value) {
-                        case None => parameters.append(Option<Any>.None)
-                        case Some(s) => parameters.append(s)
+                        case None => parameters.add(Option<Any>.None)
+                        case Some(s) => parameters.add(s)
                     }
                 case v: SqlNullableVarchar => 
                     match (v.value) {
-                        case None => parameters.append(Option<Any>.None)
-                        case Some(s) => parameters.append(s)
+                        case None => parameters.add(Option<Any>.None)
+                        case Some(s) => parameters.add(s)
                     }
                 case v: SqlNullableClob => 
                     match (v.value) {
-                        case None => parameters.append(Option<Any>.None)
-                        case Some(s) => parameters.append(s)
+                        case None => parameters.add(Option<Any>.None)
+                        case Some(s) => parameters.add(s)
                     }
                 case v: SqlNullableBlob => 
                     match (v.value) {
-                        case None => parameters.append(Option<Any>.None)
-                        case Some(s) => parameters.append(s)
+                        case None => parameters.add(Option<Any>.None)
+                        case Some(s) => parameters.add(s)
                     }
                 case v: SqlNullableDate => 
                     match (v.value) {
-                        case None => parameters.append(Option<Any>.None)
-                        case Some(s) => parameters.append(s)
+                        case None => parameters.add(Option<Any>.None)
+                        case Some(s) => parameters.add(s)
                     }
                 case v: SqlNullableTime => 
                     match (v.value) {
-                        case None => parameters.append(Option<Any>.None)
-                        case Some(s) => parameters.append(s)
+                        case None => parameters.add(Option<Any>.None)
+                        case Some(s) => parameters.add(s)
                     }
                 case v: SqlNullableTimeTz => 
                     match (v.value) {
-                        case None => parameters.append(Option<Any>.None)
-                        case Some(s) => parameters.append(s)
+                        case None => parameters.add(Option<Any>.None)
+                        case Some(s) => parameters.add(s)
                     }
                 case v: SqlNullableTimestamp => 
                     match (v.value) {
-                        case None => parameters.append(Option<Any>.None)
-                        case Some(s) => parameters.append(s)
+                        case None => parameters.add(Option<Any>.None)
+                        case Some(s) => parameters.add(s)
                     }
                 case v: SqlNullableBinary => 
                     match (v.value) {
-                        case None => parameters.append(Option<Any>.None)
-                        case Some(s) => parameters.append(s)
+                        case None => parameters.add(Option<Any>.None)
+                        case Some(s) => parameters.add(s)
                     }
                 case v: SqlNullableVarBinary => 
                     match (v.value) {
-                        case None => parameters.append(Option<Any>.None)
-                        case Some(s) => parameters.append(s)
+                        case None => parameters.add(Option<Any>.None)
+                        case Some(s) => parameters.add(s)
                     }
                 case v: SqlNullableJson => 
                     match (v.value) {
-                        case None => parameters.append(Option<Any>.None)
-                        case Some(s) => parameters.append(s)
+                        case None => parameters.add(Option<Any>.None)
+                        case Some(s) => parameters.add(s)
                     }
                 case _ => throw UnsupportedException("An unsupported input type")
             }
@@ -218,7 +218,7 @@ public class ServerPrepareStatement <: Statement {
 
     public override func setOption(key: String, value: String): Unit {
         checkResource()
-        options.put(key, value)
+        options.add(key, value)
     }
 
     private func checkResource() {

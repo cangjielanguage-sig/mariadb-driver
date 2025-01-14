@@ -25,35 +25,35 @@ extend DateTime <: BinaryDate {
     
     public func toBinaryDate(): Array<Byte> {
         let buf = ArrayList<Byte>(5)
-        buf.append(4)
-        buf.appendAll(UInt16(year).toLittleEndian())
-        buf.append(UInt8(month.value()))
-        buf.append(UInt8(dayOfMonth))
+        buf.add(4)
+        buf.add(all: UInt16(year).toLittleEndian())
+        buf.add(UInt8(month.value()))
+        buf.add(UInt8(dayOfMonth))
         return buf.toArray()
     }
 
     @OverflowWrapping
     public func toBinaryTime(): Array<Byte> {
         let buf = ArrayList<Byte>(9)
-        buf.append(8)
-        buf.append(0x00)
-        buf.appendAll([0x00, 0x00, 0x00, 0x00])
-        buf.append(UInt8(hour))
-        buf.append(UInt8(minute))
-        buf.append(UInt8(second))
+        buf.add(8)
+        buf.add(0x00)
+        buf.add(all: [0x00, 0x00, 0x00, 0x00])
+        buf.add(UInt8(hour))
+        buf.add(UInt8(minute))
+        buf.add(UInt8(second))
         return buf.toArray()
     }
 
     @OverflowWrapping
     public func toBinaryDateTime(): Array<Byte> {
         var buf = ArrayList<Byte>(8)
-        buf.append(7)
-        buf.appendAll(UInt16(year).toLittleEndian())
-        buf.append(UInt8(month.value()))
-        buf.append(UInt8(dayOfMonth))
-        buf.append(UInt8(hour))
-        buf.append(UInt8(minute))
-        buf.append(UInt8(second))
+        buf.add(7)
+        buf.add(all: UInt16(year).toLittleEndian())
+        buf.add(UInt8(month.value()))
+        buf.add(UInt8(dayOfMonth))
+        buf.add(UInt8(hour))
+        buf.add(UInt8(minute))
+        buf.add(UInt8(second))
         return buf.toArray()
     }
 

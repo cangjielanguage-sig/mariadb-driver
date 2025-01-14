@@ -3,8 +3,7 @@
  */
 protected package mysql.result
 
-import std.time.DateTime
-import std.time.TimeParseException
+import std.time.*
 import std.io.ByteBuffer
 import std.io.InputStream
 import std.math.numeric.BigInt
@@ -31,7 +30,7 @@ protected class BinaryResultSet <: ResultSet {
         this.currentRow = 0
         indexMap = HashMap<String, Int64>()
         for (i in 0..columns.size) {
-            indexMap.put(columns[i].name, i + 1)
+            indexMap.add(columns[i].name, i + 1)
         }
     }
 
@@ -315,11 +314,11 @@ protected class BinaryResultSet <: ResultSet {
                         //         throw Exception("Unsupported Charset: Latin1SwedishCi")
                         // }
                     case Date => 
-                        return getDate(index).getOrThrow().toString(DB_DATE_FORMAT)
+                        return getDate(index).getOrThrow().toString(DateTimeFormat.of(DB_DATE_FORMAT))
                     case DateTime | Timestamp => 
-                        return getDateTime(index).getOrThrow().toString(DB_DATE_TIME_FORMAT)
+                        return getDateTime(index).getOrThrow().toString(DateTimeFormat.of(DB_DATE_TIME_FORMAT))
                     case Time => 
-                        return getTime(index).getOrThrow().toString(DB_TIME_FORMAT)
+                        return getTime(index).getOrThrow().toString(DateTimeFormat.of(DB_TIME_FORMAT))
                         //case _ => throw Exception("Unsupport MySQL binary type")
                     }
         }

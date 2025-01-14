@@ -76,7 +76,7 @@ public class MySqlXaResouce <: Resource {
             let gtrid = array.slice(0, gtridLength)
             let bqual = array.toArray().slice(gtridLength, bqualLength)
             let xid = MySqlXid(gtrid, branchQualifier: bqual , formatId: formatId)
-            xids.append(xid)
+            xids.add(xid)
         }
         return xids.toArray()
     }

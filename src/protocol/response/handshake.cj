@@ -45,8 +45,8 @@ protected class Handshake <: CommonResponse {
     protected prop salt: Array<Byte>{
         get() {
             let buf = ArrayList<Byte>(salt1.size + salt2.size)
-            buf.appendAll(salt1)
-            buf.appendAll(salt2)
+            buf.add(all: salt1)
+            buf.add(all: salt2)
             return buf.toArray()
         }
     }

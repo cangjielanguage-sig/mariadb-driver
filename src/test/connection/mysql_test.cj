@@ -35,11 +35,11 @@ public class MySqlTest {
     @TestCase
     public func case1(): Unit {
         var attr = HashMap<String, String>()
-        attr.put(Params.Username, "caching_user")
-        attr.put(Params.Password, "caching_user")
-        attr.put(Params.Host, "localhost")
-        attr.put(Params.Port, "3306")
-        attr.put(Params.SSLMode, "disabled")
+        attr.add(Params.Username, "caching_user")
+        attr.add(Params.Password, "caching_user")
+        attr.add(Params.Host, "localhost")
+        attr.add(Params.Port, "3306")
+        attr.add(Params.SSLMode, "disabled")
         var conn = MySqlConnectionFactory.createAuthedConnection(attr)
         conn.close()
     }
@@ -47,11 +47,11 @@ public class MySqlTest {
     @TestCase
     public func case2(): Unit {
         var attr = HashMap<String, String>()
-        attr.put(Params.Username, "native_user")
-        attr.put(Params.Password, "native_user")
-        attr.put(Params.Host, "localhost")
-        attr.put(Params.Port, "3306")
-        attr.put(Params.SSLMode, "disabled")
+        attr.add(Params.Username, "native_user")
+        attr.add(Params.Password, "native_user")
+        attr.add(Params.Host, "localhost")
+        attr.add(Params.Port, "3306")
+        attr.add(Params.SSLMode, "disabled")
         var conn = MySqlConnectionFactory.createAuthedConnection(attr)
         conn.close()
     }
@@ -59,11 +59,11 @@ public class MySqlTest {
     @TestCase
     public func case3(): Unit {
         var attr = HashMap<String, String>()
-        attr.put(Params.Username, "sha256_user")
-        attr.put(Params.Password, "sha256_user")
-        attr.put(Params.Host, "localhost")
-        attr.put(Params.Port, "3306")
-        attr.put(Params.SSLMode, "disabled")
+        attr.add(Params.Username, "sha256_user")
+        attr.add(Params.Password, "sha256_user")
+        attr.add(Params.Host, "localhost")
+        attr.add(Params.Port, "3306")
+        attr.add(Params.SSLMode, "disabled")
         var conn = MySqlConnectionFactory.createAuthedConnection(attr)
         conn.close()
     }
@@ -71,10 +71,10 @@ public class MySqlTest {
     @TestCase
     public func case4(): Unit {
         var attr = HashMap<String, String>()
-        attr.put(Params.Username, "caching_user")
-        attr.put(Params.Password, "caching_user")
-        attr.put(Params.Host, "localhost")
-        attr.put(Params.Port, "3306")
+        attr.add(Params.Username, "caching_user")
+        attr.add(Params.Password, "caching_user")
+        attr.add(Params.Host, "localhost")
+        attr.add(Params.Port, "3306")
         var conn = MySqlConnectionFactory.createAuthedConnection(attr)
         conn.close()
     }
@@ -82,10 +82,10 @@ public class MySqlTest {
     @TestCase
     public func case5(): Unit {
         var attr = HashMap<String, String>()
-        attr.put(Params.Username, "native_user")
-        attr.put(Params.Password, "native_user")
-        attr.put(Params.Host, "localhost")
-        attr.put(Params.Port, "3306")
+        attr.add(Params.Username, "native_user")
+        attr.add(Params.Password, "native_user")
+        attr.add(Params.Host, "localhost")
+        attr.add(Params.Port, "3306")
         var conn = MySqlConnectionFactory.createAuthedConnection(attr)
         conn.close()
     }
@@ -93,10 +93,10 @@ public class MySqlTest {
     @TestCase
     public func case6(): Unit {
         var attr = HashMap<String, String>()
-        attr.put(Params.Username, "sha256_user")
-        attr.put(Params.Password, "sha256_user")
-        attr.put(Params.Host, "localhost")
-        attr.put(Params.Port, "3306")
+        attr.add(Params.Username, "sha256_user")
+        attr.add(Params.Password, "sha256_user")
+        attr.add(Params.Host, "localhost")
+        attr.add(Params.Port, "3306")
         var conn = MySqlConnectionFactory.createAuthedConnection(attr)
         conn.close()
     }

@@ -32,28 +32,28 @@ extend Array<Byte> <: ToLengthEncoded & ToNullTerminated & ToHexString {
     public func toLengthEncoded(): Array<Byte> {
         let buf = ArrayList<Byte>()
         if (this.size <= 0xFA) {
-            buf.append(UInt8(this.size))
-            buf.appendAll(this)
+            buf.add(UInt8(this.size))
+            buf.add(all: this)
         } else if (this.size <= (1 << 16)) {
-            buf.append(0xFC)
-            buf.appendAll(UInt16(this.size).toLittleEndian())
-            buf.appendAll(this)
+            buf.add(0xFC)
+            buf.add(all: UInt16(this.size).toLittleEndian())
+            buf.add(all: this)
         } else if (this.size <= (1 << 24)) {
-            buf.append(0xFD)
-            buf.appendAll(UInt32(this.size).toLittleEndian().slice(0, 3))
-            buf.appendAll(this)
+            buf.add(0xFD)
+            buf.add(all: UInt32(this.size).toLittleEndian().slice(0, 3))
+            buf.add(all: this)
         } else {
-            buf.append(0xFE)
-            buf.appendAll(UInt64(this.size).toLittleEndian())
-            buf.appendAll(this)
+            buf.add(0xFE)
+            buf.add(all: UInt64(this.size).toLittleEndian())
+            buf.add(all: this)
         }
         buf.toArray()
     }
 
     public func toNullTerminated(): Array<Byte> {
         let buf = ArrayList<Byte>(this.size + 1)
-        buf.appendAll(this)
-        buf.append(0)
+        buf.add(all: this)
+        buf.add(0)
         return buf.toArray()
     }
 

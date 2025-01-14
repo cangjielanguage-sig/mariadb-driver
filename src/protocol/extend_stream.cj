@@ -118,7 +118,7 @@ extend ByteBuffer <: LengthEncodedReader & FixedByteReader & NullTerminatedStrin
             if(b == 0) {
                 break
             }
-            buf.append(b)
+            buf.add(b)
         }
         return buf.toArray()
     }

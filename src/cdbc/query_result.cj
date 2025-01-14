@@ -32,7 +32,7 @@ public class QueryResultImpl <: QueryResult {
         let arrayList = ArrayList<ColumnInfo>()
         for(i in result.columnDefinitions){
             let info = ColumnInfoImpl(i)
-            arrayList.append(info)
+            arrayList.add(info)
         }
         this.infos = arrayList.toArray()
     }   

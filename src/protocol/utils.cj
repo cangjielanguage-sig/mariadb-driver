@@ -14,7 +14,7 @@ protected func toArray(inputStream: InputStream): Array<Byte> {
     var len = inputStream.read(buffer)
     var buf = ArrayList<Byte>()
     do {
-        buf.appendAll(buffer.slice(0,len))
+        buf.add(all: buffer.slice(0,len))
         len = inputStream.read(buffer)
     } while (len != 0)
     return buf.toArray()

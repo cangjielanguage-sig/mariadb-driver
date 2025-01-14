@@ -37,16 +37,16 @@ extend UInt <: ToLengthEncoded {
     public func toLengthEncoded(): Array<Byte> {
         let buf = ArrayList<Byte>()
         if (this < 0xFB) {
-            buf.append(UInt8(this))
+            buf.add(UInt8(this))
         } else if (this < UInt64(1 << 16)) {
-            buf.append(0xFC)
-            buf.appendAll(UInt16(this).toLittleEndian())
+            buf.add(0xFC)
+            buf.add(all: UInt16(this).toLittleEndian())
         } else if (this < UInt64(1 << 24)) {
-            buf.append(0xFD)
-            buf.appendAll(UInt32(this).toLittleEndian().slice(0, 3))
+            buf.add(0xFD)
+            buf.add(all: UInt32(this).toLittleEndian().slice(0, 3))
         } else {
-            buf.append(0xFE)
-            buf.appendAll(this.toLittleEndian())
+            buf.add(0xFE)
+            buf.add(all: this.toLittleEndian())
         }
         return buf.toArray()
     }
