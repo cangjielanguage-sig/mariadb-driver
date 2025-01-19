@@ -54,7 +54,7 @@ public class ClientPrepareStatement <: Statement {
         let result = connection.sendUpdate(executeableSql)
         var lastInsertId: Int64 = 0
         if (result.lastInsertId > 0) {
-            lastInsertId += Int64(result.lastInsertId) + getInsertCount() - 1
+            lastInsertId += Int64(result.lastInsertId) + insertCount(originSql) - 1
         }
         return UpdateResultImpl(Int64(result.effectRow), lastInsertId)
     }
@@ -224,8 +224,4 @@ public class ClientPrepareStatement <: Statement {
         }
     }
 
-    private func getInsertCount(): Int64 {
-        let matcher = Matcher(Regex("\\((.*?)\\)"), originSql.split("values")[1])
-        return matcher.findAll().getOrThrow().size
-    }
 }

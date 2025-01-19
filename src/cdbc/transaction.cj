@@ -81,10 +81,10 @@ class TransactionImpl <: Transaction {
 
     public mut override prop deferrableMode: TransactionDeferrableMode {
         get() {
-            return deferrableMode
+            throw UnsupportedException()
         }
         set(_) {
-
+            throw UnsupportedException()
         }
     }
 

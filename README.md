@@ -19,7 +19,6 @@ mysql-driver是使用Cangjie编写的mysql原生驱动程序，基于mysql客户
 ### 2.1 项目结构
 
 ```shell
-.
 ├── doc
     └── readme-image
 └── src
