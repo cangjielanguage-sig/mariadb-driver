@@ -3,7 +3,7 @@
  */
 protected package mysql.protocol
 
-import std.collection.ArrayList
+import std.collection.*
 
 protected interface ToBool {
 

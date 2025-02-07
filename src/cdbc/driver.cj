@@ -4,10 +4,10 @@
 package mysql.cdbc
 
 import std.convert.*
-import encoding.url.*
 import std.collection.*
 import std.database.sql.*
-import mysql.connection.Params
+import encoding.url.*
+import mysql.connection.*
 
 public class MySqlDriver <: Driver {
 

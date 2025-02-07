@@ -3,12 +3,13 @@
  */
 protected package mysql.protocol.request
 
-import std.collection.ArrayList
-import mysql.protocol.LittleEndian
+import std.collection.*
+import mysql.protocol.*
+
 
 protected open class Request {
 
-    private static let Header: Array<Byte> = [0x00, 0x00, 0x00]
+    private static let Header: Array<Byte> = Array<Byte>(3, repeat: 0)
 
     private let buf: ArrayList<Byte> = ArrayList<Byte>()
 
@@ -17,9 +18,9 @@ protected open class Request {
     protected init(number: UInt8) {
         this.number = number
     }
-    
-    protected func clear(): Unit {
-        buf.clear()
+
+    protected func pack(data: Array<Byte>): Unit {
+        buf.add(all: data)
     }
     
     protected open func pack(): Unit {
@@ -27,10 +28,10 @@ protected open class Request {
         buf.add(number)
     }
 
-    protected func pack(data: Array<Byte>): Unit {
-        buf.add(all: data)
+    protected func clear(): Unit {
+        buf.clear()
     }
-
+    
     protected func toByteArray(): Array<Byte> {
         pack()
         setHeader()

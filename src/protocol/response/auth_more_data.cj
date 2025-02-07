@@ -3,7 +3,7 @@
  */
 protected package mysql.protocol.response
 
-import std.io.ByteBuffer
+import std.io.*
 import mysql.protocol.*
 /*
 * AuthMoreData Packet

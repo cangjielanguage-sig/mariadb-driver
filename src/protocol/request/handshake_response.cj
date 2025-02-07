@@ -3,8 +3,7 @@
  */
 protected package mysql.protocol.request
 
-import std.collection.HashMap
-import std.collection.ArrayList
+import std.collection.*
 import mysql.protocol.*
 /*
 * HandshakeResponse41

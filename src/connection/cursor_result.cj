@@ -3,12 +3,11 @@
  */
 protected package mysql.connection
 
-import std.time.DateTime
-import std.io.InputStream
-import std.math.numeric.Decimal
-import std.math.numeric.BigInt
-import encoding.json.JsonValue
-import mysql.result.ResultSet
+import std.io.*
+import std.time.*
+import std.math.numeric.*
+import encoding.json.*
+import mysql.result.*
 import mysql.protocol.*
 import mysql.protocol.response.*
 

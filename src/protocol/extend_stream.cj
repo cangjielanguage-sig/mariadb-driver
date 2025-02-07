@@ -3,8 +3,9 @@
  */
 protected package mysql.protocol
 
-import std.io.ByteBuffer
-import std.collection.ArrayList
+import std.io.*
+import std.collection.*
+
 protected interface LengthEncodedReader {
     
     func readLengthEncodedString(): ?String

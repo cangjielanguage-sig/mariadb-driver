@@ -3,12 +3,12 @@
  */
 package mysql.cdbc
 
-import std.collection.*
 import std.sync.*
 import std.convert.*
+import std.collection.*
 import std.database.sql.*
 import mysql.result.*
-import mysql.protocol.ParameterConvertException
+import mysql.protocol.*
 import mysql.connection.*
 
 public class ConnectionImpl <: Connection{

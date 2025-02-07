@@ -3,9 +3,9 @@
  */
 package mysql.cdbc
 
+import std.sync.*
+import std.collection.*
 import std.database.sql.*
-import std.sync.AtomicBool
-import std.collection.HashMap
 
 public class DatasourceImpl <: Datasource {
 

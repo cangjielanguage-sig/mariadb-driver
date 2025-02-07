@@ -3,8 +3,8 @@
  */
 protected package mysql.protocol
 
-import std.collection.ArrayList
-import encoding.hex.toHexString
+import std.collection.*
+import encoding.hex.*
 
 protected interface ToLengthEncoded {
 

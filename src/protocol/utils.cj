@@ -3,8 +3,8 @@
  */
 protected package mysql.protocol
 
-import std.io.InputStream
-import std.collection.ArrayList
+import std.io.*
+import std.collection.*
 
 /*
  * InputStream转Array

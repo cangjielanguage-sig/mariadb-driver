@@ -3,12 +3,12 @@
  */
 package mysql.cdbc
 
-import std.database.sql.*
+
+import std.sync.*
 import std.time.*
-import std.collection.HashMap
-import std.sync.AtomicBool
-import std.regex.Regex
-import std.regex.Matcher
+import std.regex.*
+import std.collection.*
+import std.database.sql.*
 import mysql.protocol.*
 
 public class ClientPrepareStatement <: Statement {
@@ -211,11 +211,30 @@ public class ClientPrepareStatement <: Statement {
     }
 
     private func setParamWithQuotation(replacer: Matcher, value: String): String {
-        return replacer.replace("'${value}'")
+        let escaped = escapeString(value)
+        return replacer.replace(escaped)
     }
 
     private func setParamWithoutQuotation(replacer: Matcher, value: String): String {
         return replacer.replace(value)
+    }
+
+    private func escapeString(value: String): String {
+        let builder = StringBuilder()
+        builder.append("'")
+        for(i in value.toRuneArray()) {
+            match (i) {
+                // case r'\u{0000}' => builder.append("\\0")
+                // case r'\n' => builder.append("\\n")
+                // case r'\r' => builder.append("\\r")
+                // case r'\u{001a}' => builder.append("\\Z")
+                case r'\'' => builder.append("\'\'")
+                case r'\\' => builder.append("\\\\")
+                case _ => builder.append(i)
+            }
+        }
+        builder.append("'")
+        return builder.toString()
     }
 
     private func checkResourceAvailability() {

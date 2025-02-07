@@ -3,8 +3,7 @@
  */
 protected package mysql.protocol
 
-import std.binary.LittleEndianOrder
-
+import std.binary.*
 
 protected interface LittleEndian<T> {
 

@@ -32,8 +32,8 @@ public class MySqlTest {
         let password = ("password", "test_user")
         let database = ("database", "driver_test")
         let sslMode = ("ssl.mode", "disabled")
-        //let prepareMode = ("prepare.mode","client")
-        let prepareMode = ("prepare.mode", "server")
+        let prepareMode = ("prepare.mode","client")
+        //let prepareMode = ("prepare.mode", "server")
         let dataSource = driver.open("mysql://localhost", [username, password, database, sslMode, prepareMode])
         connection = dataSource.connect()
     }
@@ -392,6 +392,17 @@ public class MySqlTest {
             counter.dec()
         }
         counter.waitUntilZero()
+    }
+
+    /**
+    * 防止SQL注入测试
+    */
+    @TestCase
+    public func sqlInjectionTest() {
+        let prepare = connection.prepareStatement("insert into full_test (char_col) values (?)")
+        let id = SqlInteger(1)
+        let sqlInjection = SqlNullableVarchar("'y'esoi'm'")
+        let result = prepare.update([sqlInjection])
     }
 
 }

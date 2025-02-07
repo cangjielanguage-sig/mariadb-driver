@@ -3,22 +3,13 @@
  */
 protected package mysql.connection
 
-import std.fs.File
-import std.collection.Map
-import std.convert.Parsable
-import std.net.TcpSocket
-import std.net.SocketException
-import std.net.SocketTimeoutException
-import net.tls.TlsSocket
-import net.tls.TlsSession
-import net.tls.TlsException
-import net.tls.TlsClientConfig
-import net.tls.CertificateVerifyMode
-import crypto.x509.PrivateKey
-import crypto.x509.X509Certificate
-import crypto.x509.PublicKeyAlgorithm
-import crypto.keys.RSAPrivateKey
-import crypto.keys.ECDSAPrivateKey
+import std.fs.*
+import std.net.*
+import std.collection.*
+import std.convert.*
+import net.tls.*
+import crypto.x509.*
+import crypto.keys.*
 import mysql.protocol.*
 import mysql.protocol.request.*
 import mysql.protocol.response.*

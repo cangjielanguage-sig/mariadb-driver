@@ -3,11 +3,10 @@
  */
 protected package mysql.connection
 
-import std.io.IOException
-import std.collection.ArrayList
-import std.net.TcpSocket
-import std.net.StreamingSocket
-import mysql.protocol.LittleEndian
+import std.io.*
+import std.collection.*
+import std.net.*
+import mysql.protocol.*
 
 /*
 * mysql channl reads complete mysql packages from the socket

@@ -3,8 +3,8 @@
  */
 protected package mysql.protocol.response
 
-import std.io.ByteBuffer
-import std.collection.ArrayList
+import std.io.*
+import std.collection.*
 import mysql.protocol.*
 /*
 * Initial handshake packet for protocol version 10.
