@@ -1,11 +1,11 @@
 /*
- * Copyright (c) Yesokim. 2024-2024. All rights reserved.
+ * Copyright (c) Yesokim. 2024-2025. All rights reserved.
  */
 package mysql.cdbc
 
 import std.database.sql.*
 
-public class UpdateResultImpl <: UpdateResult{
+public class UpdateResultImpl <: UpdateResult {
     
     private var effectRows: Int64 = 0
     

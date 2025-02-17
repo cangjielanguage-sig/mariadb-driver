@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Yesokim. 2024-2024. All rights reserved.
+ * Copyright (c) Yesokim. 2024-2025. All rights reserved.
  */
 protected package mysql.connection
 
@@ -47,9 +47,6 @@ protected class CursorResultSet <: ResultSet {
         return true
     }
 
-    public override func getIndexByName(name: String): Int64 {
-        return resultSet.getIndexByName(name)
-    }
 
     public override func getBool(index: Int64): ?Bool {
         return resultSet.getBool(index)

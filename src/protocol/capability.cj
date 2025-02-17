@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Yesokim. 2024-2024. All rights reserved.
+ * Copyright (c) Yesokim. 2024-2025. All rights reserved.
  */
 protected package mysql.protocol
 
@@ -89,7 +89,7 @@ protected class DefaultCapability {
         default |= capability.value()
     }
 
-    protected static func has(capability: Capability): Bool{
+    protected static func has(capability: Capability): Bool {
         return (default & capability.value()) != 0
     }
 

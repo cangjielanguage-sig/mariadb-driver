@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Yesokim. 2024-2024. All rights reserved.
+ * Copyright (c) Yesokim. 2024-2025. All rights reserved.
  */
 protected package mysql.protocol
 
@@ -43,8 +43,8 @@ protected enum CommandType {
     | Clone 
     | SubscribeGroupReplicationStream
 
-    public func value(): Byte{
-        match(this){
+    public func value(): Byte {
+        match(this) {
             case Sleep => 0x00
             case Quit => 0x01
             case InitDB => 0x02
@@ -83,8 +83,8 @@ protected enum CommandType {
         }
     }
 
-    public static func of(value: Byte): CommandType{
-        match(value){
+    public static func of(value: Byte): CommandType {
+        match(value) {
             case 0x00 => Sleep
             case 0x01 => Quit
             case 0x02 => InitDB

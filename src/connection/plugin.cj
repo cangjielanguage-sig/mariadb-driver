@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Yesokim. 2024-2024. All rights reserved.
+ * Copyright (c) Yesokim. 2024-2025. All rights reserved.
  */
 protected package mysql.connection
 
@@ -41,7 +41,7 @@ internal func cachingSha2Password(password: Array<Byte>, salt: Array<Byte>): Arr
     return scramble
 }
 
-internal func performFullAuthentication(pubPem: String, password: Array<Byte>, salt: Array<Byte>): Array<Byte>{
+internal func performFullAuthentication(pubPem: String, password: Array<Byte>, salt: Array<Byte>): Array<Byte> {
     if(password.size == 0){
         return []
     }
@@ -59,7 +59,7 @@ internal func performFullAuthentication(pubPem: String, password: Array<Byte>, s
 }
 
 internal func mysqlNativePassword(password: Array<Byte>, salt: Array<Byte>): Array<Byte> {
-    if(password.size == 0){
+    if(password.size == 0) {
         return []
     }
     var sha1 = SHA1()
@@ -73,7 +73,7 @@ internal func mysqlNativePassword(password: Array<Byte>, salt: Array<Byte>): Arr
     sha1.write(stage2)
     var scramble = sha1.finish()
     sha1.reset()
-    for(i in 0..scramble.size){
+    for(i in 0..scramble.size) {
         scramble[i] ^= stage1[i]
     }
     return scramble

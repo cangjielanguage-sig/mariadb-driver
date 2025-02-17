@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Yesokim. 2024-2024. All rights reserved.
+ * Copyright (c) Yesokim. 2024-2025. All rights reserved.
  */
 protected package mysql.protocol.response
 
@@ -34,7 +34,7 @@ protected class Handshake <: CommonResponse {
 
     protected let authenticationPlugin: String
 
-    protected prop capabilities: UInt32{
+    protected prop capabilities: UInt32 {
         get() {
             let part1 = serverCapabilities.toLittleEndian()
             let part2 = extendedServerCapabilities.toLittleEndian()
@@ -42,7 +42,7 @@ protected class Handshake <: CommonResponse {
         }
     }
 
-    protected prop salt: Array<Byte>{
+    protected prop salt: Array<Byte> {
         get() {
             let buf = ArrayList<Byte>(salt1.size + salt2.size)
             buf.add(all: salt1)
@@ -51,17 +51,17 @@ protected class Handshake <: CommonResponse {
         }
     }
 
-    protected prop authPlugin: String{
+    protected prop authPlugin: String {
         get() {
             authenticationPlugin
         }
     }
     
-    protected func hasCapability(capability: Capability): Bool{
+    protected func hasCapability(capability: Capability): Bool {
         return (capabilities & capability.value()) != 0
     }
 
-    protected init(length: UInt32, buffer: ByteBuffer){
+    protected init(length: UInt32, buffer: ByteBuffer) {
         super(length, buffer)
         // 协议: 1 byte
         this.protocol = buffer.readOneByte()

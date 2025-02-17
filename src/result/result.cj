@@ -32,7 +32,7 @@ protected class PrepareResult {
         this.columns = columns
     }
 
-    protected prop id: UInt32{
+    protected prop id: UInt32 {
         get() {
             info.statementId
         }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Yesokim. 2024-2024. All rights reserved.
+ * Copyright (c) Yesokim. 2024-2025. All rights reserved.
  */
 protected package mysql.protocol.request
 
@@ -168,11 +168,11 @@ protected class HandshakeResponse <: Request {
 /*
  * 请求服务器公钥报文
  */
-protected class RequestPublicKey <: Request{
+protected class RequestPublicKey <: Request {
 
     protected let code: Byte
 
-    protected init(number: UInt8, code: Byte){
+    protected init(number: UInt8, code: Byte) {
         super(number)
         this.code = code
     }
@@ -187,11 +187,11 @@ protected class RequestPublicKey <: Request{
 /*
  * 密码报文
  */
-protected class SendPassword <: Request{
+protected class SendPassword <: Request {
 
     private let authResponse: Array<Byte>
 
-    protected init(number: UInt8, password: Array<Byte>){
+    protected init(number: UInt8, password: Array<Byte>) {
         super(number)
         this.authResponse = password
     }

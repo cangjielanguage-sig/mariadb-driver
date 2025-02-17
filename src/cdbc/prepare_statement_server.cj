@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Yesokim. 2024-2024. All rights reserved.
+ * Copyright (c) Yesokim. 2024-2025. All rights reserved.
  */
 
 package mysql.cdbc
@@ -44,11 +44,13 @@ public class ServerPrepareStatement <: Statement {
 
     public override prop parameterColumnInfos: Array<ColumnInfo> {
         get() {
+            checkResource()
             return paramsInfo
         }
     }
 
     public override func query(params: Array<SqlDbType>): QueryResult {
+        checkResource()
         let parameters = getBasicValues(params)
         let result = match (options.get("fetchSize")) {
             case None => 

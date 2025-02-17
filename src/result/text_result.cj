@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Yesokim. 2024-2024. All rights reserved.
+ * Copyright (c) Yesokim. 2024-2025. All rights reserved.
  */
 protected package mysql.result
 
@@ -18,18 +18,12 @@ protected class TextResultSet <: ResultSet {
 
     private let rows: Array<TextResult>
 
-    private let indexMap: HashMap<String, Int64>
-
     private var currentRow: Int64
 
     protected TextResultSet(columns: Array<ColumnDefinition>, rows: Array<TextResult>) {
         this.columns = columns
         this.rows = rows
         this.currentRow = 0
-        this.indexMap = HashMap<String, Int64>()
-        for(i in 0..columns.size){
-            indexMap.add(columns[i].name, i + 1)
-        }
     }
     
     public prop columnDefinitions: Array<ColumnDefinition> {
@@ -47,9 +41,6 @@ protected class TextResultSet <: ResultSet {
         }
     }
 
-    public override func getIndexByName(name: String): Int64 {
-        return indexMap.get(name).getOrThrow()
-    }
 
     public override func getBool(index: Int64): ?Bool {
         match (getString(index)) {

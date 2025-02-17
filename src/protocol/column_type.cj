@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Yesokim. 2024-2024. All rights reserved.
+ * Copyright (c) Yesokim. 2024-2025. All rights reserved.
  */
 protected package mysql.protocol
 
@@ -44,7 +44,7 @@ protected enum ColumnType <: ToString {
     //| Geometry
 
 
-    protected static func of(value: Byte){
+    protected static func of(value: Byte): ColumnType {
         match (value) {
             //case 0x00 => Decimal
             case 0x01 => Tiny
@@ -84,7 +84,7 @@ protected enum ColumnType <: ToString {
         }
     }
 
-    protected func value(): Byte{
+    protected func value(): Byte {
         match (this) {
             //case Decimal => 0x00
             case Tiny => 0x01
@@ -123,11 +123,11 @@ protected enum ColumnType <: ToString {
         }
     }
 
-    protected operator func == (right: ColumnType): Bool {
+    protected operator func == (right: ColumnType) {
         return this.value() == right.value()
     }
 
-    public override func toString(){
+    public override func toString() {
         match (this) {
             //case Decimal => "Decimal"
             case Tiny => "Tiny"

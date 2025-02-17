@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Yesokim. 2024-2024. All rights reserved.
+ * Copyright (c) Yesokim. 2024-2025. All rights reserved.
  */
 package mysql.cdbc
 
@@ -19,6 +19,7 @@ public class DatasourceImpl <: Datasource {
     }
     
     public override func setOption(key: String, value: String): Unit {
+        checkResource()
         optinos.add(key, value)
     }
 
@@ -36,7 +37,7 @@ public class DatasourceImpl <: Datasource {
         return closed.load()
     }
 
-    private func checkResource(){
+    private func checkResource() {
         if(isClosed()){
             throw SqlException("The data Source has been closed")
         }

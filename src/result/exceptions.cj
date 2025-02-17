@@ -6,8 +6,8 @@ protected package mysql.result
 /*
 * 值转换异常
 */
-protected class ValueConvertException <: Exception{
-    init(){
+protected class ValueConvertException <: Exception {
+    init() {
        super()
     }
 

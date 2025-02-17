@@ -1,14 +1,14 @@
 /*
- * Copyright (c) Yesokim. 2024-2024. All rights reserved.
+ * Copyright (c) Yesokim. 2024-2025. All rights reserved.
  */
 protected package mysql.connection
 
 /*
 * 服务器响应Error异常,表示执行命令后服务器响应Error
 */
-protected class ResponseErrorException <: Exception{
+protected class ResponseErrorException <: Exception {
 
-    init(){
+    init() {
        super()
     }
 
@@ -21,8 +21,8 @@ protected class ResponseErrorException <: Exception{
 /*
 *  连接失败异常
 */
-protected class ConnectFailedException <: Exception{
-    init(){
+protected class ConnectFailedException <: Exception {
+    init() {
        super()
     }
 

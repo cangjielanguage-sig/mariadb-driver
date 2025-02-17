@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Yesokim. 2024-2024. All rights reserved.
+ * Copyright (c) Yesokim. 2024-2025. All rights reserved.
  */
 protected package mysql.protocol.response
 
@@ -17,7 +17,7 @@ protected open class AuthMoreData <: Response {
      */
     internal var authRep: Array<Byte>
 
-    internal init(length:UInt32, buffer: ByteBuffer){
+    internal init(length:UInt32, buffer: ByteBuffer) {
         super(length, buffer)
         this.authRep = buffer.readBytes(Int64(length - 1))
     }
@@ -35,7 +35,7 @@ protected class PublicKeyResponse <: AuthMoreData {
         }
     }
 
-    protected init(length: UInt32, buffer: ByteBuffer){
+    protected init(length: UInt32, buffer: ByteBuffer) {
         super(length, buffer)
     }
 }
@@ -51,7 +51,7 @@ protected class AuthStatus <: AuthMoreData {
         }
     }
 
-    protected init(length: UInt32, buffer: ByteBuffer){
+    protected init(length: UInt32, buffer: ByteBuffer) {
         super(length, buffer)
     }
     

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Yesokim. 2024-2024. All rights reserved.
+ * Copyright (c) Yesokim. 2024-2025. All rights reserved.
  */
 protected package mysql.protocol.response
 
@@ -15,7 +15,7 @@ protected open class Response <: CommonResponse {
 
     protected let code: ResponseCode
 
-    protected init(length: UInt32, buffer: ByteBuffer){
+    protected init(length: UInt32, buffer: ByteBuffer) {
         super(length, buffer)
         code = ResponseCode.of(buffer.readOneByte())
     }
@@ -74,7 +74,7 @@ protected class OkResponse <: Response {
 * This packet signals that an error occurred.
 * referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_basic_err_packet.html
 */
-protected class ErrorResponse <: Response{
+protected class ErrorResponse <: Response {
 
     protected let errorCode: UInt16
 
@@ -84,7 +84,7 @@ protected class ErrorResponse <: Response{
 
     protected let message: String
 
-    protected init(length: UInt32,buffer: ByteBuffer){
+    protected init(length: UInt32,buffer: ByteBuffer) {
         super(length, buffer)
         //错误代码: 2 byte
         this.errorCode = UInt16.fromLittleEndian(buffer.readBytes(2))
@@ -102,9 +102,9 @@ protected class ErrorResponse <: Response{
 * EOF packet
 * referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_basic_eof_packet.html
 */
-protected open class AbstractEOF <: Response{
+protected open class AbstractEOF <: Response {
 
-    protected init(length: UInt32, buffer: ByteBuffer){
+    protected init(length: UInt32, buffer: ByteBuffer) {
         super(length, buffer)
     }
 }
@@ -112,13 +112,13 @@ protected open class AbstractEOF <: Response{
 /*
 * 切换认证方式响应报文
 */
-protected class AuthSwitch <: AbstractEOF{
+protected class AuthSwitch <: AbstractEOF {
 
     protected let pluginName: String
 
     protected let salt: Array<Byte>
 
-    protected init(length: UInt32, buffer: ByteBuffer){
+    protected init(length: UInt32, buffer: ByteBuffer) {
         super(length, buffer)
         //插件名称: null end
         this.pluginName = buffer.readNullTerminatedString()
@@ -131,13 +131,13 @@ protected class AuthSwitch <: AbstractEOF{
 /*
 * 普通Eof响应报文
 */
-protected class EofResponse <: AbstractEOF{
+protected class EofResponse <: AbstractEOF {
 
     protected let waringCount: UInt16
 
     protected let status: UInt16
 
-    protected init(length: UInt32, buffer: ByteBuffer){
+    protected init(length: UInt32, buffer: ByteBuffer) {
         super(length, buffer)
         //警告数量: 2 byte
         this.waringCount = UInt16.fromLittleEndian(buffer.readBytes(2))
@@ -151,7 +151,7 @@ protected class EofResponse <: AbstractEOF{
 * COM_STMT_PREPARE_OK
 * referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_com_stmt_prepare.html#sect_protocol_com_stmt_prepare_response
 */
-protected class PrepareResposne <: Response{
+protected class PrepareResposne <: Response {
 
     protected let statementId: UInt32
 
@@ -163,7 +163,7 @@ protected class PrepareResposne <: Response{
 
     protected let warningCount: UInt16
 
-    protected init(length: UInt32, buffer: ByteBuffer){
+    protected init(length: UInt32, buffer: ByteBuffer) {
         super(length, buffer)
         //语句id: 4 byte
         this.statementId = UInt32.fromLittleEndian(buffer.readBytes(4))

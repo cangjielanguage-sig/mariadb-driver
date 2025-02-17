@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Yesokim. 2024-2024. All rights reserved.
+ * Copyright (c) Yesokim. 2024-2025. All rights reserved.
  */
 protected package mysql.result
 
@@ -15,8 +15,6 @@ protected interface ResultSet {
     prop columnDefinitions: Array<ColumnDefinition>
 
     func next(): Bool
-
-    func getIndexByName(name: String): Int64
 
     func getBool(index: Int64): ?Bool
 

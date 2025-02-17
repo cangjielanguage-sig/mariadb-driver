@@ -1,12 +1,12 @@
 /*
- * Copyright (c) Yesokim. 2024-2024. All rights reserved.
+ * Copyright (c) Yesokim. 2024-2025. All rights reserved.
  */
 package mysql.cdbc
 
 import std.database.sql.*
 import encoding.json.*
 
-public class SqlJson <: SqlDbType{
+public class SqlJson <: SqlDbType {
 
     private let typeName: String = "SqlJson"
 

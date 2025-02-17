@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Yesokim. 2024-2024. All rights reserved.
+ * Copyright (c) Yesokim. 2024-2025. All rights reserved.
  */
 protected package mysql.protocol
 
@@ -14,16 +14,16 @@ protected enum AuthState {
 
     public static func of(value: Byte): AuthState {
         match (value) {
-            case 0x03 => return FastAuthSuccess
-            case 0x04 => return PerformFullAuthentication
+            case 0x03 => FastAuthSuccess
+            case 0x04 => PerformFullAuthentication
             case _ => throw IllegalArgumentException("Don't have this AuthState by value ${value}")
         }
     }
 
     public func value(): Byte {
         match (this) {
-            case FastAuthSuccess => return 0x03
-            case performFullAuthentication => return 0x04
+            case FastAuthSuccess => 0x03
+            case performFullAuthentication => 0x04
         }
     }
 
@@ -44,18 +44,19 @@ protected enum ResponseCode {
 
     public func value(): Byte {
         match (this) {
-            case Ok => return 0x00
-            case AuthMoreData => return 0x01
-            case Eof => return 0xFE
-            case Error => return 0xFF
+            case Ok => 0x00
+            case AuthMoreData => 0x01
+            case Eof => 0xFE
+            case Error => 0xFF
         }
     }
+    
     public static func of(value: Byte): ResponseCode {
         match (value) {
-            case 0x00 => return Ok
-            case 0xFF => return Error
-            case 0xFE => return Eof
-            case 0x01 => return AuthMoreData
+            case 0x00 => Ok
+            case 0xFF => Error
+            case 0xFE => Eof
+            case 0x01 => AuthMoreData
             case _ => throw Exception("Don't have this ResponseCode by value: ${value}")
         }
     }
@@ -79,11 +80,11 @@ protected enum CursorType {
 
     internal func value(): Byte {
         match (this) {
-            case NoCursor => return 0x00
-            case ReadOnly => return 0x01
-            case ForUpdate => return 0x02
-            case Scrollable => return 0x04
-            case ParameterCountAvailable => return 0x08
+            case NoCursor => 0x00
+            case ReadOnly => 0x01
+            case ForUpdate => 0x02
+            case Scrollable => 0x04
+            case ParameterCountAvailable => 0x08
         }
     }
 
@@ -99,8 +100,8 @@ protected enum StatementOption {
 
     internal func value(): UInt16 {
         match (this) {
-            case MultiStatementsOn => return 0x00
-            case MultiStatementsOff => return 0x01
+            case MultiStatementsOn => 0x00
+            case MultiStatementsOff => 0x01
         }
     }
 }

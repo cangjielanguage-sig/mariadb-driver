@@ -1,3 +1,6 @@
+/*
+ * Copyright (c) Yesokim. 2024-2025. All rights reserved.
+ */
 protected package mysql.protocol
 
 //mysql datetime类型的默认格式

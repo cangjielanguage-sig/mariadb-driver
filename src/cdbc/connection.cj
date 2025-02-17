@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Yesokim. 2024-2024. All rights reserved.
+ * Copyright (c) Yesokim. 2024-2025. All rights reserved.
  */
 package mysql.cdbc
 
@@ -11,7 +11,7 @@ import mysql.result.*
 import mysql.protocol.*
 import mysql.connection.*
 
-public class ConnectionImpl <: Connection{
+public class ConnectionImpl <: Connection {
     
     private var currentState: ConnectionState
     
@@ -27,7 +27,7 @@ public class ConnectionImpl <: Connection{
         }
     }
 
-    public ConnectionImpl(options: Map<String, String>){
+    public ConnectionImpl(options: Map<String, String>) {
         this.currentState = ConnectionState.Connecting
         this.options = options
         try {
@@ -41,12 +41,12 @@ public class ConnectionImpl <: Connection{
         applyOptions()
     }
 
-    override public func getMetaData(): Map<String,String>{
+    override public func getMetaData(): Map<String,String> {
         checkResource()
         return options
     }
     
-    override public func prepareStatement(sql: String): Statement{
+    override public func prepareStatement(sql: String): Statement {
         checkResource()
         checkEmptySql(sql)
         let prepareMode = options.get(Params.PrepareMode) ?? "client"
@@ -59,20 +59,20 @@ public class ConnectionImpl <: Connection{
         }
     }
 
-    override public func createTransaction(): Transaction{
+    override public func createTransaction(): Transaction {
         checkResource()
         return transaction
     }
 
-    override public func close(){
+    override public func close() {
         checkResource()
-        synchronized(getConnectionMutex()){
+        synchronized(getConnectionMutex()) {
             currentState = ConnectionState.Closed
             connection.close()
         }
     }
     
-    override public func isClosed(): Bool{
+    override public func isClosed(): Bool {
         return connection.isClosed()
     }
 
@@ -136,7 +136,7 @@ public class ConnectionImpl <: Connection{
         return connection.closePrepare(id)
     }
 
-    protected func getConnectionMutex(): ReentrantMutex{
+    protected func getConnectionMutex(): ReentrantMutex {
         return connection.mutex
     }
 
@@ -152,9 +152,9 @@ public class ConnectionImpl <: Connection{
         }
     }
 
-    private func applyOptions(){
+    private func applyOptions() {
         let queryTimeout = options.get(Params.QueryTimeout)
-        if(let Some(v) <- queryTimeout){
+        if(let Some(v) <- queryTimeout) {
             try {
                 var timeout = Int64.parse(v)
                 sendCommand("set session max_execution_time = ${timeout}")
@@ -163,7 +163,7 @@ public class ConnectionImpl <: Connection{
             }
         }
         let updateTimeout = options.get(Params.UpdateTimeout)
-        if(let Some(v) <- updateTimeout){
+        if(let Some(v) <- updateTimeout) {
              try {
                 var timeout = Int64.parse(updateTimeout.getOrThrow())
                 sendCommand("set session lock_wait_timeout = ${timeout}")
