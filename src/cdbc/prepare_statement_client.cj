@@ -3,7 +3,6 @@
  */
 package mysql.cdbc
 
-
 import std.sync.*
 import std.time.*
 import std.regex.*

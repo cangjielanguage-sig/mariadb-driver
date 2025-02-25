@@ -53,7 +53,7 @@ cjpm.toml文件添加以下配置后，再执行cjpm update，即可在项目中
 
 ```toml
 [dependencies]
-  mysql = {git = "https://gitcode.com/weixin_64400442/mysql-driver.git", branch="master"}
+  mysql = {git = "https://gitcode.com/Yesokim/mysql-driver.git", branch="master"}
 ```
 
 ### 3.2 功能示例
@@ -197,4 +197,4 @@ main(){
 
 本项目基于 Apache License 2.0，欢迎给我们提交PR，欢迎参与任何形式的贡献。
 
-本项目commiter：[@Yesokim](https://gitcode.com/weixin_64400442)
+本项目commiter：[@Yesokim](https://gitcode.com/Yesokim)

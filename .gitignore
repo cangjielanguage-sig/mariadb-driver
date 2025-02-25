@@ -10,4 +10,5 @@ output
 cov_output
 tmpFile*
 .idea/
+.arts
 .devbrain/
