@@ -26,7 +26,7 @@ extend DateTime <: BinaryDate {
         let buf = ArrayList<Byte>(5)
         buf.add(4)
         buf.add(all: UInt16(year).toLittleEndian())
-        buf.add(UInt8(month.value()))
+        buf.add(UInt8(month.toInteger()))
         buf.add(UInt8(dayOfMonth))
         return buf.toArray()
     }
@@ -48,7 +48,7 @@ extend DateTime <: BinaryDate {
         var buf = ArrayList<Byte>(8)
         buf.add(7)
         buf.add(all: UInt16(year).toLittleEndian())
-        buf.add(UInt8(month.value()))
+        buf.add(UInt8(month.toInteger()))
         buf.add(UInt8(dayOfMonth))
         buf.add(UInt8(hour))
         buf.add(UInt8(minute))

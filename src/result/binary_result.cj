@@ -190,7 +190,7 @@ protected class BinaryResultSet <: ResultSet {
                     case LongLong => 
                         return BigInt(getInt64(index).getOrThrow())
                 case String | VarString => 
-                    return BigInt(getString(index).getOrThrow())
+                    return BigInt.parse(getString(index).getOrThrow())
                 case _ => 
                     throw ValueConvertException("Unsupported conversion from ${columnType} to BigInt")
                 }
@@ -208,10 +208,10 @@ protected class BinaryResultSet <: ResultSet {
                     case Double => 
                         return Decimal(getFloat64(index).getOrThrow())
                     case String | VarString | NewDecimal => 
-                        Decimal(getString(index).getOrThrow())
+                        Decimal.parse(getString(index).getOrThrow())
                     case _ => 
                         throw ValueConvertException("Unsupported conversion from ${columnType} to Integer")
-        }
+                }
         }
 
     }
@@ -302,11 +302,11 @@ protected class BinaryResultSet <: ResultSet {
                         //         throw Exception("Unsupported Charset: Latin1SwedishCi")
                         // }
                     case Date => 
-                        return getDate(index).getOrThrow().toString(DateTimeFormat.of(DB_DATE_FORMAT))
+                        return getDate(index).getOrThrow().format(DB_DATE_FORMAT)
                     case DateTime | Timestamp => 
-                        return getDateTime(index).getOrThrow().toString(DateTimeFormat.of(DB_DATE_TIME_FORMAT))
+                        return getDateTime(index).getOrThrow().format(DB_DATE_TIME_FORMAT)
                     case Time => 
-                        return getTime(index).getOrThrow().toString(DateTimeFormat.of(DB_TIME_FORMAT))
+                        return getTime(index).getOrThrow().format(DB_TIME_FORMAT)
                         //case _ => throw Exception("Unsupport MySQL binary type")
                     }
         }

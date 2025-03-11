@@ -413,7 +413,7 @@ protected class ExecuteCommand <: Command {
             case Timestamp | DateTime => 
                 value.toBinaryDateTime() |> pack
             case String | VarString | Blob => 
-                appendString(index, value.toString(DateTimeFormat.of(DB_DATE_TIME_FORMAT)))
+                appendString(index, value.format(DB_DATE_TIME_FORMAT))
             case _ => throw IllegalArgumentException("The parameter type at position ${index + 1} does not match the required type: ${paramType}")
         }
     }

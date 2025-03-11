@@ -41,7 +41,7 @@ public class MySqlTest {
     @TestCase
     public func insertTest() {
         let prepare = connection.prepareStatement(INSERT_SQL)
-        //tinyint
+        //tinyintm
         let p1 = SqlByte(-128)
         //utinyint
         let p2 = SqlSmallInt(0)

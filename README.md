@@ -5,14 +5,14 @@
 
 <p align="center">
 <img alt="" src="https://img.shields.io/badge/release-v0.7.1-brightgreen" style="display: inline-block;" />
-<img alt="" src="https://img.shields.io/badge/cjc-v0.58.3-brightgreen" style="display: inline-block;" />
+<img alt="" src="https://img.shields.io/badge/cjc-v0.59.6-brightgreen" style="display: inline-block;" />
 </p>
 
 ## <img alt="" src="./doc/readme-image/readme-icon-introduction.png" style="display: inline-block;" width=3%/> 1 介绍
 
 ### 1.1 项目特性
 
-mysql-driver是使用Cangjie编写的mysql原生驱动程序，基于mysql客户端协议。同时适配TIDB、OceanBase等国产数据库。
+mysql-driver是使用Cangjie编写的mysql原生驱动程序，适配TIDB、OceanBase等国产数据库。
 
 ## <img alt="" src="./doc/readme-image/readme-icon-framework.png" style="display: inline-block;" width=3%/> 2 架构
 

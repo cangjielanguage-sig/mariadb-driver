@@ -5,6 +5,7 @@ import std.unittest.testmacro.*
 import mysql.connection.*
 import std.collection.*
 import std.time.*
+
 /*
 * 测试认证插件的兼容情况
 * default: caching_sha2_password -> use: caching_sha2_password ssl:close √

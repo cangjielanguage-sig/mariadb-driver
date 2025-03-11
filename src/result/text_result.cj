@@ -295,7 +295,7 @@ protected class TextResultSet <: ResultSet {
 
     private func stringParseToBigInt(index: Int64, str: String): ?BigInt {
         try {
-            return BigInt(str)
+            return BigInt.parse(str)
         } catch (e: IllegalArgumentException) {
             throw ValueConvertException("Parse to BigInt failed: column name is '${metadata(index).name}', raw value is ${str}")
         }
@@ -303,7 +303,7 @@ protected class TextResultSet <: ResultSet {
 
     private func stringParseToDecimal(index: Int64, str: String): Decimal {
         try {
-            return Decimal(str)
+            return Decimal.parse(str)
         } catch (e: IllegalArgumentException) {
             throw ValueConvertException("Parse to Float64 failed: column name is '${metadata(index).name}', raw value is ${str}")
         }
