@@ -8,24 +8,19 @@ import std.collection.*
 import std.database.sql.*
 import encoding.url.*
 import mysql.connection.*
+import std.database.sql.DriverManager
+
+let _ = DriverManager.register("mysql", MySqlDriver())
 
 public class MySqlDriver <: Driver {
 
-    private let driverName: String = "CangjieMySqlDriver"
+    private let driverName: String = "MySqlDriver"
 
     private let driverVersion: String = "1.0.0"
 
     private let supportPooling: Bool = true
 
-    private static let DRIVER = MySqlDriver()
-
-    private MySqlDriver() {
-    }
-
-    public static prop instance: Driver {
-        get() {
-            DRIVER
-        }
+    protected MySqlDriver() {
     }
 
     public override prop name: String {
@@ -75,49 +70,31 @@ public class MySqlDriver <: Driver {
         return datasource
     }
 
-    private func setPooledDataSourceParam(datasource: PooledDatasource, k: String, v: String) {
+    private func setPooledDataSourceParam(datasource: PooledDatasource, k: String, v: String): Unit {
         if (k == Params.PoolConnectionTimout) {
-            try {
-                let connnectionTimeout = Int64.parse(v)
-                datasource.connectionTimeout = Duration.second * connnectionTimeout
-            } catch (e: IllegalArgumentException) {
-                throw IllegalArgumentException("Parse PoolConnectionTimout failed: ${v}")
-            }
-        }else if (k == Params.PoolIdleTimout) {
-            try {
-                var idleTimeout = Int64.parse(v)
-                datasource.idleTimeout = Duration.minute * idleTimeout
-            } catch (e: IllegalArgumentException) {
-                throw IllegalArgumentException("Parse PoolIdleTimout failed: ${v}")
-            }
-        }else if (k == Params.PoolKeepaliveTime) {
-            try {
-                var keepaliveTime = Int64.parse(v)
-                datasource.keepaliveTime = Duration.minute * keepaliveTime
-            } catch (e: IllegalArgumentException) {
-                throw IllegalArgumentException("Parse PoolKeepaliveTime failed: ${v}")
-            }
-        }else if (k == Params.PoolMaxIdleSize) {
-            try {
-                var maxIdleSize = Int32.parse(v)
-                datasource.maxIdleSize = maxIdleSize
-            } catch (e: IllegalArgumentException) {
-                throw IllegalArgumentException("Parse PoolMaxIdleSize failed: ${v}")
-            }
-        }else if (k == Params.PoolMaxLifeTime) {
-            try {
-                var maxLifeTime = Int64.parse(v)
-                datasource.maxLifeTime = Duration.minute * maxLifeTime
-            } catch (e: IllegalArgumentException) {
-                throw IllegalArgumentException("Parse PoolMaxLifeTime failed: ${v}")
-            }
-        }else if (k == Params.PoolMaxSize) {
-            try {
-                var maxSize = Int32.parse(v)
-                datasource.maxSize = maxSize
-            } catch (e: IllegalArgumentException) {
-                throw IllegalArgumentException("Parse PoolMaxSize failed: ${v}")
-            }
+            let connnectionTimeout = Int64.tryParse(v) ?? throw IllegalArgumentException("Parse PoolConnectionTimout failed: ${v}")
+            return datasource.connectionTimeout = Duration.second * connnectionTimeout
+        }
+        if (k == Params.PoolIdleTimout) {
+            let idleTimeout = Int64.tryParse(v) ?? throw IllegalArgumentException("Parse PoolIdleTimout failed: ${v}")
+            return datasource.idleTimeout = Duration.minute * idleTimeout
+        }
+        if (k == Params.PoolKeepaliveTime) {
+            let keepaliveTime = Int64.tryParse(v) ?? throw IllegalArgumentException("Parse PoolKeepaliveTime failed: ${v}")
+            return datasource.keepaliveTime = Duration.minute * keepaliveTime
+        }
+        if (k == Params.PoolMaxIdleSize) {
+            let maxIdleSize = Int32.tryParse(v) ?? throw IllegalArgumentException("Parse PoolMaxIdleSize failed: ${v}")
+            return datasource.maxIdleSize = maxIdleSize
+        }
+        if (k == Params.PoolMaxLifeTime) {
+            let maxLifeTime = Int64.tryParse(v) ?? throw IllegalArgumentException("Parse PoolMaxLifeTime failed: ${v}")
+            return datasource.maxLifeTime = Duration.minute * maxLifeTime
+        }
+        if (k == Params.PoolMaxSize) {
+            let maxSize = Int32.tryParse(v) ?? throw IllegalArgumentException("Parse PoolMaxSize failed: ${v}")
+            return datasource.maxSize = maxSize
         }
     }
 }
+

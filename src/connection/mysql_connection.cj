@@ -380,8 +380,7 @@ protected class MySqlConnection <: Resource {
 
     private func checkError(length: UInt32, payload: Array<Byte>) {
         if (payload[1] == ResponseCode.Error.value()) {
-            let stream = ByteBuffer(payload)
-            let error = ErrorResponse(length, stream)
+            let error = ErrorResponse(length, ByteBuffer(payload))
             throw ResponseErrorException(error.message)
         }
     }
