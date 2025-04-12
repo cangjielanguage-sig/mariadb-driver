@@ -32,7 +32,9 @@ import std.time.*
 @Test
 public class MySqlTest {
 
-
+    /*
+    * 测试认证插件的兼容情况
+    */
     @TestCase
     public func case1(): Unit {
         var attr = HashMap<String, String>()

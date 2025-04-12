@@ -24,7 +24,7 @@ public class MySqlTest {
     private let connection: Connection
 
     init() {
-        let driver = MySqlDriver.instance
+        let driver = MySqlDriver()
         let username = ("username", "test_user")
         let password = ("password", "test_user")
         let database = ("database", "driver_test")
@@ -371,7 +371,7 @@ public class MySqlTest {
     }
 
     /*
-     * 多线程并发测试
+     * 单连接并发测试
      */
     @TestCase
     public func concurrentTest() {

@@ -165,7 +165,7 @@ public class ConnectionImpl <: Connection {
         let updateTimeout = options.get(Params.UpdateTimeout)
         if(let Some(v) <- updateTimeout) {
              try {
-                var timeout = Int64.parse(updateTimeout.getOrThrow())
+                var timeout = Int64.parse(v)
                 sendCommand("set session lock_wait_timeout = ${timeout}")
              }catch (e: IllegalArgumentException) {
                 throw IllegalArgumentException("parse update_timeout failed")

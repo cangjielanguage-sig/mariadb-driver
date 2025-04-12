@@ -5,7 +5,6 @@ package mysql.cdbc
 
 import std.sync.*
 import std.time.*
-import std.regex.*
 import std.collection.*
 import std.database.sql.*
 import mysql.protocol.*
@@ -59,150 +58,21 @@ public class ClientPrepareStatement <: Statement {
         if (params.size != originSql.count("?")) {
             throw SqlException("The number of placeholders does not match the number of parameters")
         }
-        let regex = Regex("\\?")
-        var sql = originSql
-        for (i in 0..params.size) {
-            sql = match (params[i]) {
-                    case v: SqlBool => 
-                        regex.replace(sql, "'" + v.value.toString() + "'")
-                    case v: SqlByte => 
-                        regex.replace(sql, v.value.toString())
-                    case v: SqlSmallInt => 
-                        regex.replace(sql, v.value.toString())
-                    case v: SqlInteger => 
-                        regex.replace(sql, v.value.toString())
-                    case v: SqlBigInt => 
-                        regex.replace(sql, v.value.toString())
-                    case v: SqlReal => 
-                        regex.replace(sql, v.value.toString())
-                    case v: SqlDouble => 
-                        regex.replace(sql, v.value.toString())
-                    case v: SqlDecimal => 
-                        regex.replace(sql, "'" + v.value.toString() + "'")
-                    case v: SqlChar => 
-                        regex.replace(sql, escapeString(v.value.toString()))
-                    case v: SqlVarchar => 
-                        regex.replace(sql, escapeString(v.value.toString()))
-                    case v: SqlClob => 
-                        regex.replace(sql, toArray(v.value).toHexStringWithPrefix())
-                    case v: SqlBlob => 
-                        regex.replace(sql, toArray(v.value).toHexStringWithPrefix())
-                    case v: SqlDate => 
-                        regex.replace(sql, "'" + v.value.format(DB_DATE_FORMAT) + "'")
-                    case v: SqlTime => 
-                        regex.replace(sql, "'" + v.value.format(DB_TIME_FORMAT) + "'")
-                    case v: SqlTimeTz => 
-                        regex.replace(sql, "'" + v.value.format(DB_TIME_FORMAT) + "'")
-                    case v: SqlTimestamp => 
-                        regex.replace(sql, "'" + v.value.format(DB_DATE_TIME_FORMAT) + "'")
-                    case v: SqlBinary => 
-                        regex.replace(sql, v.value.toHexStringWithPrefix())
-                    case v: SqlVarBinary => 
-                        regex.replace(sql, v.value.toHexStringWithPrefix())
-                    case v: SqlJson => 
-                        regex.replace(sql, escapeString(v.value.toString()))
-                    case v: SqlNullableBool => 
-                        match (v.value) {
-                            case None => regex.replace(sql, "NULL")
-                            case Some(s) => regex.replace(sql, "'" + s.toString() + "'")
-                        }
-                    case v: SqlNullableByte => 
-                        match (v.value) {
-                            case None => regex.replace(sql, "NULL")
-                            case Some(s) => regex.replace(sql, s.toString())
-                        }
-                    case v: SqlNullableSmallInt => 
-                        match (v.value) {
-                            case None => regex.replace(sql, "NULL")
-                            case Some(s) => regex.replace(sql, s.toString())
-                        }
-                    case v: SqlNullableInteger => 
-                        match (v.value) {
-                            case None => regex.replace(sql, "NULL")
-                            case Some(s) => regex.replace(sql, s.toString())
-                        }
-                    case v: SqlNullableBigInt => 
-                        match (v.value) {
-                            case None => regex.replace(sql, "NULL")
-                            case Some(s) => regex.replace(sql, s.toString())
-                        }
-                    case v: SqlNullableReal => 
-                        match (v.value) {
-                            case None => regex.replace(sql, "NULL")
-                            case Some(s) => regex.replace(sql, s.toString())
-                        }
-                    case v: SqlNullableDouble => 
-                        match (v.value) {
-                            case None => regex.replace(sql, "NULL")
-                            case Some(s) => regex.replace(sql, s.toString())
-                        }
-                    case v: SqlNullableDecimal => 
-                        match (v.value) {
-                            case None => regex.replace(sql, "NULL")
-                            case Some(s) => regex.replace(sql, "'" + s.toString() + "'")
-                        }
-                    case v: SqlNullableChar => 
-                        match (v.value) {
-                            case None => regex.replace(sql, "NULL")
-                            case Some(s) => regex.replace(sql, escapeString(s.toString()))
-                        }
-                    case v: SqlNullableVarchar => 
-                        match (v.value) {
-                            case None => regex.replace(sql, "NULL")
-                            case Some(s) => regex.replace(sql, escapeString(s.toString()))
-                        }
-                    case v: SqlNullableClob => 
-                        match (v.value) {
-                            case None => regex.replace(sql, "NULL")
-                            case Some(s) => regex.replace(sql, toArray(s).toHexStringWithPrefix())
-                        }
-                    case v: SqlNullableBlob => 
-                        match (v.value) {
-                            case None => regex.replace(sql, "NULL")
-                            case Some(s) => regex.replace(sql, toArray(s).toHexStringWithPrefix())
-                        }
-                    case v: SqlNullableDate => 
-                        match (v.value) {
-                            case None => regex.replace(sql, "NULL")
-                            case Some(s) => regex.replace(sql, "'" + s.format(DB_DATE_FORMAT) + "'")
-                        }
-                    case v: SqlNullableTime => 
-                        match (v.value) {
-                            case None => regex.replace(sql, "NULL")
-                            case Some(s) => regex.replace(sql, "'" + s.format(DB_TIME_FORMAT) + "'")
-                        }
-                    case v: SqlNullableTimeTz => 
-                        match (v.value) {
-                            case None => regex.replace(sql, "NULL")
-                            case Some(s) => regex.replace(sql, "'" + s.format(DB_TIME_FORMAT) + "'")
-                    }
-                    case v: SqlNullableTimestamp => 
-                        match (v.value) {
-                            case None => regex.replace(sql, "NULL")
-                            case Some(s) => regex.replace(sql, "'" + s.format(DB_DATE_TIME_FORMAT) + "'")
-                        }
-                    case v: SqlNullableBinary => 
-                        match (v.value) {
-                            case None => regex.replace(sql, "NULL")
-                            case Some(s) => regex.replace(sql, s.toHexStringWithPrefix())
-                        }
-                    case v: SqlNullableVarBinary => 
-                        match (v.value) {
-                            case None => regex.replace(sql, "NULL")
-                            case Some(s) => regex.replace(sql, s.toHexStringWithPrefix())
-                        }
-                    case v: SqlNullableJson => 
-                        match (v.value) {
-                            case None => regex.replace(sql, "NULL")
-                            case Some(s) => regex.replace(sql, escapeString(s.toString()))
-                        }
-                    case _ => 
-                        throw UnsupportedException("An unsupported input type")
+        let sqlBuilder = StringBuilder()
+        let parts = originSql.split("?", removeEmpty: true)
+        var index = 0 
+        for(i in parts) {
+            sqlBuilder.append(i)
+            if(index < params.size) {
+                match (params[index]) {
+                    case param: Parameter =>sqlBuilder.append(param.asParameter())
+                    case _ =>  throw UnsupportedException("an unsupported sql type")
+                }
+                index ++
             }
         }
-        return sql
+        return sqlBuilder.toString()
     }
-
     private func checkResource() {
         if (isClosed()) {
             throw SqlException("The Statement has been closed")

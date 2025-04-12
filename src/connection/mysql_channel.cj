@@ -3,8 +3,6 @@
  */
 protected package mysql.connection
 
-import std.io.*
-import std.collection.*
 import std.net.*
 import mysql.protocol.*
 
