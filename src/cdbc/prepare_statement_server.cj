@@ -5,12 +5,10 @@
 package mysql.cdbc
 
 import std.sync.*
-import std.regex.*
 import std.convert.*
 import std.collection.*
 import std.database.sql.*
 import mysql.result.*
-import mysql.protocol.*
 
 public class ServerPrepareStatement <: Statement {
 
@@ -74,146 +72,15 @@ public class ServerPrepareStatement <: Statement {
     }
 
     private func getBasicValues(params: Array<SqlDbType>): Array<Any> {
-        let parameters = ArrayList<Any>()
+        let parameters = Array<Any>(params.size, repeat: 0)
         for (i in 0..params.size) {
             match (params[i]) {
-                case v: SqlBool => 
-                    parameters.add(v.value)
-                case v: SqlByte => 
-                    parameters.add(v.value)
-                case v: SqlSmallInt => 
-                    parameters.add(v.value)
-                case v: SqlInteger => 
-                    parameters.add(v.value)
-                case v: SqlBigInt => 
-                    parameters.add(v.value)
-                case v: SqlReal => 
-                    parameters.add(v.value)
-                case v: SqlDouble => 
-                    parameters.add(v.value)
-                case v: SqlDecimal => 
-                    parameters.add(v.value)
-                case v: SqlChar => 
-                    parameters.add(v.value)
-                case v: SqlVarchar => 
-                    parameters.add(v.value)
-                case v: SqlClob => 
-                    parameters.add(v.value)
-                case v: SqlBlob => 
-                    parameters.add(v.value)
-                case v: SqlDate => 
-                    parameters.add(v.value)
-                case v: SqlTime => 
-                    parameters.add(v.value)
-                case v: SqlTimeTz => 
-                    parameters.add(v.value)
-                case v: SqlTimestamp => 
-                    parameters.add(v.value)
-                case v: SqlBinary => 
-                    parameters.add(v.value)
-                case v: SqlVarBinary => 
-                    parameters.add(v.value)
-                case v: SqlJson => 
-                    parameters.add(v.value)
-                case v: SqlNullableBool => 
-                    match (v.value) {
-                        case None => parameters.add(Option<Any>.None)
-                        case Some(s) => parameters.add(s)
-                    }
-                case v: SqlNullableByte => 
-                    match (v.value) {
-                        case None => parameters.add(Option<Any>.None)
-                        case Some(s) => parameters.add(s)
-                    }
-                case v: SqlNullableSmallInt => 
-                    match (v.value) {
-                        case None => parameters.add(Option<Any>.None)
-                        case Some(s) => parameters.add(s)
-                    }
-                case v: SqlNullableInteger => 
-                    match (v.value) {
-                        case None => parameters.add(Option<Any>.None)
-                        case Some(s) => parameters.add(s)
-                    }
-                case v: SqlNullableBigInt => 
-                    match (v.value) {
-                        case None => parameters.add(Option<Any>.None)
-                        case Some(s) => parameters.add(s)
-                    }
-                case v: SqlNullableReal => 
-                    match (v.value) {
-                        case None => parameters.add(Option<Any>.None)
-                        case Some(s) => parameters.add(s)
-                    }
-                case v: SqlNullableDouble => 
-                    match (v.value) {
-                        case None => parameters.add(Option<Any>.None)
-                        case Some(s) => parameters.add(s)
-                    }
-                case v: SqlNullableDecimal => 
-                    match (v.value) {
-                        case None => parameters.add(Option<Any>.None)
-                        case Some(s) => parameters.add(s)
-                    }
-                case v: SqlNullableChar => 
-                    match (v.value) {
-                        case None => parameters.add(Option<Any>.None)
-                        case Some(s) => parameters.add(s)
-                    }
-                case v: SqlNullableVarchar => 
-                    match (v.value) {
-                        case None => parameters.add(Option<Any>.None)
-                        case Some(s) => parameters.add(s)
-                    }
-                case v: SqlNullableClob => 
-                    match (v.value) {
-                        case None => parameters.add(Option<Any>.None)
-                        case Some(s) => parameters.add(s)
-                    }
-                case v: SqlNullableBlob => 
-                    match (v.value) {
-                        case None => parameters.add(Option<Any>.None)
-                        case Some(s) => parameters.add(s)
-                    }
-                case v: SqlNullableDate => 
-                    match (v.value) {
-                        case None => parameters.add(Option<Any>.None)
-                        case Some(s) => parameters.add(s)
-                    }
-                case v: SqlNullableTime => 
-                    match (v.value) {
-                        case None => parameters.add(Option<Any>.None)
-                        case Some(s) => parameters.add(s)
-                    }
-                case v: SqlNullableTimeTz => 
-                    match (v.value) {
-                        case None => parameters.add(Option<Any>.None)
-                        case Some(s) => parameters.add(s)
-                    }
-                case v: SqlNullableTimestamp => 
-                    match (v.value) {
-                        case None => parameters.add(Option<Any>.None)
-                        case Some(s) => parameters.add(s)
-                    }
-                case v: SqlNullableBinary => 
-                    match (v.value) {
-                        case None => parameters.add(Option<Any>.None)
-                        case Some(s) => parameters.add(s)
-                    }
-                case v: SqlNullableVarBinary => 
-                    match (v.value) {
-                        case None => parameters.add(Option<Any>.None)
-                        case Some(s) => parameters.add(s)
-                    }
-                case v: SqlNullableJson => 
-                    match (v.value) {
-                        case None => parameters.add(Option<Any>.None)
-                        case Some(s) => parameters.add(s)
-                    }
-                case _ => throw UnsupportedException("An unsupported input type")
+                case param: Parameter => 
+                    parameters[i] = param.unbox()
+                case _ => throw UnsupportedException("an unsupported sql type")
             }
         }
-        return parameters.toArray()
+        return parameters
     }
 
     public override func setOption(key: String, value: String): Unit {

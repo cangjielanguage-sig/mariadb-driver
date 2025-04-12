@@ -129,9 +129,9 @@ protected class ExecuteCommand <: Command {
                         case v: String => appendString(i, v)
                         case v: DateTime => appendDateTime(i, v)
                         case v: JsonValue => appendJsonValue(i, v)
-                        case v: Array<Byte> => nothing(v)
-                        case v: InputStream => nothing(v)
-                        case v: ?Any => nothing(v) // means null
+                        case _: Array<Byte> => { => }
+                        case _: InputStream => { => }
+                        case _: ?Any => { => }
                         case _ => throw UnsupportedException("Unsupport type")
                     }
                 }

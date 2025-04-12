@@ -7,12 +7,18 @@ public interface Parameter {
     
     func asParameter(): String
 
+    func unbox(): Any
+
 }
 
 extend SqlBool <: Parameter {
 
     public func asParameter(): String {
         return "'" + this.value.toString() + "'"
+    }
+
+    public func unbox(): Any {
+        return this.value
     }
 
 }
@@ -23,12 +29,20 @@ extend SqlByte <: Parameter {
         return this.value.toString()
     }
 
+    public func unbox(): Any {
+        return this.value
+    }
+
 }
 
 extend SqlSmallInt <: Parameter{
     
     public func asParameter(): String {
         return this.value.toString()
+    }
+
+    public func unbox(): Any {
+        return this.value
     }
 
 }
@@ -39,12 +53,20 @@ extend SqlInteger <: Parameter {
         return this.value.toString()
     }
 
+    public func unbox(): Any {
+        return this.value
+    }
+
 }
 
 extend SqlBigInt <: Parameter {
     
     public func asParameter(): String {
         return this.value.toString()
+    }
+
+    public func unbox(): Any {
+        return this.value
     }
 
 }
@@ -55,12 +77,20 @@ extend SqlReal <: Parameter {
         return this.value.toString()
     }
 
+    public func unbox(): Any {
+        return this.value
+    }
+
 }
 
 extend SqlDouble <: Parameter {
     
     public func asParameter(): String {
         return this.value.toString()
+    }
+
+    public func unbox(): Any {
+        return this.value
     }
 
 }
@@ -71,12 +101,20 @@ extend SqlDecimal <: Parameter {
         return "'" + this.value.toString() +"'"
     }
 
+    public func unbox(): Any {
+        return this.value
+    }
+
 }
 
 extend SqlChar <: Parameter {
 
     public func asParameter(): String {
         return escapeString(this.value.toString())
+    }
+
+    public func unbox(): Any {
+        return this.value
     }
 
 }
@@ -87,12 +125,20 @@ extend SqlVarchar <: Parameter{
         return escapeString(this.value.toString())
     }
 
+    public func unbox(): Any {
+        return this.value
+    }
+
 }
 
 extend SqlClob <: Parameter {
     
     public func asParameter(): String {
         return toArray(this.value).toHexStringWithPrefix()
+    }
+
+    public func unbox(): Any {
+        return this.value
     }
 
 }
@@ -103,12 +149,20 @@ extend SqlBlob <: Parameter {
         return toArray(this.value).toHexStringWithPrefix()
     }
 
+    public func unbox(): Any {
+        return this.value
+    }
+
 }
 
 extend SqlDate <: Parameter {
 
     public func asParameter(): String {
         return "'" + this.value.format(DB_DATE_FORMAT) + "'"
+    }
+
+    public func unbox(): Any {
+        return this.value
     }
 
 }
@@ -119,12 +173,20 @@ extend SqlTime <: Parameter {
         return "'" + this.value.format(DB_TIME_FORMAT) + "'"
     }
 
+    public func unbox(): Any {
+        return this.value
+    }
+
 }
 
 extend SqlTimeTz <: Parameter {
     
     public func asParameter(): String {
         return "'" + this.value.format(DB_TIME_FORMAT) + "'"
+    }
+
+    public func unbox(): Any {
+        return this.value
     }
 
 }
@@ -135,12 +197,20 @@ extend SqlTimestamp <: Parameter {
         return "'" + this.value.format(DB_DATE_TIME_FORMAT) + "'"
     }
 
+    public func unbox(): Any {
+        return this.value
+    }
+
 }
 
 extend SqlBinary <: Parameter {
     
     public func asParameter(): String {
         return this.value.toHexStringWithPrefix()
+    }
+
+    public func unbox(): Any {
+        return this.value
     }
 
 }
@@ -151,12 +221,20 @@ extend SqlVarBinary <: Parameter {
         return this.value.toHexStringWithPrefix()
     }
 
+    public func unbox(): Any {
+        return this.value
+    }
+
 }
 
 extend SqlJson <: Parameter {
     
     public func asParameter(): String {
         return escapeString(this.value.toJsonString())
+    }
+
+    public func unbox(): Any {
+        return this.value
     }
 
 }
@@ -167,6 +245,13 @@ extend SqlNullableBool <: Parameter {
         match (this.value) {
             case None => "NULL"
             case Some(s) => "'" + s.toString() + "'"
+        }
+    }
+
+    public func unbox(): Any {
+        match (this.value) {
+            case None => return Option<Any>.None
+            case Some(s) => return s
         }
     }
 
@@ -181,6 +266,13 @@ extend SqlNullableByte <: Parameter {
         }
     }
     
+    public func unbox(): Any {
+        match (this.value) {
+            case None => return Option<Any>.None
+            case Some(s) => return s
+        }
+    }
+
 }
 
 extend SqlNullableSmallInt <: Parameter {
@@ -192,6 +284,13 @@ extend SqlNullableSmallInt <: Parameter {
         }
     }
     
+    public func unbox(): Any {
+        match (this.value) {
+            case None => return Option<Any>.None
+            case Some(s) => return s
+        }
+    }
+
 }
 
 extend SqlNullableInteger <: Parameter{
@@ -200,6 +299,13 @@ extend SqlNullableInteger <: Parameter{
         match (this.value) {
             case None => "NULL"
             case Some(s) => s.toString()
+        }
+    }
+
+    public func unbox(): Any {
+        match (this.value) {
+            case None => return Option<Any>.None
+            case Some(s) => return s
         }
     }
 
@@ -213,7 +319,14 @@ extend SqlNullableBigInt <: Parameter {
             case Some(s) => s.toString()
         }
     }
-    
+
+    public func unbox(): Any {
+        match (this.value) {
+            case None => return Option<Any>.None
+            case Some(s) => return s
+        }
+    }
+
 }
 
 extend SqlNullableReal <: Parameter {
@@ -224,7 +337,14 @@ extend SqlNullableReal <: Parameter {
             case Some(s) => s.toString()
         }
     }
-    
+
+    public func unbox(): Any {
+        match (this.value) {
+            case None => return Option<Any>.None
+            case Some(s) => return s
+        }
+    }
+
 }
 
 extend SqlNullableDouble <: Parameter {
@@ -236,6 +356,13 @@ extend SqlNullableDouble <: Parameter {
         }
     }
     
+    public func unbox(): Any {
+        match (this.value) {
+            case None => return Option<Any>.None
+            case Some(s) => return s
+        }
+    }
+
 }
 
 extend SqlNullableDecimal <: Parameter {
@@ -244,6 +371,13 @@ extend SqlNullableDecimal <: Parameter {
         match (this.value) {
             case None => "NULL"
             case Some(s) => "'" + s.toString() + "'"
+        }
+    }
+
+    public func unbox(): Any {
+        match (this.value) {
+            case None => return Option<Any>.None
+            case Some(s) => return s
         }
     }
 
@@ -258,6 +392,12 @@ extend SqlNullableChar <: Parameter {
         }
     }
     
+    public func unbox(): Any {
+        match (this.value) {
+            case None => return Option<Any>.None
+            case Some(s) => return s
+        }
+    }
 }
 
 extend SqlNullableVarchar <: Parameter {
@@ -266,6 +406,13 @@ extend SqlNullableVarchar <: Parameter {
         match (this.value) {
             case None => "NULL"
             case Some(s) => escapeString(s.toString())
+        }
+    }
+
+    public func unbox(): Any {
+        match (this.value) {
+            case None => return Option<Any>.None
+            case Some(s) => return s
         }
     }
 
@@ -279,6 +426,13 @@ extend SqlNullableClob <: Parameter {
             case Some(s) => toArray(s).toHexStringWithPrefix()
         }
     }
+
+    public func unbox(): Any {
+        match (this.value) {
+            case None => return Option<Any>.None
+            case Some(s) => return s
+        }
+    }
     
 }
 
@@ -290,7 +444,14 @@ extend SqlNullableBlob <: Parameter {
             case Some(s) => toArray(s).toHexStringWithPrefix()
         }
     }
-    
+
+    public func unbox(): Any {
+        match (this.value) {
+            case None => return Option<Any>.None
+            case Some(s) => return s
+        }
+    }
+
 }
 
 extend SqlNullableDate <: Parameter {
@@ -299,6 +460,13 @@ extend SqlNullableDate <: Parameter {
         match (this.value) {
             case None => "NULL"
             case Some(s) => "'" + s.format(DB_DATE_FORMAT) + "'"
+        }
+    }
+
+    public func unbox(): Any {
+        match (this.value) {
+            case None => return Option<Any>.None
+            case Some(s) => return s
         }
     }
     
@@ -310,6 +478,13 @@ extend SqlNullableTime <: Parameter {
         match (this.value) {
             case None => "NULL"
             case Some(s) => "'" + s.format(DB_TIME_FORMAT) + "'"
+        }
+    }
+
+    public func unbox(): Any {
+        match (this.value) {
+            case None => return Option<Any>.None
+            case Some(s) => return s
         }
     }
     
@@ -324,6 +499,13 @@ extend SqlNullableTimeTz <: Parameter {
         }
     }
     
+    public func unbox(): Any {
+        match (this.value) {
+            case None => return Option<Any>.None
+            case Some(s) => return s
+        }
+    }
+
 }
 
 extend SqlNullableTimestamp <: Parameter {
@@ -335,6 +517,13 @@ extend SqlNullableTimestamp <: Parameter {
         }
     }
     
+    public func unbox(): Any {
+        match (this.value) {
+            case None => return Option<Any>.None
+            case Some(s) => return s
+        }
+    }
+
 }
 
 extend SqlNullableBinary <: Parameter {
@@ -346,6 +535,12 @@ extend SqlNullableBinary <: Parameter {
         }
     }
     
+    public func unbox(): Any {
+        match (this.value) {
+            case None => return Option<Any>.None
+            case Some(s) => return s
+        }
+    }
 }
 
 extend SqlNullableVarBinary <: Parameter {
@@ -357,6 +552,12 @@ extend SqlNullableVarBinary <: Parameter {
         }
     }
     
+    public func unbox(): Any {
+        match (this.value) {
+            case None => return Option<Any>.None
+            case Some(s) => return s
+        }
+    }
 }
 
 extend SqlNullableJson <: Parameter{
@@ -365,6 +566,13 @@ extend SqlNullableJson <: Parameter{
         match (this.value) {
             case None => "NULL"
             case Some(s) => escapeString(s.toJsonString())
+        }
+    }
+
+    public func unbox(): Any {
+        match (this.value) {
+            case None => return Option<Any>.None
+            case Some(s) => return s
         }
     }
 

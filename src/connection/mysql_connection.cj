@@ -191,9 +191,9 @@ protected class MySqlConnection <: Resource {
         for (i in 0..params.size) {
             let param = params[i]
             match (param) {
-                case v:InputStream => writeRequest(SendLongDataCommand(statementId, UInt16(i), (toArray(v))))
-                case v:Array<Byte> => writeRequest(SendLongDataCommand(statementId, UInt16(i), v))
-                case _ => nothing(0)
+                case v: InputStream => writeRequest(SendLongDataCommand(statementId, UInt16(i), toArray(v)))
+                case v: Array<Byte> => writeRequest(SendLongDataCommand(statementId, UInt16(i), v))
+                case _ => { => }
             }
         }
     }
@@ -207,7 +207,7 @@ protected class MySqlConnection <: Resource {
         checkError(length, payload)
         let prepareResponse = PrepareResposne(length, ByteBuffer(payload))
         let parameters = ArrayList<ColumnDefinition>(Int64(prepareResponse.numParams))
-        if(prepareResponse.numParams > 0){
+        if(prepareResponse.numParams > 0) {
             for (_ in 0..prepareResponse.numParams) {
                 let (length, payload) = read()
                 parameters.add(ColumnDefinition(length, ByteBuffer(payload)))

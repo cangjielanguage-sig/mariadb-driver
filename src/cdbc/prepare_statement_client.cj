@@ -60,15 +60,13 @@ public class ClientPrepareStatement <: Statement {
         }
         let sqlBuilder = StringBuilder()
         let parts = originSql.split("?", removeEmpty: true)
-        var index = 0 
-        for(i in parts) {
-            sqlBuilder.append(i)
-            if(index < params.size) {
-                match (params[index]) {
+        for(i in 0..parts.size) {
+            sqlBuilder.append(parts[i])
+            if(i < params.size) {
+                match (params[i]) {
                     case param: Parameter =>sqlBuilder.append(param.asParameter())
                     case _ =>  throw UnsupportedException("an unsupported sql type")
                 }
-                index ++
             }
         }
         return sqlBuilder.toString()
