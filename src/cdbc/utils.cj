@@ -3,12 +3,25 @@
  */
 package mysql.cdbc
 
-import std.regex.*
+import std.database.sql.*
 
 protected func insertCount(sql: String): Int {
     let lower = sql.toAsciiLower()
-    let matcher = Regex("\\((.*?)\\)")
-    return matcher.findAll(lower.split("values")[1]).size
+    let index = lower.indexOf("values") ?? throw SqlException()
+    let values = lower[index + "values".size..lower.size]
+    var depth = 0
+    var count = 0
+    for(i in values.runes()) {
+        if(i == r'(') {
+            depth ++
+            if(depth == 1) {
+                count ++
+            }
+        }else if(i == r')') {
+            depth --
+        }
+    }
+    return count
 }
 
 func escapeString(value: String): String {

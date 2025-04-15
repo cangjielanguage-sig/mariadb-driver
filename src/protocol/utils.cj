@@ -5,10 +5,8 @@ protected package mysql.protocol
 
 import std.io.*
 import std.collection.*
+import encoding.hex.*
 
-/*
- * InputStream转Array
- */
 protected func toArray(inputStream: InputStream): Array<Byte> {
     let buffer = Array<Byte>(1024, repeat: 0)
     let buf = ArrayList<Byte>()
@@ -20,9 +18,17 @@ protected func toArray(inputStream: InputStream): Array<Byte> {
     return buf.toArray()
 }
 
-/*
- * 无事可做的函数，用于压制编译器报警
- */
- protected func nothing(v: Any): Any {
-    return v
- }
+protected func toHexStringWithPrefix(inputStream: InputStream): String {
+    let buffer = Array<Byte>(1024, repeat: 0)
+    var len = inputStream.read(buffer)
+    if(len == 0) {
+        return "''"
+    }
+    let builder = StringBuilder()
+    builder.append("0x")
+    do {
+        builder.append(toHexString(buffer.slice(0, len)))
+        len = inputStream.read(buffer)
+    } while (len != 0)
+    return builder.toString()
+}

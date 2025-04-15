@@ -134,7 +134,7 @@ extend SqlVarchar <: Parameter{
 extend SqlClob <: Parameter {
     
     public func asParameter(): String {
-        return toArray(this.value).toHexStringWithPrefix()
+        return toHexStringWithPrefix(this.value)
     }
 
     public func unbox(): Any {
@@ -146,7 +146,7 @@ extend SqlClob <: Parameter {
 extend SqlBlob <: Parameter {
     
     public func asParameter(): String {
-        return toArray(this.value).toHexStringWithPrefix()
+        return toHexStringWithPrefix(this.value)
     }
 
     public func unbox(): Any {
@@ -423,7 +423,7 @@ extend SqlNullableClob <: Parameter {
     public func asParameter(): String {
         match (this.value) {
             case None => "NULL"
-            case Some(s) => toArray(s).toHexStringWithPrefix()
+            case Some(s) => toHexStringWithPrefix(s)
         }
     }
 
@@ -441,7 +441,7 @@ extend SqlNullableBlob <: Parameter {
     public func asParameter(): String {
         match (this.value) {
             case None => "NULL"
-            case Some(s) => toArray(s).toHexStringWithPrefix()
+            case Some(s) => toHexStringWithPrefix(s)
         }
     }
 

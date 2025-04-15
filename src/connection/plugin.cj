@@ -29,12 +29,7 @@ internal func cachingSha2Password(password: Array<Byte>, salt: Array<Byte>): Arr
     sha256.write(salt)
     var scramble: Array<Byte> = sha256.finish()
     sha256.reset()
-    //var x: Int64 = 0
     // 4. XOR(SHA256(password), SHA256(SHA256(SHA256(password)), nonce))
-    // while (x < scramble.size) {
-    //     scramble[x] ^= digestStage1[x]
-    //     x++
-    // }
     for(i in 0..scramble.size){
         scramble[i] ^= digestStage1[i]
     }

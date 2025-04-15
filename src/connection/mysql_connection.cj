@@ -193,7 +193,7 @@ protected class MySqlConnection <: Resource {
             match (param) {
                 case v: InputStream => writeRequest(SendLongDataCommand(statementId, UInt16(i), toArray(v)))
                 case v: Array<Byte> => writeRequest(SendLongDataCommand(statementId, UInt16(i), v))
-                case _ => { => }
+                case _ => continue
             }
         }
     }
