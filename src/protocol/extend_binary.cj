@@ -36,14 +36,16 @@ extend UInt16 <: LittleEndian<UInt16> {
     }
 
     public static func fromLittleEndian(buffer: Array<Byte>): UInt16 {
-        if (buffer.size < 1 || buffer.size > 2) {
-            throw IllegalArgumentException("buffer size must between 1 and 2")
+        if(buffer.size < 1 || buffer.size > 2) {
+            throw IllegalArgumentException("Buffer size must between 1 and 2")
         }
-        var result: UInt16 = 0x00
-        for(i in 0..buffer.size) {
-            result |= UInt16(buffer[i]) << 8 * i
+        if(buffer.size < 2) {
+            let temp = Array<Byte>(2, repeat: 0)
+            buffer.copyTo(temp, 0, 0, buffer.size)
+            return UInt16.readLittleEndian(temp)
+        } else {
+            return UInt16.readLittleEndian(buffer)
         }
-        return result
     }
 }
 
@@ -56,14 +58,16 @@ extend UInt32 <: LittleEndian<UInt32> {
     }
 
     public static func fromLittleEndian(buffer: Array<Byte>): UInt32 {
-        if (buffer.size < 1 || buffer.size > 4) {
-            throw IllegalArgumentException("buffer size must between 1 and 4")
+        if(buffer.size < 1 || buffer.size > 4) {
+            throw IllegalArgumentException("Buffer size must between 1 and 4")
         }
-        var result: UInt32 = 0x00
-        for(i in 0..buffer.size) {
-            result |= UInt32(buffer[i]) << 8 * i
+        if(buffer.size < 4) {
+            let temp = Array<Byte>(4, repeat: 0)
+            buffer.copyTo(temp, 0, 0, buffer.size)
+            return UInt32.readLittleEndian(temp)
+        } else {
+            return UInt32.readLittleEndian(buffer)
         }
-        return result
     }
 }
 
@@ -76,14 +80,16 @@ extend UInt64 <: LittleEndian<UInt64> {
     }
 
     public static func fromLittleEndian(buffer: Array<Byte>): UInt64 {
-        if (buffer.size < 1 || buffer.size > 8) {
-            throw IllegalArgumentException("buffer size must between 1 and 8")
+        if(buffer.size < 1 || buffer.size > 8) {
+            throw IllegalArgumentException("Buffer size must between 1 and 8")
         }
-        var result: UInt64 = 0x00
-        for(i in 0..buffer.size) {
-            result |= UInt64(buffer[i]) << 8 * i
+        if(buffer.size < 8) {
+            let temp = Array<Byte>(8, repeat: 0)
+            buffer.copyTo(temp, 0, 0, buffer.size)
+            return UInt64.readLittleEndian(temp)
+        } else {
+            return UInt64.readLittleEndian(buffer)
         }
-        return result
     }
 }
 
