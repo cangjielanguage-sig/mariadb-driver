@@ -15,11 +15,11 @@ import encoding.json.*
 @Test
 public class MySqlTest {
 
-    private static const INSERT_SQL: String = ###"insert into full_test (tinyint_col, utinyint_col, smallint_col, usmallint_col, mediumint_col,
+    private static const INSERT_SQL: String = ###"insert into full_test (bool_col, tinyint_col, utinyint_col, smallint_col, usmallint_col, mediumint_col,
                                 umediumint_col, int_col, uint_col, bigint_col, ubigint_col, float_col, double_col,
                                 decimal_col, date_col, time_col, datetime_col,timestamp_col, year_col, char_col, varchar_col,
                                 tinytext_col, text_col, mediumtext_col, longtext_col, tinyblob_col, blob_col, mediumblob_col,
-                                longblob_col, json_col, set_col, enum_col) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"###
+                                longblob_col, json_col, set_col, enum_col) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"###
 
     private let connection: Connection
 
@@ -29,8 +29,8 @@ public class MySqlTest {
         let password = ("password", "test_user")
         let database = ("database", "driver_test")
         let sslMode = ("ssl.mode", "disabled")
-        //let prepareMode = ("prepare.mode","client")
-        let prepareMode = ("prepare.mode", "server")
+        let prepareMode = ("prepare.mode","client")
+        //let prepareMode = ("prepare.mode", "server")
         let dataSource = driver.open("mysql://localhost", [username, password, database, sslMode, prepareMode])
         connection = dataSource.connect()
     }
@@ -41,6 +41,8 @@ public class MySqlTest {
     @TestCase
     public func insertTest() {
         let prepare = connection.prepareStatement(INSERT_SQL)
+        //bool
+        let p0 = SqlBool(false)
         //tinyintm
         let p1 = SqlByte(-128)
         //utinyint
@@ -125,7 +127,7 @@ public class MySqlTest {
         //enum
         let p31 = SqlChar("value1")
         let result = prepare.update(
-            [p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19, p20, p21, p22, p23,
+            [p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19, p20, p21, p22, p23,
                 p24, p25, p26, p27, p28, p29, p30, p31])
         println("effect rows: ${result.rowCount}")
         println("last insert id: ${result.lastInsertId}")
@@ -135,6 +137,8 @@ public class MySqlTest {
     @TestCase
     public func insertNullableTest() {
         let prepare = connection.prepareStatement(INSERT_SQL)
+        //bool
+        let p0 = SqlNullableBool(true)
         //tinyint
         let p1 = SqlNullableByte(-128)
         //utinyint
@@ -219,7 +223,7 @@ public class MySqlTest {
         //enum
         let p31 = SqlNullableChar("value1")
         let result = prepare.update(
-            [p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19, p20, p21, p22, p23,
+            [p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19, p20, p21, p22, p23,
                 p24, p25, p26, p27, p28, p29, p30, p31])
         println("effect rows: ${result.rowCount}")
         println("last insert id: ${result.lastInsertId}")
@@ -232,7 +236,7 @@ public class MySqlTest {
     @TestCase
     public func insertNullTest() {
         let prepare = connection.prepareStatement(INSERT_SQL)
-        let null = Array<SqlDbType>(31, repeat: SqlNullableBlob(None))
+        let null = Array<SqlDbType>(32, repeat: SqlNullableBlob(None))
         let result = prepare.update(null)
         println("effect rows: ${result.rowCount}")
         println("last insert id: ${result.lastInsertId}")
@@ -246,6 +250,7 @@ public class MySqlTest {
         let prepare = connection.prepareStatement("select * from full_test")
         //prepare.setOption("fetchSize", "10")
         let id = SqlInteger(-1)
+        let col0 = SqlNullableBool(None)
         //tinyint
         let col1 = SqlNullableByte(None)
         //utinyint
@@ -310,43 +315,44 @@ public class MySqlTest {
         let col31 = SqlNullableVarchar(None)
         let result = prepare.query()
 
-        let row: Array<SqlDbType> = [id, col1, col2, col3, col4, col5, col6, col7, col8, col9, col10, col11, col12,
+        let row: Array<SqlDbType> = [id, col0, col1, col2, col3, col4, col5, col6, col7, col8, col9, col10, col11, col12,
             col13, col14, col15, col16, col17, col18, col19, col20, col21, col22, col23, col24, col25, col26, col27,
             col28, col29, col30, col31]
 
         while (result.next(row)) {
             println(id.value)
-            println(col1.value)
-            println(col2.value)
-            println(col3.value)
-            println(col4.value)
-            println(col5.value)
-            println(col6.value)
-            println(col7.value)
-            println(col8.value)
-            println(col9.value)
-            println(col10.value)
-            println(col11.value)
-            println(col12.value)
-            println(col13.value)
-            println(col14.value)
-            println(col15.value)
-            println(col16.value)
-            println(col17.value)
-            println(col18.value)
-            println(col19.value)
-            println(col20.value)
-            println(col21.value)
-            println(col22.value)
-            println(col23.value)
-            println(col24.value)
-            println(col25.value)
-            println(toArray(col26.value.getOrDefault({=> ByteBuffer()})).size)
-            println(toArray(col27.value.getOrDefault({=> ByteBuffer()})).size)
-            println(toArray(col28.value.getOrDefault({=> ByteBuffer()})).size)
-            println(col29.value)
-            println(col30.value)
-            println(col31.value)
+            println(col0.value)
+            // println(col1.value)
+            // println(col2.value)
+            // println(col3.value)
+            // println(col4.value)
+            // println(col5.value)
+            // println(col6.value)
+            // println(col7.value)
+            // println(col8.value)
+            // println(col9.value)
+            // println(col10.value)
+            // println(col11.value)
+            // println(col12.value)
+            // println(col13.value)
+            // println(col14.value)
+            // println(col15.value)
+            // println(col16.value)
+            // println(col17.value)
+            // println(col18.value)
+            // println(col19.value)
+            // println(col20.value)
+            // println(col21.value)
+            // println(col22.value)
+            // println(col23.value)
+            // println(col24.value)
+            // println(col25.value)
+            // println(toArray(col26.value.getOrDefault({=> ByteBuffer()})).size)
+            // println(toArray(col27.value.getOrDefault({=> ByteBuffer()})).size)
+            // println(toArray(col28.value.getOrDefault({=> ByteBuffer()})).size)
+            // println(col29.value)
+            // println(col30.value)
+            // println(col31.value)
         }
     }
 

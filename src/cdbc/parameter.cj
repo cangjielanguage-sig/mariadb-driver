@@ -14,7 +14,11 @@ public interface Parameter {
 extend SqlBool <: Parameter {
 
     public func asParameter(): String {
-        return "'" + this.value.toString() + "'"
+        if (this.value) {
+            return "1"
+        }else {
+            return "0"
+        }
     }
 
     public func unbox(): Any {
@@ -244,7 +248,12 @@ extend SqlNullableBool <: Parameter {
     public func asParameter(): String {
         match (this.value) {
             case None => "NULL"
-            case Some(s) => "'" + s.toString() + "'"
+            case Some(s) => 
+                if (s) {
+                    return "1"
+                }else {
+                    return "0"
+                }
         }
     }
 

@@ -12,6 +12,7 @@ GRANT ALL PRIVILEGES ON driver_test.* TO 'test_user'@'%';
 #创建测试表
 CREATE TABLE `full_test`  (
   `id` bigint NOT NULL AUTO_INCREMENT,
+  `bool_col` tinyint(1) ,
   `tinyint_col` tinyint ,
   `utinyint_col` tinyint UNSIGNED ,
   `smallint_col` smallint,
