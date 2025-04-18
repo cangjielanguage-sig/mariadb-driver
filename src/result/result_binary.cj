@@ -11,7 +11,7 @@ import std.math.numeric.*
 import encoding.json.*
 import mysql.protocol.*
 import mysql.protocol.response.*
-
+import mysql.protocol.binary.*
 protected class BinaryResultSet <: ResultSet {
     
     private let columns: Array<ColumnDefinition>
@@ -42,210 +42,79 @@ protected class BinaryResultSet <: ResultSet {
     }
 
     public override func getBool(index: Int64): ?Bool {
-        match (getString(index)) {
-            case None => return None
-            case Some(v) => return v.toBool()
-        }
+        return Bool.fromBinary(metadata(index), getBinaryData(index))
     }
 
-    @OverflowWrapping
     public override func getInt8(index: Int64): ?Int8 {
-        match (getUInt8(index)) {
-            case None => None
-            case Some(v) => Int8(v)
-        }
+        return Int8.fromBinary(metadata(index), getBinaryData(index))
     }
 
     public override func getUInt8(index: Int64): ?UInt8 {
-        match (getUInt64(index)) {
-            case None => None
-            case Some(v) => UInt8(v)
-        }
+        return UInt8.fromBinary(metadata(index), getBinaryData(index))
     }
 
-    @OverflowWrapping
     public override func getInt16(index: Int64): ?Int16 {
-        match (getUInt16(index)) {
-            case None => None
-            case Some(v) => Int16(v)
-        }
+        return Int16.fromBinary(metadata(index), getBinaryData(index))
     }
 
     public override func getUInt16(index: Int64): ?UInt16 {
-        match (getUInt64(index)) {
-            case None => None
-            case Some(v) => UInt16(v)
-        }
+        return UInt16.fromBinary(metadata(index), getBinaryData(index))
     }
 
     @OverflowWrapping
     public override func getInt32(index: Int64): ?Int32 {
-        match (getUInt32(index)) {
-            case None => None
-            case Some(v) => Int32(v)
-        }
+        return Int32.fromBinary(metadata(index), getBinaryData(index))
     }
 
     public override func getUInt32(index: Int64): ?UInt32 {
-        match (getUInt64(index)) {
-            case None => None
-            case Some(v) => UInt32(v)
-        }
+        return UInt32.fromBinary(metadata(index), getBinaryData(index))
     }
 
     @OverflowWrapping
     public override func getInt64(index: Int64): ?Int64 {
-        match (getUInt64(index)) {
-            case None => None
-            case Some(v) => Int64(v)
-        }
+        return Int64.fromBinary(metadata(index), getBinaryData(index))
     }
 
     public override func getUInt64(index: Int64): ?UInt64 {
-        match (getBinaryData(index)) {
-            case None => return None
-            case Some(v) => 
-                let columnType = metadata(index).columnType
-                match (columnType) {
-                    case Tiny => 
-                        return UInt64(v[0])
-                    case Short | Year => 
-                        return UInt64(UInt16.fromLittleEndian(v))
-                    case Long | Int24 => 
-                        return UInt64(UInt32.fromLittleEndian(v))
-                    case LongLong => 
-                        return UInt64.fromLittleEndian(v)
-                    case Float => 
-                        return UInt64(getFloat32(index).getOrThrow())
-                    case Double => 
-                        return UInt64(getFloat64(index).getOrThrow())
-                    case String | VarString | NewDecimal =>
-                        var str = getString(index).getOrThrow()
-                        try {
-                            return UInt64.parse(str)
-                        } catch (e: IllegalArgumentException) {
-                            throw ValueConvertException("Parse to Integer failed: column name is '${metadata(index).name}', raw value is ${str}")
-                        }
-                    case _ => throw ValueConvertException("Unsupported conversion from ${columnType} to Integer")
-                }
-        }
+        return UInt64.fromBinary(metadata(index), getBinaryData(index))
     }
 
 
     public override func getFloat16(index: Int64): ?Float16 {
-        match (getFloat32(index)) {
-            case None => None
-            case Some(v) => return Float16(v)
-        }
+        return Float16.fromBinary(metadata(index), getBinaryData(index))
     }
 
     public override func getFloat32(index: Int64): ?Float32 {
-        match (getBinaryData(index)) {
-            case None => return None
-            case Some(v) => 
-                let columnType = metadata(index).columnType
-                match (columnType) {
-                    case Float => 
-                        return Float32.fromLittleEndian(v)
-                    case Double => 
-                        return Float32(getFloat64(index).getOrThrow())
-                    case String | VarString => 
-                        return Float32.parse(getString(index).getOrThrow())
-                    case _ => 
-                        throw ValueConvertException("Unsupported conversion from ${columnType} to Float32")
-                }   
-        }
+        return Float32.fromBinary(metadata(index), getBinaryData(index))
     }
 
     public override func getFloat64(index: Int64): ?Float64 {
-        match(getBinaryData(index)) {
-            case None => return None
-            case Some(v) => 
-                let columnType = metadata(index).columnType
-                match (columnType) {
-                    case Float => 
-                        return Float64(getFloat32(index).getOrThrow())
-                    case Double => 
-                        return Float64.fromLittleEndian(v)
-                    case String | VarString | NewDecimal => 
-                        return Float64.parse(getString(index).getOrThrow())
-                    case _ => 
-                        throw ValueConvertException("Unsupported conversion from ${columnType} to Float64")
-                }
-        }
+        return Float64.fromBinary(metadata(index), getBinaryData(index))
     }
 
     public override func getBigInt(index: Int64): ?BigInt {
-        match (getBinaryData(index)) {
-            case None => return None
-            case Some(v) => 
-                let columnType = metadata(index).columnType
-                match (columnType) {
-                    case Tiny => 
-                        return BigInt(getInt8(index).getOrThrow())
-                    case Short | Year => 
-                        return BigInt(getInt16(index).getOrThrow())
-                    case Int24 | Long => 
-                        return BigInt(getInt32(index).getOrThrow())
-                    case LongLong => 
-                        return BigInt(getInt64(index).getOrThrow())
-                case String | VarString => 
-                    return BigInt.parse(getString(index).getOrThrow())
-                case _ => 
-                    throw ValueConvertException("Unsupported conversion from ${columnType} to BigInt")
-                }
-        }
+        return BigInt.fromBinary(metadata(index), getBinaryData(index))
     }
 
     public override func getDecimal(index: Int64): ?Decimal {
-        match (getBinaryData(index)) {
-            case None => return None
-            case Some(v) => 
-                let columnType = metadata(index).columnType
-                match (columnType) {
-                    case Float => 
-                        return Decimal(getFloat32(index).getOrThrow())
-                    case Double => 
-                        return Decimal(getFloat64(index).getOrThrow())
-                    case String | VarString | NewDecimal => 
-                        Decimal.parse(getString(index).getOrThrow())
-                    case _ => 
-                        throw ValueConvertException("Unsupported conversion from ${columnType} to Integer")
-                }
-        }
+        return Decimal.fromBinary(metadata(index), getBinaryData(index))
 
     }
 
     public override func getDate(index: Int64): ?DateTime {
-        return getTimestamp(index)
+        return DateTime.fromBinary(metadata(index), getBinaryData(index))
     }
 
     public override func getTime(index: Int64): ?DateTime {
-        return getTimestamp(index)
+        return DateTime.fromBinary(metadata(index), getBinaryData(index))
     }
 
     public func getDateTime(index: Int64): ?DateTime {
-        return getTimestamp(index)
+        return DateTime.fromBinary(metadata(index), getBinaryData(index))
     }
 
     public func getTimestamp(index: Int64): ?DateTime {
-        match(getBinaryData(index)) {
-            case None => return None
-            case Some(v) => 
-                let columnType = metadata(index).columnType
-                match (columnType) {
-                    case Date => 
-                        return DateTime.fromBinaryDateTime(v)
-                    case DateTime | Timestamp => 
-                        return DateTime.fromBinaryDateTime(v)
-                    case Time => 
-                        return DateTime.fromBinaryTime(v)
-                    case _ => 
-                        throw ValueConvertException("Unsupported conversion from ${columnType} to DateTime")
-        }
-        }
-    
-
+        return DateTime.fromBinary(metadata(index), getBinaryData(index))
     }
 
     public override func getInputStream(index: Int64): ?InputStream {
@@ -257,60 +126,7 @@ protected class BinaryResultSet <: ResultSet {
 
     @OverflowWrapping
     public override func getString(index: Int64): ?String {
-        match (getBinaryData(index)) {
-            case None => return None
-            case Some(v) => 
-                let columnType = metadata(index).columnType
-                let unsigned = metadata(index).hasFlag(Unsigned)
-                match (columnType) {
-                    case Tiny =>
-                        if (!unsigned) {
-                            return getInt8(index).getOrThrow().toString()
-                        } else {
-                            return getUInt8(index).getOrThrow().toString()
-                        }
-                    case Short | Year =>
-                        if (!unsigned) {
-                            return getInt16(index).getOrThrow().toString()
-                        } else {
-                         return getUInt16(index).getOrThrow().toString()
-                        }
-                    case Long | Int24 =>
-                        if (!unsigned) {
-                            return getInt32(index).getOrThrow().toString()
-                        } else {
-                            return getUInt32(index).getOrThrow().toString()
-                        }
-                    case LongLong =>
-                        if (!unsigned) {
-                            return getInt64(index).getOrThrow().toString()
-                        } else {
-                        return getUInt64(index).getOrThrow().toString()
-                        }
-                    case Float => 
-                        return getFloat32(index).getOrThrow().toString()
-                    case Double => 
-                        return getFloat64(index).getOrThrow().toString()
-                    case VarString | String | Json | Enum | Set | TinyBlob | MediumBlob | LongBlob | Blob | NewDecimal =>
-                        return String.fromUtf8(v)
-                        // match (charset) {
-                        //     case Binary => 
-                        //         throw Exception("Unsupported Charset: Binary")
-                        //     case Utf8mb3GeneralCi => 
-                        //         return String.fromUtf8(data)
-                        //     case Latin1SwedishCi => 
-                        //         throw Exception("Unsupported Charset: Latin1SwedishCi")
-                        // }
-                    case Date => 
-                        return getDate(index).getOrThrow().format(DB_DATE_FORMAT)
-                    case DateTime | Timestamp => 
-                        return getDateTime(index).getOrThrow().format(DB_DATE_TIME_FORMAT)
-                    case Time => 
-                        return getTime(index).getOrThrow().format(DB_TIME_FORMAT)
-                        //case _ => throw Exception("Unsupport MySQL binary type")
-                    }
-        }
-
+        return String.fromBinary(metadata(index), getBinaryData(index))
     }
 
     public override func getArray(index: Int64): ?Array<Byte> {
@@ -328,10 +144,7 @@ protected class BinaryResultSet <: ResultSet {
     }
 
     public override func getJsonValue(index: Int64): ?JsonValue {
-        match (getString(index)) {
-            case None => return None
-            case Some(v) => return JsonValue.fromStr(v)
-        }
+        return JsonValue.fromBinary(metadata(index), getBinaryData(index))
     }
 
     public override func metadata(index: Int64): ColumnDefinition {

@@ -29,8 +29,8 @@ public class MySqlTest {
         let password = ("password", "test_user")
         let database = ("database", "driver_test")
         let sslMode = ("ssl.mode", "disabled")
-        let prepareMode = ("prepare.mode","client")
-        //let prepareMode = ("prepare.mode", "server")
+        //let prepareMode = ("prepare.mode","client")
+        let prepareMode = ("prepare.mode", "server")
         let dataSource = driver.open("mysql://localhost", [username, password, database, sslMode, prepareMode])
         connection = dataSource.connect()
     }
@@ -66,7 +66,7 @@ public class MySqlTest {
         //double
         let p12 = SqlDouble(2465.089728343)
         //decimal
-        let p13 = SqlDecimal(Decimal("1234.56789"))
+        let p13 = SqlDecimal(Decimal.parse("1234.56789"))
         //date
         let p14 = SqlDate(DateTime.now())
         //time
@@ -160,7 +160,7 @@ public class MySqlTest {
         //double
         let p12 = SqlNullableDouble(2465.089728343)
         //decimal
-        let p13 = SqlNullableDecimal(Decimal("1234.56789"))
+        let p13 = SqlNullableDecimal(Decimal.parse("1234.56789"))
         //date
         let p14 = SqlNullableDate(DateTime.now())
         //time

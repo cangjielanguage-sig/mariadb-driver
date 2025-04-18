@@ -13,6 +13,89 @@ protected interface LittleEndian<T> {
 
 }
 
+extend Int8 <: LittleEndian<Int8> {
+
+    public func toLittleEndian(): Array<Byte> {
+        let buffer = Array<Byte>(1, repeat: 0)
+        this.writeLittleEndian(buffer)
+        return buffer
+    }
+
+    public static func fromLittleEndian(buffer: Array<Byte>): Int8 {
+        if(buffer.size != 1) {
+            throw IllegalArgumentException("Buffer size must equals 1")
+        }
+        return Int8.readLittleEndian(buffer)
+    }
+}
+
+extend Int16 <: LittleEndian<Int16> {
+
+    public func toLittleEndian(): Array<Byte> {
+        let buffer = Array<Byte>(2, repeat: 0)
+        this.writeLittleEndian(buffer)
+        return buffer
+    }
+
+    public static func fromLittleEndian(buffer: Array<Byte>): Int16 {
+        if(buffer.size < 1 || buffer.size > 2) {
+            throw IllegalArgumentException("Buffer size must between 1 and 2")
+        }
+        if(buffer.size < 2) {
+            let temp = Array<Byte>(2, repeat: 0)
+            buffer.copyTo(temp, 0, 0, buffer.size)
+            return Int16.readLittleEndian(temp)
+        } else {
+            return Int16.readLittleEndian(buffer)
+        }
+    }
+}
+
+extend Int32 <: LittleEndian<Int32> {
+
+    public func toLittleEndian(): Array<Byte> {
+        let buffer = Array<Byte>(4, repeat: 0)
+        this.writeLittleEndian(buffer)
+        return buffer
+    }
+
+    public static func fromLittleEndian(buffer: Array<Byte>): Int32 {
+        if(buffer.size < 1 || buffer.size > 4) {
+            throw IllegalArgumentException("Buffer size must between 1 and 4")
+        }
+        if(buffer.size < 4) {
+            let temp = Array<Byte>(4, repeat: 0)
+            buffer.copyTo(temp, 0, 0, buffer.size)
+            return Int32.readLittleEndian(temp)
+        } else {
+            return Int32.readLittleEndian(buffer)
+        }
+    }
+}
+
+extend Int64 <: LittleEndian<Int64> {
+
+    public func toLittleEndian(): Array<Byte> {
+        let buffer = Array<Byte>(8, repeat: 0)
+        this.writeLittleEndian(buffer)
+        return buffer
+    }
+
+    public static func fromLittleEndian(buffer: Array<Byte>): Int64 {
+        if(buffer.size < 1 || buffer.size > 8) {
+            throw IllegalArgumentException("Buffer size must between 1 and 8")
+        }
+        if(buffer.size < 8) {
+            let temp = Array<Byte>(8, repeat: 0)
+            buffer.copyTo(temp, 0, 0, buffer.size)
+            return Int64.readLittleEndian(temp)
+        } else {
+            return Int64.readLittleEndian(buffer)
+        }
+    }
+
+}
+
 extend UInt8 <: LittleEndian<UInt8> {
 
     public func toLittleEndian(): Array<Byte> {

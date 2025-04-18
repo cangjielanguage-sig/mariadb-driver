@@ -5,14 +5,8 @@ protected package mysql.protocol
 
 import std.collection.*
 
-protected interface ToBool {
 
-    func toBool(): Bool
-
-}
-
-
-extend String <: ToLengthEncoded & ToNullTerminated & ToBool {
+extend String <: ToLengthEncoded & ToNullTerminated {
 
     public func toLengthEncoded(): Array<Byte> {
         return this.toArray().toLengthEncoded()
@@ -21,15 +15,7 @@ extend String <: ToLengthEncoded & ToNullTerminated & ToBool {
     public func toNullTerminated(): Array<Byte> {
         return this.toArray().toNullTerminated()
     }
-
-    public func toBool(): Bool {
-        match (this) {
-            case "1" => return true
-            case "0" => return false
-            case _ => throw IllegalArgumentException("parse string to bool faild")
-        }
-    }
-
+    
 }
 
 extend UInt <: ToLengthEncoded {

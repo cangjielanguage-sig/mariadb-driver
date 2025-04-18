@@ -29,12 +29,12 @@ func escapeString(value: String): String {
     builder.append("'")
     for(i in value.toRuneArray()) {
         match (i) {
-            // case r'\u{0000}' => builder.append("\\0")
-            // case r'\n' => builder.append("\\n")
-            // case r'\r' => builder.append("\\r")
-            // case r'\u{001a}' => builder.append("\\Z")
-            case r'\'' => builder.append("\'\'")
+            case r'0' => builder.append("\\0")
+            case r'\n' => builder.append("\\n")
+            case r'\r' => builder.append("\\r")
             case r'\\' => builder.append("\\\\")
+            case r'\'' => builder.append("\'\'")
+            case r'"' => builder.append("\"")
             case _ => builder.append(i)
             }
         }

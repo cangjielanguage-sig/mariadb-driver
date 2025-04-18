@@ -15,9 +15,9 @@ protected interface BinaryDate {
 
     func toBinaryDateTime(): Array<Byte>
 
-    static func fromBinaryDateTime(data: Array<Byte>): ?DateTime
+    static func fromBinaryDateTime(data: Array<Byte>): DateTime
 
-    static func fromBinaryTime(data: Array<Byte>): ?DateTime
+    static func fromBinaryTime(data: Array<Byte>): DateTime
 }
 
 extend DateTime <: BinaryDate {
@@ -56,10 +56,10 @@ extend DateTime <: BinaryDate {
         return buf.toArray()
     }
 
-    public static func fromBinaryDateTime(data: Array<Byte>): ?DateTime {
+    public static func fromBinaryDateTime(data: Array<Byte>): DateTime {
         let buffer = ByteBuffer(data)
         match (buffer.readOneByte()) {
-            case 0 => return None
+            case 0 => throw IllegalFormatException()
             case 4 =>
                 let year = UInt16.fromLittleEndian(buffer.readBytes(2))
                 let month = UInt8.fromLittleEndian(buffer.readBytes(1))
@@ -89,10 +89,10 @@ extend DateTime <: BinaryDate {
         }
     }
 
-    public static func fromBinaryTime(data: Array<Byte>): ?DateTime {
+    public static func fromBinaryTime(data: Array<Byte>): DateTime {
         let buffer = ByteBuffer(data)
         match (buffer.readOneByte()) {
-            case 0 => return None
+            case 0 => throw IllegalFormatException()
             case 8 =>
                 let _ = buffer.readBytes(1) //negative
                 let _ = buffer.readBytes(4) //day
