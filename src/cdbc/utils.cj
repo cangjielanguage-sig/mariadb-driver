@@ -29,7 +29,6 @@ func escapeString(value: String): String {
     builder.append("'")
     for(i in value.toRuneArray()) {
         match (i) {
-            case r'0' => builder.append("\\0")
             case r'\n' => builder.append("\\n")
             case r'\r' => builder.append("\\r")
             case r'\\' => builder.append("\\\\")
