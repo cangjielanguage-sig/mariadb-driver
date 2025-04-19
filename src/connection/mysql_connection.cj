@@ -7,6 +7,7 @@ import std.io.*
 import std.net.*
 import std.sync.*
 import std.collection.*
+import mysql.util.*
 import mysql.result.*
 import mysql.protocol.*
 import mysql.protocol.request.*
@@ -329,6 +330,7 @@ protected class MySqlConnection <: Resource {
 
     internal func writeRequest(req: Request): Unit {
         write(req.toByteArray())
+        flush()
     }
 
 

@@ -1,6 +1,7 @@
 package mysql.cdbc
 
 import std.database.sql.*
+import mysql.util.*
 import mysql.protocol.*
 
 public interface Parameter {
@@ -210,7 +211,7 @@ extend SqlTimestamp <: Parameter {
 extend SqlBinary <: Parameter {
     
     public func asParameter(): String {
-        return this.value.toHexStringWithPrefix()
+        return toHexStringWithPrefix(this.value)
     }
 
     public func unbox(): Any {
@@ -222,7 +223,7 @@ extend SqlBinary <: Parameter {
 extend SqlVarBinary <: Parameter {
     
     public func asParameter(): String {
-        return this.value.toHexStringWithPrefix()
+        return toHexStringWithPrefix(this.value)
     }
 
     public func unbox(): Any {
@@ -302,7 +303,7 @@ extend SqlNullableSmallInt <: Parameter {
 
 }
 
-extend SqlNullableInteger <: Parameter{
+extend SqlNullableInteger <: Parameter {
     
     public func asParameter(): String {
         match (this.value) {
@@ -540,7 +541,7 @@ extend SqlNullableBinary <: Parameter {
     public func asParameter(): String {
         match (this.value) {
             case None => "NULL"
-            case Some(s) => s.toHexStringWithPrefix()
+            case Some(s) => toHexStringWithPrefix(s)
         }
     }
     
@@ -557,7 +558,7 @@ extend SqlNullableVarBinary <: Parameter {
     public func asParameter(): String {
         match (this.value) {
             case None => "NULL"
-            case Some(s) => s.toHexStringWithPrefix()
+            case Some(s) => toHexStringWithPrefix(s)
         }
     }
     
@@ -569,7 +570,7 @@ extend SqlNullableVarBinary <: Parameter {
     }
 }
 
-extend SqlNullableJson <: Parameter{
+extend SqlNullableJson <: Parameter {
     
     public func asParameter(): String {
         match (this.value) {

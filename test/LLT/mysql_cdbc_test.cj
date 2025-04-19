@@ -1,5 +1,6 @@
-protected package mysql.test.cdbc
-
+// EXEC: cjc %import-path %L %l %f --test
+// EXEC: ./mainprotected package mysql.test.cdbc
+package mysql
 import std.unittest.*
 import std.unittest.testmacro.*
 import std.database.sql.*
@@ -9,7 +10,7 @@ import std.sync.*
 import std.fs.*
 import std.io.*
 import std.math.numeric.*
-import mysql.protocol.*
+import mysql.util.*
 import encoding.json.*
 
 @Test
@@ -29,8 +30,8 @@ public class MySqlTest {
         let password = ("password", "test_user")
         let database = ("database", "driver_test")
         let sslMode = ("ssl.mode", "disabled")
-        let prepareMode = ("prepare.mode","client")
-        //let prepareMode = ("prepare.mode", "server")
+        //let prepareMode = ("prepare.mode","client")
+        let prepareMode = ("prepare.mode", "server")
         let dataSource = driver.open("mysql://localhost", [username, password, database, sslMode, prepareMode])
         connection = dataSource.connect()
     }
@@ -114,10 +115,8 @@ public class MySqlTest {
                 67, 145, 67, 34, 12, 45, 32, 76, 90, 62, 145, 24, 56, 234, 34, 235, 56, 67])
         let p27 = SqlBlob(stream3)
         //longblob
-        let file = File(".\\doc\\1.jpg", OpenMode.Read)
-        let array = readToEnd(file)
-        let stream4 = ByteBuffer()
-        stream4.write(array)
+        // let stream4 = ByteBuffer(Array<Byte>(10485760, repeat: 0))
+        let stream4 = ByteBuffer(Array<Byte>(1048576 * 5, repeat: 0))
         let p28 = SqlBlob(stream4)
         //json
         let json = JsonObject.fromStr('{"name":"yesokim", "age": 22, "sex": 1}')
@@ -210,10 +209,7 @@ public class MySqlTest {
                 67, 145, 67, 34, 12, 45, 32, 76, 90, 62, 145, 24, 56, 234, 34, 235, 56, 67])
         let p27 = SqlNullableBlob(stream3)
         //longblob
-        let file = File(".\\doc\\1.jpg", OpenMode.Read)
-        let array = readToEnd(file)
-        let stream4 = ByteBuffer()
-        stream4.write(array)
+        let stream4 = ByteBuffer(Array<Byte>(1048576, repeat: 0))
         let p28 = SqlNullableBlob(stream4)
         //json
         let json = JsonObject.fromStr('{"name":"yesokim", "age": 22, "sex": 1}')
@@ -322,37 +318,37 @@ public class MySqlTest {
         while (result.next(row)) {
             println(id.value)
             println(col0.value)
-            // println(col1.value)
-            // println(col2.value)
-            // println(col3.value)
-            // println(col4.value)
-            // println(col5.value)
-            // println(col6.value)
-            // println(col7.value)
-            // println(col8.value)
-            // println(col9.value)
-            // println(col10.value)
-            // println(col11.value)
-            // println(col12.value)
-            // println(col13.value)
-            // println(col14.value)
-            // println(col15.value)
-            // println(col16.value)
-            // println(col17.value)
-            // println(col18.value)
-            // println(col19.value)
-            // println(col20.value)
-            // println(col21.value)
-            // println(col22.value)
-            // println(col23.value)
-            // println(col24.value)
-            // println(col25.value)
-            // println(toArray(col26.value.getOrDefault({=> ByteBuffer()})).size)
-            // println(toArray(col27.value.getOrDefault({=> ByteBuffer()})).size)
-            // println(toArray(col28.value.getOrDefault({=> ByteBuffer()})).size)
-            // println(col29.value)
-            // println(col30.value)
-            // println(col31.value)
+            println(col1.value)
+            println(col2.value)
+            println(col3.value)
+            println(col4.value)
+            println(col5.value)
+            println(col6.value)
+            println(col7.value)
+            println(col8.value)
+            println(col9.value)
+            println(col10.value)
+            println(col11.value)
+            println(col12.value)
+            println(col13.value)
+            println(col14.value)
+            println(col15.value)
+            println(col16.value)
+            println(col17.value)
+            println(col18.value)
+            println(col19.value)
+            println(col20.value)
+            println(col21.value)
+            println(col22.value)
+            println(col23.value)
+            println(col24.value)
+            println(col25.value)
+            println(toArray(col26.value.getOrDefault({=> ByteBuffer()})).size)
+            println(toArray(col27.value.getOrDefault({=> ByteBuffer()})).size)
+            println(toArray(col28.value.getOrDefault({=> ByteBuffer()})).size)
+            println(col29.value)
+            println(col30.value)
+            println(col31.value)
         }
     }
 

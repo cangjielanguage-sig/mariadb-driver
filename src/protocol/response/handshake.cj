@@ -5,6 +5,7 @@ protected package mysql.protocol.response
 
 import std.io.*
 import std.collection.*
+import mysql.util.*
 import mysql.protocol.*
 /*
 * Initial handshake packet for protocol version 10.
@@ -64,30 +65,33 @@ protected class Handshake <: CommonResponse {
     protected init(length: UInt32, buffer: ByteBuffer) {
         super(length, buffer)
         // 协议: 1 byte
-        this.protocol = buffer.readOneByte()
+        this.protocol = buffer.readFix1Integer()
         // 服务器版本: null end
         this.version = buffer.readNullTerminatedString()
         // 线程id: 4 byte
-        this.threadId = UInt32.fromLittleEndian(buffer.readBytes(4))
+        this.threadId = buffer.readFix4Integer()
         // 随机盐: null end
         this.salt1 = buffer.readNullTerminatedStringRaw()
         // 服务器权能标志: 2 byte
-        this.serverCapabilities = UInt16.fromLittleEndian(buffer.readBytes(2))
+        this.serverCapabilities = buffer.readFix2Integer()
         // 服务字符编码集: 1 byte
-        this.serverLanguage = buffer.readOneByte()
+        this.serverLanguage = buffer.readFix1Integer()
         // 服务器状态: 2 byte
-        this.serverStatus = UInt16.fromLittleEndian(buffer.readBytes(2))
+        this.serverStatus = buffer.readFix2Integer()
         // 服务器权能标志扩展: 2 byte
-        this.extendedServerCapabilities = UInt16.fromLittleEndian(buffer.readBytes(2))
+        this.extendedServerCapabilities = buffer.readFix2Integer()
         // 认证插件长度: 1 byte
-        this.authenticationDataLength = buffer.readOneByte()
+        this.authenticationDataLength = buffer.readFix1Integer()
         // if(hasCapability(PluginAuth)){
         //     this.authenticationDataLength = buffer.readOneByte()
         // }else{
         //     this.authenticationDataLength = 0x00
         // }
         // 未使用: 10 byte
-        buffer.readBytes(10)
+        let temp = Array<Byte>(10, repeat: 0)
+        if(buffer.read(temp)  != 10) {
+            throw InvalidPacketException()
+        }
         // 随机盐: n byte
         this.salt2 = buffer.readNullTerminatedStringRaw()
         // 认证插件: n byte

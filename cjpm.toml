@@ -4,7 +4,7 @@
   description = ""
   link-option = ""
   name = "mysql"
-  output-type = "static"
+  output-type = "dynamic"
   src-dir = ""
   target-dir = ""
   version = "0.7.1"

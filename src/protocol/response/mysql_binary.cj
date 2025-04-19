@@ -1,7 +1,7 @@
 /*
  * Copyright (c) Yesokim. 2024-2025. All rights reserved.
  */
-protected package mysql.protocol.binary
+protected package mysql.protocol.response
 
 import std.io.*
 import std.time.*
@@ -9,11 +9,11 @@ import std.convert.*
 import std.collection.*
 import std.math.numeric.*
 import encoding.json.*
+import mysql.util.*
 import mysql.protocol.*
-import mysql.protocol.response.*
 
 /*
-* MySQL binary protocol interface
+* MySQL Binary Protocol Value
 * referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_binary_resultset.html#sect_protocol_binary_resultset_row_value
 */
 protected interface ToMySqlBinary {
@@ -782,6 +782,103 @@ extend JsonValue <: MySqlBinary<JsonValue> {
                         return JsonValue.fromStr(String.fromUtf8(v))
                     case _ => throw Exception("Unsupport MySQL binary type")
                 }
+        }
+    }
+
+}
+
+extend DateTime {
+    
+    protected func toBinaryDate(): Array<Byte> {
+        let buf = ArrayList<Byte>(5)
+        buf.add(4)
+        buf.add(all: UInt16(year).toLittleEndian())
+        buf.add(UInt8(month.toInteger()))
+        buf.add(UInt8(dayOfMonth))
+        return buf.toArray()
+    }
+
+    @OverflowWrapping
+    protected func toBinaryTime(): Array<Byte> {
+        let buf = ArrayList<Byte>(9)
+        buf.add(8)
+        buf.add(0x00)
+        buf.add(all: [0x00, 0x00, 0x00, 0x00])
+        buf.add(UInt8(hour))
+        buf.add(UInt8(minute))
+        buf.add(UInt8(second))
+        return buf.toArray()
+    }
+
+    @OverflowWrapping
+    protected func toBinaryDateTime(): Array<Byte> {
+        var buf = ArrayList<Byte>(8)
+        buf.add(7)
+        buf.add(all: UInt16(year).toLittleEndian())
+        buf.add(UInt8(month.toInteger()))
+        buf.add(UInt8(dayOfMonth))
+        buf.add(UInt8(hour))
+        buf.add(UInt8(minute))
+        buf.add(UInt8(second))
+        return buf.toArray()
+    }
+
+    protected static func fromBinaryDateTime(data: Array<Byte>): DateTime {
+        let buffer = ByteBuffer(data)
+        match (buffer.readFix1Integer()) {
+            case 0 => throw IllegalFormatException()
+            case 4 =>
+                let year = buffer.readFix2Integer()
+                let month = buffer.readFix1Integer()
+                let day = buffer.readFix1Integer()
+                return DateTime.of(year: Int64(year), month: Int64(month), dayOfMonth: Int64(day),
+                    timeZone: TimeZone.UTC)
+            case 7 =>
+                let year = buffer.readFix2Integer()
+                let month = buffer.readFix1Integer()
+                let day = buffer.readFix1Integer()
+                let hour = buffer.readFix1Integer()
+                let minute = buffer.readFix1Integer()
+                let second = buffer.readFix1Integer()
+                return DateTime.of(year: Int64(year), month: Int64(month), dayOfMonth: Int64(day), hour: Int64(hour),
+                    minute: Int64(minute), second: Int64(second), timeZone: TimeZone.Local)
+            case 11 =>
+                let year = buffer.readFix2Integer()
+                let month = buffer.readFix1Integer()
+                let day = buffer.readFix1Integer()
+                let hour = buffer.readFix1Integer()
+                let minute = buffer.readFix1Integer()
+                let second = buffer.readFix1Integer()
+                let micorSecond = buffer.readFix4Integer()
+                return DateTime.of(year: Int64(year),month: Int64(month),dayOfMonth: Int64(day),hour: Int64(hour),
+                    minute: Int64(minute),second: Int64(second),nanosecond: Int64(micorSecond),timeZone: TimeZone.Local)
+            case _ => throw InvalidPacketException("")
+        }
+    }
+
+    protected static func fromBinaryTime(data: Array<Byte>): DateTime {
+        let buffer = ByteBuffer(data)
+        match (buffer.readFix1Integer()) {
+            case 0 => throw IllegalFormatException()
+            case 8 =>
+                let _ = buffer.readFix1Integer() //negative
+                let _ = buffer.readFix4Integer //day
+                let hour = buffer.readFix1Integer()
+                let minute = buffer.readFix1Integer()
+                let second = buffer.readFix1Integer()
+                return DateTime.of(year: 1970,month: 1,dayOfMonth: 1, hour: Int64(hour),
+                    minute: Int64(minute),second: Int64(second),timeZone: TimeZone.UTC)
+            case 12 =>
+                let _ = buffer.readFix1Integer() //negative
+                let _ = buffer.readFix4Integer() //day
+                let hour = buffer.readFix1Integer()
+                let minute = buffer.readFix1Integer()
+                let second = buffer.readFix1Integer()
+                let micorSecond = buffer.readFix4Integer()
+                return DateTime.of(year: 1970, month: 1, dayOfMonth: 1, hour: Int64(hour), minute: Int64(minute),
+                    second: Int64(second), nanosecond: Int64(micorSecond), timeZone: TimeZone.Local
+                )
+            case _ => throw InvalidPacketException("")
         }
     }
 

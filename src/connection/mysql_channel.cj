@@ -4,7 +4,7 @@
 protected package mysql.connection
 
 import std.net.*
-import mysql.protocol.*
+import mysql.util.*
 
 /*
 * mysql channl reads complete mysql packages from the socket

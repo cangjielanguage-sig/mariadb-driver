@@ -3,6 +3,10 @@
  */
 protected package mysql.protocol
 
+/*
+* MySQL character set support
+* referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_basic_character_set.html
+*/
 protected enum Charset {
     
     | Latin1SwedishCi

@@ -1,5 +1,6 @@
-protected package mysql.test.connection
-
+// EXEC: cjc %import-path %L %l %f --test
+// EXEC: ./main
+package mysql
 import std.unittest.*
 import std.unittest.testmacro.*
 import mysql.connection.*

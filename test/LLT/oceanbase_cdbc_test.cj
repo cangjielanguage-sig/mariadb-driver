@@ -1,17 +1,15 @@
-protected package mysql.test.cdbc
 
-
-import std.unittest.*
-import std.unittest.testmacro.*
-import std.database.sql.*
-import mysql.cdbc.*
-import std.time.*
-import std.sync.*
-import std.fs.*
-import std.io.*
-import std.math.numeric.*
-import mysql.protocol.*
-import encoding.json.*
+// import std.unittest.*
+// import std.unittest.testmacro.*
+// import std.database.sql.*
+// import mysql.cdbc.*
+// import std.time.*
+// import std.sync.*
+// import std.fs.*
+// import std.io.*
+// import std.math.numeric.*
+// import mysql.protocol.*
+// import encoding.json.*
 // @Test
 // public class OceanBaseTest{
 

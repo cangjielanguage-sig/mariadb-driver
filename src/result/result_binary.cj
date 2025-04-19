@@ -11,7 +11,6 @@ import std.math.numeric.*
 import encoding.json.*
 import mysql.protocol.*
 import mysql.protocol.response.*
-import mysql.protocol.binary.*
 protected class BinaryResultSet <: ResultSet {
     
     private let columns: Array<ColumnDefinition>

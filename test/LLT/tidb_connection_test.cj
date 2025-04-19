@@ -1,9 +1,8 @@
-protected package mysql.test.connection
 
-import std.unittest.*
-import std.unittest.testmacro.*
-import mysql.connection.*
-import std.collection.*
+// import std.unittest.*
+// import std.unittest.testmacro.*
+// import mysql.connection.*
+// import std.collection.*
 
 // @Test
 // public class TidbTest {

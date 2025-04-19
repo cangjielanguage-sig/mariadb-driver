@@ -4,6 +4,7 @@
 package mysql.xa
 
 import std.collection.*
+import mysql.util.*
 import mysql.protocol.*
 import mysql.connection.*
 
@@ -83,11 +84,11 @@ public class MySqlXaResouce <: Resource {
         let gtrid = xid.globalTransactionId
         let btrid = xid.branchQualifier
         if (gtrid.size != 0) {
-            builder.append(gtrid.toHexStringWithPrefix())
+            builder.append(toHexStringWithPrefix(gtrid))
         }
         builder.append(',')
         if (btrid.size != 0) {
-             builder.append(btrid.toHexStringWithPrefix())
+             builder.append(toHexStringWithPrefix(btrid))
         }
         builder.append(',')
         builder.append(xid.formatId)

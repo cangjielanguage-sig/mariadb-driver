@@ -4,7 +4,7 @@
 protected package mysql.protocol.response
 
 import std.io.*
-import std.collection.*
+import mysql.util.*
 import mysql.protocol.*
 /*
  * Field Count packet
@@ -66,17 +66,17 @@ protected class ColumnDefinition <: CommonResponse {
         //列名: lenenc
         this.originalName = buffer.readLengthEncodedString().getOrThrow()
         //保留位: 1 byte
-        this.padding = buffer.readOneByte()
+        this.padding = buffer.readFix1Integer()
         //字符集: 2 byte
-        this.charset = Charset.of(UInt16.fromLittleEndian(buffer.readBytes(2)))
+        this.charset = Charset.of(buffer.readFix2Integer())
         //字段最大长度: 4 byte
-        this.columnLength = UInt32.fromLittleEndian(buffer.readBytes(4))
+        this.columnLength = buffer.readFix4Integer()
         //列类型: 1 byte
-        this.columnType = ColumnType.of(buffer.readOneByte())
+        this.columnType = ColumnType.of(buffer.readFix1Integer())
         //列标志: 2 byte
-        this.flags = UInt16.fromLittleEndian(buffer.readBytes(2))
+        this.flags =buffer.readFix2Integer()
         //精度: 1 byte
-        this.decimals = buffer.readOneByte()
+        this.decimals = buffer.readFix1Integer()
     }
 
     protected func hasFlag(flag: ColumnFlag): Bool {
@@ -115,7 +115,12 @@ protected class BinaryResult <: Response {
         super(length, buffer)
         let columnCount = columnInfos.size
         //null数据位图
-        this.nullMap = buffer.readBytes((columnCount + 7 + 2) / 8)
+        let size = (columnCount + 7 + 2) / 8
+        let nullMap = Array<Byte>(size, repeat: 0)
+        if(buffer.read(nullMap) != size) {
+            throw InvalidPacketException()
+        }
+        this.nullMap = nullMap
         //二进制数据
         this.binaryData = Array<?Array<Byte>>(columnCount, repeat: [])
         for (i in 0..columnCount){
@@ -127,22 +132,26 @@ protected class BinaryResult <: Response {
                 let columnType = columnInfo.columnType
                 match (columnType) {
                     case Tiny =>
-                        binaryData[i] = buffer.readBytes(1)
+                        binaryData[i] = buffer.readFix1IntegerRaw()
                     case Short | Year =>
-                        binaryData[i] = buffer.readBytes(2)
+                        binaryData[i] = buffer.readFix2IntegerRaw()
                     case Long | Int24 | Float =>
-                        binaryData[i] = buffer.readBytes(4)
+                        binaryData[i] = buffer.readFix4IntegerRaw()
                     case LongLong | Double =>
-                        binaryData[i] = buffer.readBytes(8)
+                        binaryData[i] = buffer.readFix8IntegerRaw()
                     case String | NewDecimal | Json | Enum | Set | TinyBlob | MediumBlob | LongBlob | Blob | VarString =>
                          binaryData[i] = buffer.readLengthEncodedStringRaw()
                     case Date | DateTime | Timestamp | Time =>
-                        let flag = buffer.readOneByte()
-                        let temp = buffer.readBytes(Int64(flag))
-                        let list = ArrayList<Byte>(Int64(1 + flag))
-                        list.add(flag)
-                        list.add(all: temp)
-                        binaryData[i] = list.toArray()
+                        let flag = buffer.readFix1Integer()
+                        let size = Int64(flag)
+                        let temp = Array<Byte>(size, repeat: 0)
+                        if(buffer.read(temp) != size) {
+                            throw InvalidPacketException()
+                        }
+                        let array = Array<Byte>(size + 1, repeat: 0)
+                        array[0] = flag
+                        temp.copyTo(array, 0, 1, temp.size)
+                        binaryData[i] = array
                     //case _ => throw Exception("Unsupport MySQL binary type")
                 }
             }

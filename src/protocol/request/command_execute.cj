@@ -9,9 +9,9 @@ import std.convert.*
 import std.collection.*
 import std.math.numeric.*
 import encoding.json.*
+import mysql.util.*
 import mysql.protocol.*
 import mysql.protocol.response.*
-import mysql.protocol.binary.*
 
 /*
  * It sends the values for the placeholders of the prepared statement (if it contained any) in Binary Protocol Value form.

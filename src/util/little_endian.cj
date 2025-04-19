@@ -1,7 +1,7 @@
 /*
  * Copyright (c) Yesokim. 2024-2025. All rights reserved.
  */
-protected package mysql.protocol
+protected package mysql.util
 
 import std.binary.*
 

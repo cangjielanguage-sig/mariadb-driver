@@ -4,6 +4,7 @@
 protected package mysql.protocol.request
 
 import std.collection.*
+import mysql.util.*
 import mysql.protocol.*
 /*
 * HandshakeResponse41

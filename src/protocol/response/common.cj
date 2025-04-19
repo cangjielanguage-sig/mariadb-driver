@@ -18,7 +18,7 @@ protected open class CommonResponse {
 
     internal init(length: UInt32, buffer: ByteBuffer) {
         this.length = length
-        this.number = buffer.readOneByte()
+        this.number = buffer.readFix1Integer()
     }
 
 }

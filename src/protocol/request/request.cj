@@ -4,6 +4,7 @@
 protected package mysql.protocol.request
 
 import std.collection.*
+import mysql.util.*
 import mysql.protocol.*
 
 protected open class Request {
@@ -38,13 +39,12 @@ protected open class Request {
     }
     
     private func setHeader(): Unit {
-        try {
-            let header = UInt32(buf.size - 4).toLittleEndian()
-            buf[0] = header[0]
-            buf[1] = header[1]
-            buf[2] = header[2]
-        }catch (e: OverflowException) {
-            throw Exception("current package size is to large")
+        if(buf.size - 4 > 1 << 24) {
+            throw IllegalMemoryException("The SQL statement is too large")
         }
+        let header = UInt32(buf.size - 4).toLittleEndian()
+        buf[0] = header[0]
+        buf[1] = header[1]
+        buf[2] = header[2]
     }
 }

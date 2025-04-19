@@ -12,3 +12,8 @@ tmpFile*
 .idea/
 .arts
 .devbrain/
+ci_test/
+test_temp/
+test/log/
+test/report/
+test/temp/

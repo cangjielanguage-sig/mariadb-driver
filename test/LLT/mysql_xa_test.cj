@@ -1,6 +1,6 @@
-protected package mysql.test.xa
-
-
+// EXEC: cjc %import-path %L %l %f --test
+// EXEC: ./main
+package mysql
 import std.unittest.*
 import std.unittest.testmacro.*
 import std.collection.HashMap

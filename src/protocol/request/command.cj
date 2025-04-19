@@ -3,8 +3,8 @@
  */
 protected package mysql.protocol.request
 
+import mysql.util.*
 import mysql.protocol.*
-
 
 /*
  * Command Phase

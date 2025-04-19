@@ -5,6 +5,7 @@ protected package mysql.protocol.response
 
 import std.io.*
 import std.collection.*
+import mysql.util.*
 import mysql.protocol.*
 
 /*
@@ -17,7 +18,7 @@ protected open class Response <: CommonResponse {
 
     protected init(length: UInt32, buffer: ByteBuffer) {
         super(length, buffer)
-        code = ResponseCode.of(buffer.readOneByte())
+        code = ResponseCode.of(buffer.readFix1Integer())
     }
 }
 
@@ -45,11 +46,11 @@ protected class OkResponse <: Response {
         //受影响的行: lenenc byte
         this.effectRows = UInt64.fromLittleEndian(buffer.readLengthEncodedIntegerRaw().getOrThrow())
         //最后一个插入的ID: lenenc byte
-        this.index = UInt64.fromLittleEndian(buffer.readLengthEncodedIntegerRaw().getOrThrow())
+        this.index = buffer.readLengthEncodedInteger().getOrThrow()
         //服务器状态: 2 byte
-        this.serverStatus = UInt16.fromLittleEndian(buffer.readBytes(2))
+        this.serverStatus = buffer.readFix2Integer()
         //警告数量: 2 byte
-        this.waringCount = UInt16.fromLittleEndian(buffer.readBytes(2))
+        this.waringCount = buffer.readFix2Integer()
         //this.message = ""
         //this.sessionInfo = ""
         // if(DefaultCapability.has(SessionTrack)) {
@@ -87,13 +88,17 @@ protected class ErrorResponse <: Response {
     protected init(length: UInt32,buffer: ByteBuffer) {
         super(length, buffer)
         //错误代码: 2 byte
-        this.errorCode = UInt16.fromLittleEndian(buffer.readBytes(2))
+        this.errorCode = buffer.readFix2Integer()
         //SQL状态标记: 1 byte
-        this.serverStatusFlag = buffer.readOneByte()
+        this.serverStatusFlag = buffer.readFix1Integer()
         //SQL状态: 5 byte
-        this.sqlStatus = buffer.readBytes(5)
+        let temp = Array<Byte>(5, repeat: 0)
+        if(buffer.read(temp) != 5) {
+            throw InvalidPacketException()
+        }
+        this.sqlStatus = temp
         //错误信息: rest byte
-        this.message = String.fromUtf8(buffer.readBytes(Int64(length - 9)))
+        this.message = buffer.readFixedString(Int64(length - 9))
     }
 
 }
@@ -140,9 +145,9 @@ protected class EofResponse <: AbstractEOF {
     protected init(length: UInt32, buffer: ByteBuffer) {
         super(length, buffer)
         //警告数量: 2 byte
-        this.waringCount = UInt16.fromLittleEndian(buffer.readBytes(2))
+        this.waringCount = buffer.readFix2Integer()
         //状态标志
-        this.status = UInt16.fromLittleEndian(buffer.readBytes(2))
+        this.status = buffer.readFix2Integer()
     }
 
 }
@@ -166,16 +171,16 @@ protected class PrepareResposne <: Response {
     protected init(length: UInt32, buffer: ByteBuffer) {
         super(length, buffer)
         //语句id: 4 byte
-        this.statementId = UInt32.fromLittleEndian(buffer.readBytes(4))
+        this.statementId = buffer.readFix4Integer()
         //列的数量: 2 byte
-        this.numColumns = UInt16.fromLittleEndian(buffer.readBytes(2))
+        this.numColumns = buffer.readFix2Integer()
         //参数的数量: 2 byte
-        this.numParams = UInt16.fromLittleEndian(buffer.readBytes(2))
+        this.numParams = buffer.readFix2Integer()
         //保留位: 1 byte
         this.reserved = 0x00
         //警告数量
         if(length > 12) {
-            this.warningCount = UInt16.fromLittleEndian(buffer.readBytes(2))
+            this.warningCount = buffer.readFix2Integer()
         }else {
             this.warningCount = 0
         }
