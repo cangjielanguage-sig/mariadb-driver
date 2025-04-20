@@ -4,6 +4,7 @@
 protected package mysql.protocol
 
 import std.io.ByteBuffer
+import std.io.SeekPosition
 import std.collection.ArrayList
 import mysql.util.LittleEndian
 
@@ -48,11 +49,7 @@ protected interface ToNullTerminated {
 extend ByteBuffer <: FixedLengthStringReader {
 
     public func readFixedString(size: Int64): String {
-        let temp = Array<Byte>(size, repeat: 0)
-        if(read(temp) != size) {
-            throw InvalidPacketException()
-        }
-        return String.fromUtf8(temp)
+        return String.fromUtf8(slice(size))
     }
 
 }
@@ -64,18 +61,10 @@ extend ByteBuffer <: NullTerminatedStringReader {
     }
 
     public func readNullTerminatedStringRaw(): Array<Byte> {
-        let buf = ArrayList<Byte>()
-        while (true) {
-            let b = match (readByte()) {
-                case None => throw InvalidPacketException("read a null terminated string failed")
-                case Some(v) => v
-            }
-            if(b == 0) {
-                break
-            }
-            buf.add(b)
-        }
-        return buf.toArray()
+        let index = this.bytes().indexOf(0) ?? throw InvalidPacketException("read a null terminated string failed")
+        let data = slice(index)
+        this.readByte()//skip \0
+        return data
     }
 
 }
@@ -92,16 +81,16 @@ extend ByteBuffer <: LengthEncodedStringReader {
     public func readLengthEncodedStringRaw(): ?Array<Byte> {
         match (readLengthEncodedInteger()) {
             case None => return None
-            case Some(length) => return readStringRaw(length)
+            case Some(length) => return slice(Int64(length))
         }
     }
 
-    private func readStringRaw(length: UInt64): Array<Byte> {
+    protected func slice(length: Int64): Array<Byte> {
         if (length == 0) {
             return []
         }
-        let data = Array<Byte>(Int64(length), repeat: 0)
-        read(data)
+        let data = this.bytes().slice(0, length)
+        this.seek(Current(length))
         return data
     }
 

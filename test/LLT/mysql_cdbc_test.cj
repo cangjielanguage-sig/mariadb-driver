@@ -30,8 +30,8 @@ public class MySqlTest {
         let password = ("password", "test_user")
         let database = ("database", "driver_test")
         let sslMode = ("ssl.mode", "disabled")
-        let prepareMode = ("prepare.mode","client")
-        //let prepareMode = ("prepare.mode", "server")
+        //let prepareMode = ("prepare.mode","client")
+        let prepareMode = ("prepare.mode", "server")
         let dataSource = driver.open("mysql://localhost", [username, password, database, sslMode, prepareMode])
         connection = dataSource.connect()
     }
@@ -218,9 +218,9 @@ public class MySqlTest {
         prepare.close()
     }
 
-    /*
-     * NULL值插入测试
-     */
+    // /*
+    //  * NULL值插入测试
+    //  */
     @TestCase
     public func insertNullTest() {
         let prepare = connection.prepareStatement(INSERT_SQL)
@@ -335,9 +335,9 @@ public class MySqlTest {
             println(col23.value)
             println(col24.value)
             println(col25.value)
-            println(toArray(col26.value.getOrDefault({=> ByteBuffer()})).size)
-            println(toArray(col27.value.getOrDefault({=> ByteBuffer()})).size)
-            println(toArray(col28.value.getOrDefault({=> ByteBuffer()})).size)
+            // println(toArray(col26.value.getOrDefault({=> ByteBuffer()})).size)
+            // println(toArray(col27.value.getOrDefault({=> ByteBuffer()})).size)
+            // println(toArray(col28.value.getOrDefault({=> ByteBuffer()})).size)
             println(col29.value)
             println(col30.value)
             println(col31.value)

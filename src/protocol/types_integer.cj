@@ -74,51 +74,27 @@ extend ByteBuffer <: FixedLengthIntegerReader {
     }
 
     public func readFix1IntegerRaw(): Array<Byte> {
-        let temp = Array<Byte>(1, repeat: 0)
-        if(read(temp) != 1) {
-            throw InvalidPacketException()
-        }
-        return temp
+        return slice(1)
     }
 
     public func readFix2IntegerRaw(): Array<Byte> {
-        let temp = Array<Byte>(2, repeat: 0)
-        if(read(temp) != 2) {
-            throw InvalidPacketException()
-        }
-        return temp
+        return slice(2)
     }
 
     public func readFix3IntegerRaw(): Array<Byte> {
-        let temp = Array<Byte>(3, repeat: 0)
-        if(read(temp) != 3) {
-            throw InvalidPacketException()
-        }
-        return temp
+        return slice(3)
     }
 
     public func readFix4IntegerRaw(): Array<Byte> {
-        let temp = Array<Byte>(4, repeat: 0)
-        if(read(temp) != 4) {
-            throw InvalidPacketException()
-        }
-        return temp
+        return slice(4)
     }
 
     public func readFix6IntegerRaw(): Array<Byte> {
-        let temp = Array<Byte>(6, repeat: 0)
-        if(read(temp) != 6) {
-            throw InvalidPacketException()
-        }
-        return temp
+        return slice(6)
     }
 
     public func readFix8IntegerRaw(): Array<Byte> {
-        let temp = Array<Byte>(8, repeat: 0)
-        if(read(temp) != 8) {
-            throw InvalidPacketException()
-        }
-        return temp
+        return slice(8)
     }
 }
 
@@ -132,25 +108,16 @@ extend ByteBuffer <: LengthEncodeIntegerReader {
     }
 
     public func readLengthEncodedIntegerRaw(): ?Array<Byte> {
-        let single = Array<Byte>(1, repeat: 0)
-        if (read(single) == 0) {
-            throw InvalidPacketException("read a length encoded integer failed")
-        }
+        let single = slice(1)
         let flag = single[0]
         match (flag) {
             case 0xFB => return None
             case 0xFC =>
-                let buffer = Array<Byte>(2, repeat: 0)
-                read(buffer)
-                return buffer
+                return slice(2)
             case 0xFD =>
-                let buffer = Array<Byte>(3, repeat: 0)
-                read(buffer)
-                return buffer
+                return slice(3)
             case 0xFE =>
-                let buffer = Array<Byte>(8, repeat: 0)
-                read(buffer)
-                return buffer
+                return slice(8)
             case 0xFF => throw InvalidPacketException("This packet is Error packet")
             case _ => return single
         }
@@ -158,7 +125,7 @@ extend ByteBuffer <: LengthEncodeIntegerReader {
 
 }
 
-extend UInt <: ToLengthEncoded {
+extend UInt64 <: ToLengthEncoded {
 
     public func toLengthEncoded(): Array<Byte> {
         let buf = ArrayList<Byte>()

@@ -144,14 +144,8 @@ protected class BinaryResult <: Response {
                     case Date | DateTime | Timestamp | Time =>
                         let flag = buffer.readFix1Integer()
                         let size = Int64(flag)
-                        let temp = Array<Byte>(size, repeat: 0)
-                        if(buffer.read(temp) != size) {
-                            throw InvalidPacketException()
-                        }
-                        let array = Array<Byte>(size + 1, repeat: 0)
-                        array[0] = flag
-                        temp.copyTo(array, 0, 1, temp.size)
-                        binaryData[i] = array
+                        binaryData[i] = buffer.bytes().slice(0, Int64(size))
+                        buffer.seek(Current(Int64(size)))
                     //case _ => throw Exception("Unsupport MySQL binary type")
                 }
             }

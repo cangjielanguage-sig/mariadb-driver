@@ -825,7 +825,7 @@ extend DateTime {
 
     protected static func fromBinaryDateTime(data: Array<Byte>): DateTime {
         let buffer = ByteBuffer(data)
-        match (buffer.readFix1Integer()) {
+        match (data.size) {
             case 0 => throw IllegalFormatException()
             case 4 =>
                 let year = buffer.readFix2Integer()
@@ -858,7 +858,7 @@ extend DateTime {
 
     protected static func fromBinaryTime(data: Array<Byte>): DateTime {
         let buffer = ByteBuffer(data)
-        match (buffer.readFix1Integer()) {
+        match (data.size) {
             case 0 => throw IllegalFormatException()
             case 8 =>
                 let _ = buffer.readFix1Integer() //negative
