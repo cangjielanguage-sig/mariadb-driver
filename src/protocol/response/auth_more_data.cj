@@ -17,8 +17,8 @@ protected open class AuthMoreData <: Response {
      */
     internal var authRep: Array<Byte>
 
-    internal init(length:UInt32, buffer: ByteBuffer) {
-        super(length, buffer)
+    internal init(length: UInt64, number: UInt8, buffer: ByteBuffer) {
+        super(length, number, buffer)
         let size = Int64(length - 1)
         let temp = Array<Byte>(size, repeat: 0)
         if(buffer.read(temp) != size) {
@@ -40,8 +40,8 @@ protected class PublicKeyResponse <: AuthMoreData {
         }
     }
 
-    protected init(length: UInt32, buffer: ByteBuffer) {
-        super(length, buffer)
+    protected init(length: UInt64, number: UInt8, buffer: ByteBuffer) {
+        super(length, number, buffer)
     }
 }
 
@@ -56,8 +56,8 @@ protected class AuthStatus <: AuthMoreData {
         }
     }
 
-    protected init(length: UInt32, buffer: ByteBuffer) {
-        super(length, buffer)
+    protected init(length: UInt64, number: UInt8, buffer: ByteBuffer) {
+        super(length, number, buffer)
     }
     
 }

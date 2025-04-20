@@ -3,6 +3,7 @@
  */
 protected package mysql.connection
 
+import std.io.*
 import std.net.*
 import mysql.util.*
 
@@ -11,7 +12,11 @@ import mysql.util.*
 */
 protected class MySqlChannel <: Resource {
 
-    private let header: Array<Byte> = Array<Byte>(3, repeat: 0)
+    private static let SINGLE_PACKAGE_MAX: UInt64 = (1 << 24) - 1
+
+    private let length: Array<Byte> = Array<Byte>(3, repeat: 0)
+
+    private let number: Array<Byte> = Array<Byte>(1, repeat: 0)
 
     private let buffer: Array<Byte> = Array<Byte>(1024, repeat: 0)
 
@@ -29,33 +34,59 @@ protected class MySqlChannel <: Resource {
         return socket.isClosed()
     }
 
-    /*
-     * read a mysql package from socket
-     */
-    protected func read(): (UInt32, Array<Byte>) {
-        readFully(header)
-        let length = UInt32.fromLittleEndian(header)                                  
-        let b = Array<Byte>(Int64(length) + 1, repeat: 0)
-        readFully(b)
-        return (length, b)
+    protected func read(): (UInt64, UInt8, ByteBuffer) {
+        let bytes = ByteBuffer()
+        var total = 0u64
+        fillIn(length)
+        fillIn(number)
+        var len = UInt32.fromLittleEndian(length)
+        var num = UInt8.fromLittleEndian(number)
+        //对超过16mb的数据包进行整合                     
+        while (UInt64(len) == SINGLE_PACKAGE_MAX) {
+            fillIn(SINGLE_PACKAGE_MAX, bytes)
+            total += UInt64(len)
+            fillIn(length)
+            fillIn(number)
+            len = UInt32.fromLittleEndian(length)
+            num = UInt8.fromLittleEndian(number)
+        }
+        fillIn(UInt64(len), bytes)
+        total += UInt64(len)
+        return (total, num, bytes)
     }
 
-    private func readFully(b: Array<Byte>): Int {
-        var i: Int = 0 //已经读取了的长度
-        while(i < b.size) {
-            let remaining = b.size - i
-            var readed = 0
-            if(remaining >= 1024) {
-                readed = socket.read(buffer)
-                buffer.copyTo(b, 0, i, readed)
+    private func fillIn(length: UInt64, dest: ByteBuffer) {
+        var readed = 0u64
+        while(readed < length) {
+            let remaining = length - readed
+            if(remaining >= UInt64(buffer.size)) {
+                let len = socket.read(buffer)
+                dest.write(buffer.slice(0, len))
+                readed += UInt64(len)
             }else {
-                let temp = Array<Byte>(remaining, repeat: 0)
-                readed = socket.read(temp)
-                temp.copyTo(b, 0, i, readed)
+                let temp = Array<Byte>(Int64(remaining), repeat: 0)
+                let len = socket.read(temp)
+                dest.write(temp.slice(0, len))
+                readed += UInt64(len)
             }
-            i += readed
         }
-        return i
+    }
+
+    private func fillIn(b: Array<Byte>) {
+        var readed = 0i64
+        while(readed < b.size) {
+            let remaining = b.size - readed
+            if(remaining >= buffer.size) {
+                let len = socket.read(buffer)
+                buffer.copyTo(b, 0, readed, len)
+                readed += len 
+            } else {
+                let temp = Array<Byte>(remaining, repeat: 0)
+                let len = socket.read(temp)
+                temp.copyTo(b, 0, readed, len)
+                readed += len
+            }
+        }
     }
 
     /*

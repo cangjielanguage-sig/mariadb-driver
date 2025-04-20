@@ -12,13 +12,13 @@ import mysql.protocol.*
 */
 protected open class CommonResponse {
 
-    protected let length: UInt32
+    protected let length: UInt64
 
     protected let number: UInt8
 
-    internal init(length: UInt32, buffer: ByteBuffer) {
+    internal init(length: UInt64, number: UInt8) {
         this.length = length
-        this.number = buffer.readFix1Integer()
+        this.number = number
     }
 
 }

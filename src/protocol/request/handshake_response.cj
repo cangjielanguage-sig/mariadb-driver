@@ -96,7 +96,6 @@ protected class HandshakeResponse <: Request {
     }
 
     public override func pack(): Unit {
-        super.pack()
         //put client Capabilities
         this.capabilities.toLittleEndian() |> pack
         //put max packet
@@ -140,21 +139,12 @@ protected class HandshakeResponse <: Request {
         
     }
 
-    /*
-    * SSL Connection Request Packet.
-    * referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_connection_phase_packets_protocol_ssl_request.html
-    */
-    protected func sslRequest(): Array<Byte> {
-        super.pack()
-        //put client Capabilities
-        this.capabilities.toLittleEndian() |> pack
-        //put max packet
-        this.maxPacket.toLittleEndian() |> pack
-        //put charset
-        this.charset |> pack
-        //put unused
-        this.unused |> pack
-        return toByteArray()
+    protected func sslRequest(): Request {
+        let ssl = SslRequeset(number)
+        ssl.capabilities = capabilities
+        ssl.maxPacket = maxPacket
+        ssl.charset = charset
+        return ssl
     }
 
     protected static func getDefault(number: UInt8): HandshakeResponse{
@@ -165,6 +155,38 @@ protected class HandshakeResponse <: Request {
     }
 
 }
+
+/*
+* SSL Connection Request Packet.
+* referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_connection_phase_packets_protocol_ssl_request.html
+*/
+protected class SslRequeset <: Request {
+
+    protected var capabilities: UInt32 = 0x00
+
+    protected var maxPacket: UInt32 = 0x00
+
+    protected var charset: Byte = 0x00
+
+    protected var unused: Array<Byte> = Array<Byte>(23, repeat: 0)
+
+    protected init(number: UInt8) {
+        super(number)
+    }
+
+    public override func pack(): Unit {
+        //put client Capabilities
+        this.capabilities.toLittleEndian() |> pack
+        //put max packet
+        this.maxPacket.toLittleEndian() |> pack
+        //put charset
+        this.charset.toLittleEndian() |> pack
+        //put unused
+        this.unused |> pack
+    }
+
+}
+
 
 /*
  * 请求服务器公钥报文
@@ -179,7 +201,6 @@ protected class RequestPublicKey <: Request {
     }
 
     protected override func pack(): Unit {
-        super.pack()
         this.code |> pack
     }
 
@@ -198,7 +219,6 @@ protected class SendPassword <: Request {
     }
 
     protected override func pack(): Unit {
-        super.pack()
         this.authResponse |> pack
     }
 

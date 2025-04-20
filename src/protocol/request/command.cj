@@ -20,7 +20,6 @@ protected abstract class Command <: Request {
     }
 
     protected open override func pack(): Unit {
-        super.pack()
         this.commandType.value() |> pack
     }
 

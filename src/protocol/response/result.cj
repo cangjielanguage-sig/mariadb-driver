@@ -14,8 +14,8 @@ protected class ColumnCount <: CommonResponse {
 
     protected let count: UInt64
 
-    protected init(length: UInt32, buffer: ByteBuffer) {
-        super(length, buffer)
+    protected init(length: UInt64, number: UInt8, buffer: ByteBuffer) {
+        super(length, number)
         //列的数量: lenenc
         this.count = UInt64.fromLittleEndian(buffer.readLengthEncodedIntegerRaw().getOrThrow())
     }
@@ -51,8 +51,8 @@ protected class ColumnDefinition <: CommonResponse {
     /*浮点型精度*/
     protected let decimals: Byte
 
-    protected init(length: UInt32, buffer: ByteBuffer) {
-        super(length, buffer)
+    protected init(length: UInt64, number: UInt8, buffer: ByteBuffer) {
+        super(length, number)
         //目录名: lenenc
         this.catalog = buffer.readLengthEncodedString().getOrThrow()
         //数据库名: lenenc
@@ -92,8 +92,8 @@ protected class TextResult <: CommonResponse {
 
     protected let row: Array<?Array<Byte>>
 
-    protected init(length: UInt32, buffer: ByteBuffer, columnCount: Int64) {
-        super(length, buffer)
+    protected init(length: UInt64, number: UInt8, buffer: ByteBuffer, columnCount: Int64) {
+        super(length, number)
         this.row = Array<?Array<Byte>>(columnCount, repeat: None)
         for(i in 0..columnCount) {
             row[i] = buffer.readLengthEncodedStringRaw()
@@ -111,8 +111,8 @@ protected class BinaryResult <: Response {
 
     protected let binaryData: Array<?Array<Byte>>
 
-    protected init(length: UInt32, buffer: ByteBuffer, columnInfos: Array<ColumnDefinition>) {
-        super(length, buffer)
+    protected init(length: UInt64, number: UInt8, buffer: ByteBuffer, columnInfos: Array<ColumnDefinition>) {
+        super(length, number, buffer)
         let columnCount = columnInfos.size
         //null数据位图
         let size = (columnCount + 7 + 2) / 8

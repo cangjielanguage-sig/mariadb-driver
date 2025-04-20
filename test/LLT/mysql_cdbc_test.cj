@@ -30,8 +30,8 @@ public class MySqlTest {
         let password = ("password", "test_user")
         let database = ("database", "driver_test")
         let sslMode = ("ssl.mode", "disabled")
-        //let prepareMode = ("prepare.mode","client")
-        let prepareMode = ("prepare.mode", "server")
+        let prepareMode = ("prepare.mode","client")
+        //let prepareMode = ("prepare.mode", "server")
         let dataSource = driver.open("mysql://localhost", [username, password, database, sslMode, prepareMode])
         connection = dataSource.connect()
     }
@@ -105,10 +105,10 @@ public class MySqlTest {
         //blob
         let p26 = SqlBinary(Array<Byte>(1024, repeat: 0))
         //mediumblob
-        let stream3 = ByteBuffer(Array<Byte>(10485760, repeat: 0))
+        let stream3 = ByteBuffer(Array<Byte>(1048576 * 10, repeat: 0))
         let p27 = SqlBlob(stream3)
         //longblob
-        let stream4 = ByteBuffer(Array<Byte>(1048576 * 5, repeat: 0))
+        let stream4 = ByteBuffer(Array<Byte>(1048576 * 20, repeat: 0))
         let p28 = SqlBlob(stream4)
         //json
         let json = JsonObject.fromStr('{"name":"yesokim", "age": 22, "sex": 1}')

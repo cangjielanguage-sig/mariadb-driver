@@ -16,8 +16,8 @@ protected open class Response <: CommonResponse {
 
     protected let code: ResponseCode
 
-    protected init(length: UInt32, buffer: ByteBuffer) {
-        super(length, buffer)
+    protected init(length: UInt64, number: UInt8, buffer: ByteBuffer) {
+        super(length, number)
         code = ResponseCode.of(buffer.readFix1Integer())
     }
 }
@@ -41,8 +41,8 @@ protected class OkResponse <: Response {
 
     //protected let sessionInfo: String
 
-    protected init(length: UInt32, buffer: ByteBuffer) {
-        super(length, buffer)
+    protected init(length: UInt64, number: UInt8, buffer: ByteBuffer) {
+        super(length, number, buffer)
         //受影响的行: lenenc byte
         this.effectRows = UInt64.fromLittleEndian(buffer.readLengthEncodedIntegerRaw().getOrThrow())
         //最后一个插入的ID: lenenc byte
@@ -85,8 +85,8 @@ protected class ErrorResponse <: Response {
 
     protected let message: String
 
-    protected init(length: UInt32,buffer: ByteBuffer) {
-        super(length, buffer)
+    protected init(length: UInt64, number: UInt8, buffer: ByteBuffer) {
+        super(length, number, buffer)
         //错误代码: 2 byte
         this.errorCode = buffer.readFix2Integer()
         //SQL状态标记: 1 byte
@@ -109,8 +109,8 @@ protected class ErrorResponse <: Response {
 */
 protected open class AbstractEOF <: Response {
 
-    protected init(length: UInt32, buffer: ByteBuffer) {
-        super(length, buffer)
+    protected init(length: UInt64, number: UInt8, buffer: ByteBuffer) {
+        super(length, number, buffer)
     }
 }
 
@@ -123,8 +123,8 @@ protected class AuthSwitch <: AbstractEOF {
 
     protected let salt: Array<Byte>
 
-    protected init(length: UInt32, buffer: ByteBuffer) {
-        super(length, buffer)
+    protected init(length: UInt64, number: UInt8, buffer: ByteBuffer) {
+        super(length, number, buffer)
         //插件名称: null end
         this.pluginName = buffer.readNullTerminatedString()
         //插件提供的数据: null end
@@ -142,8 +142,8 @@ protected class EofResponse <: AbstractEOF {
 
     protected let status: UInt16
 
-    protected init(length: UInt32, buffer: ByteBuffer) {
-        super(length, buffer)
+    protected init(length: UInt64, number: UInt8, buffer: ByteBuffer) {
+        super(length, number, buffer)
         //警告数量: 2 byte
         this.waringCount = buffer.readFix2Integer()
         //状态标志
@@ -168,8 +168,8 @@ protected class PrepareResposne <: Response {
 
     protected let warningCount: UInt16
 
-    protected init(length: UInt32, buffer: ByteBuffer) {
-        super(length, buffer)
+    protected init(length: UInt64, number: UInt8, buffer: ByteBuffer) {
+        super(length, number, buffer)
         //语句id: 4 byte
         this.statementId = buffer.readFix4Integer()
         //列的数量: 2 byte

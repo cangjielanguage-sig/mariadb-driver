@@ -3,15 +3,15 @@
  */
 protected package mysql.protocol.request
 
-import std.collection.*
+import std.io.*
 import mysql.util.*
 import mysql.protocol.*
 
-protected open class Request {
+protected abstract class Request {
 
-    private static let Header: Array<Byte> = Array<Byte>(3, repeat: 0)
+    private static let SINGLE_PACKAGE_MAX: Int64 = (1 << 24) - 1
 
-    private let buf: ArrayList<Byte> = ArrayList<Byte>()
+    private let buffer: ByteBuffer = ByteBuffer()
 
     protected var number: UInt8
 
@@ -20,31 +20,27 @@ protected open class Request {
     }
 
     protected func pack(data: Array<Byte>): Unit {
-        buf.add(all: data)
+        buffer.write(data)
     }
     
-    protected open func pack(): Unit {
-        buf.add(all: Header)
-        buf.add(number)
+    protected open func pack(): Unit
+    
+    protected func writeTo(outputStream: OutputStream): Unit {
+        pack()
+        let bytes = buffer.bytes()
+        var size = bytes.size
+        var i = 0u8
+        //对超过16mb的数据包进行分包处理
+        while (size > SINGLE_PACKAGE_MAX) {
+            outputStream.write(UInt32(SINGLE_PACKAGE_MAX).toLittleEndian().slice(0, 3))
+            outputStream.write(number + i)
+            outputStream.write(bytes.slice(SINGLE_PACKAGE_MAX * Int64(i), SINGLE_PACKAGE_MAX))
+            size -= SINGLE_PACKAGE_MAX
+            i++
+        }
+        outputStream.write(UInt32(size).toLittleEndian().slice(0,3))
+        outputStream.write(number + i)
+        outputStream.write(bytes.slice(SINGLE_PACKAGE_MAX * Int64(i), size))
     }
 
-    protected func clear(): Unit {
-        buf.clear()
-    }
-    
-    protected func toByteArray(): Array<Byte> {
-        pack()
-        setHeader()
-        return buf.toArray()
-    }
-    
-    private func setHeader(): Unit {
-        if(buf.size - 4 > 1 << 24) {
-            throw IllegalMemoryException("The SQL statement is too large")
-        }
-        let header = UInt32(buf.size - 4).toLittleEndian()
-        buf[0] = header[0]
-        buf[1] = header[1]
-        buf[2] = header[2]
-    }
 }

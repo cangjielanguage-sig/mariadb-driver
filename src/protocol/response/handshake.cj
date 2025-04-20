@@ -62,8 +62,8 @@ protected class Handshake <: CommonResponse {
         return (capabilities & capability.value()) != 0
     }
 
-    protected init(length: UInt32, buffer: ByteBuffer) {
-        super(length, buffer)
+    protected init(length: UInt64, number: UInt8, buffer: ByteBuffer) {
+        super(length, number)
         // 协议: 1 byte
         this.protocol = buffer.readFix1Integer()
         // 服务器版本: null end

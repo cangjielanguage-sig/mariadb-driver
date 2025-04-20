@@ -41,7 +41,7 @@ protected class MySqlConnection <: Resource {
         }
     }
 
-    protected func read(): (UInt32, Array<Byte>) {
+    protected func read(): (UInt64, UInt8, ByteBuffer) {
         return channel.read()
     }
 
@@ -204,22 +204,22 @@ protected class MySqlConnection <: Resource {
      * read response of prepare statemnt
      */
     private func readPrepareResponse(): PrepareResult {
-        let (length, payload) = read()
-        checkError(length, payload)
-        let prepareResponse = PrepareResposne(length, ByteBuffer(payload))
+        let (length, number, payload) = read()
+        checkError(length, number, payload)
+        let prepareResponse = PrepareResposne(length, number, payload)
         let parameters = ArrayList<ColumnDefinition>(Int64(prepareResponse.numParams))
         if(prepareResponse.numParams > 0) {
             for (_ in 0..prepareResponse.numParams) {
-                let (length, payload) = read()
-                parameters.add(ColumnDefinition(length, ByteBuffer(payload)))
+                let (length, number, payload) = read()
+                parameters.add(ColumnDefinition(length, number, payload))
             }
             read()
         }
         let columns = ArrayList<ColumnDefinition>(Int64(prepareResponse.numColumns))
         if(prepareResponse.numColumns > 0) {
             for (_ in 0..prepareResponse.numColumns) {
-                let (length, payload) = read()
-                columns.add(ColumnDefinition(length, ByteBuffer(payload)))
+                let (length, number, payload) = read()
+                columns.add(ColumnDefinition(length, number, payload))
             }
             read()
         }
@@ -230,23 +230,23 @@ protected class MySqlConnection <: Resource {
     * read response of execute query prepare statemnt
     */
     private func readQueryPrepareResponse(): ResultSet {
-        var (length, payload) = read()
-        checkError(length, payload)
-        let filedsCount = ColumnCount(length, ByteBuffer(payload))
+        var (length, number, payload) = read()
+        checkError(length, number, payload)
+        let filedsCount = ColumnCount(length, number, payload)
         let fields = ArrayList<ColumnDefinition>()
         for (_ in 0..filedsCount.count) {
-            let (length, payload) = read()
-            let field = ColumnDefinition(length, ByteBuffer(payload))
+            let (length, number, payload) = read()
+            let field = ColumnDefinition(length, number, payload)
             fields.add(field)
         }
         //丢弃Eof包
         read()
-        (length, payload) = read()
+        (length, number, payload) = read()
         let rows = ArrayList<Array<?Array<Byte>>>()
-        while (payload[1] != ResponseCode.Eof.value() || payload.size > 6) {
-            let row = BinaryResult(length, ByteBuffer(payload), fields.toArray())
+        while (payload.bytes()[0] != ResponseCode.Eof.value() || payload.bytes().size > 5) {
+            let row = BinaryResult(length, number, payload, fields.toArray())
             rows.add(row.binaryData)
-            (length, payload) = read()
+            (length, number, payload) = read()
         }
         return BinaryResultSet(fields.toArray(), rows.toArray())
     }
@@ -255,13 +255,13 @@ protected class MySqlConnection <: Resource {
     * read response of fetch result set
     */
     private func readFetchResponse(columnInfos: Array<ColumnDefinition>): ResultSet {
-        var (length, payload) = read()
-        checkError(length, payload)
+        var (length, number, payload) = read()
+        checkError(length, number, payload)
         let rows = ArrayList<Array<?Array<Byte>>>()
-        while (payload[1] != ResponseCode.Eof.value() || payload.size > 6) {
-            let row = BinaryResult(length, ByteBuffer(payload), columnInfos)
+        while (payload.bytes()[0] != ResponseCode.Eof.value() || payload.bytes().size > 5) {
+            let row = BinaryResult(length, number, payload, columnInfos)
             rows.add(row.binaryData)
-            (length, payload) = read()
+            (length, number, payload) = read()
         }
         return BinaryResultSet(columnInfos, rows.toArray())
     }
@@ -270,13 +270,13 @@ protected class MySqlConnection <: Resource {
     * read response of execute query prepare with cursor
     */
     private func readQueryPrepareResponseWithCursor(prepareId: UInt32, fetchSize: UInt32): ResultSet {
-        let (length, payload) = read()
-        checkError(length, payload) 
-        let filedsCount = ColumnCount(length, ByteBuffer(payload))
+        let (length, number, payload) = read()
+        checkError(length, number, payload) 
+        let filedsCount = ColumnCount(length, number, payload)
         let fields = ArrayList<ColumnDefinition>()
         for (_ in 0..filedsCount.count) {
-            let (length, payload) = read()
-            let field = ColumnDefinition(length, ByteBuffer(payload))
+            let (length, number, payload) = read()
+            let field = ColumnDefinition(length, number, payload)
             fields.add(field)
         }
         //drop eof package
@@ -289,47 +289,45 @@ protected class MySqlConnection <: Resource {
      * read handshake package
      */
     internal func readHandhake(): Handshake {
-        let (length, payload) = read()
-        return Handshake(length, ByteBuffer(payload))
+        let (length, number, payload) = read()
+        return Handshake(length, number, payload)
     }
 
     /*
      * read a response, maybe OkResponse,ErrorResponse,AbstructEof,AuthStateResponse or it's subclass
      */
     internal func readResponse(): Response {
-        let (length, payload) = read()
-        let code = ResponseCode.of(payload[1])
+        let (length, number, payload) = read()
+        let code = ResponseCode.of(payload.bytes()[0])
         match (code) {
             case ResponseCode.Ok =>
-                return OkResponse(length, ByteBuffer(payload))
+                return OkResponse(length, number, payload)
             case ResponseCode.Error =>
-                return ErrorResponse(length, ByteBuffer(payload))
-            case ResponseCode.Eof => return getEofResponse(length, payload)
-            case ResponseCode.AuthMoreData => return getAuthMoreData(length, payload)
+                return ErrorResponse(length, number, payload)
+            case ResponseCode.Eof => return getEofResponse(length, number, payload)
+            case ResponseCode.AuthMoreData => return getAuthMoreData(length, number, payload)
         }
     }
 
-    private func getEofResponse(length: UInt32, payload: Array<Byte>): AbstractEOF {
-        let stream = ByteBuffer(payload)
-        if (payload.size > 9) {
-            return AuthSwitch(length, stream)
+    private func getEofResponse(length: UInt64, number: UInt8, payload: ByteBuffer): AbstractEOF {
+        if (payload.bytes().size > 8) {
+            return AuthSwitch(length, number, payload)
         } else {
-            return EofResponse(length, stream)
+            return EofResponse(length, number, payload)
         }
     }
 
-    private func getAuthMoreData(length: UInt32, payload: Array<Byte>): AuthMoreData {
-        let authCode = payload[2]
-        let stream = ByteBuffer(payload)
-        if (payload.size == 3 && (authCode == AuthState.FastAuthSuccess.value() || authCode == AuthState.PerformFullAuthentication.value())) {
-            return AuthStatus(length, stream)
+    private func getAuthMoreData(length: UInt64, number: UInt8, payload: ByteBuffer): AuthMoreData {
+        let authCode = payload.bytes()[1]
+        if (payload.bytes().size == 2 && (authCode == AuthState.FastAuthSuccess.value() || authCode == AuthState.PerformFullAuthentication.value())) {
+            return AuthStatus(length, number, payload)
         } else {
-            return PublicKeyResponse(length, stream)
+            return PublicKeyResponse(length, number, payload)
         }
     }
 
-    internal func writeRequest(req: Request): Unit {
-        write(req.toByteArray())
+    internal func writeRequest(request: Request): Unit {
+        request.writeTo(channel.socket)
         flush()
     }
 
@@ -349,23 +347,23 @@ protected class MySqlConnection <: Resource {
      * handler response of execute query
      */
     private func readQueryResponse(): ResultSet {
-        var (length, payload) = read()
-        checkError(length, payload)
-        let columnCount = ColumnCount(length, ByteBuffer(payload))
+        var (length, number, payload) = read()
+        checkError(length, number, payload)
+        let columnCount = ColumnCount(length, number, payload)
         let fields = ArrayList<ColumnDefinition>()
         for (_ in 0..columnCount.count) {
-            let (length, payload) = channel.read()
-            let field = ColumnDefinition(length, ByteBuffer(payload))
+            let (length, number, payload) = channel.read()
+            let field = ColumnDefinition(length, number, payload)
             fields.add(field)
         }
         //丢弃Eof包
         read()
-        (length, payload) = read()
+        (length, number, payload) = read()
         let rowPackets = ArrayList<TextResult>()
-        while (payload[1] != ResponseCode.Eof.value() || payload.size > 6) {
-            let row = TextResult(length, ByteBuffer(payload), Int64(columnCount.count))
+        while (payload.bytes()[0] != ResponseCode.Eof.value() || payload.bytes().size > 5) {
+            let row = TextResult(length, number, payload, Int64(columnCount.count))
             rowPackets.add(row)
-            (length, payload) = channel.read()
+            (length, number, payload) = channel.read()
         }
         return TextResultSet(fields.toArray(), rowPackets.toArray())
     }
@@ -374,15 +372,15 @@ protected class MySqlConnection <: Resource {
      * handler response of execute update
      */
     private func readUpdateResponse(): ChangeResult {
-        let(length, payload) = read()
-        checkError(length, payload)
-        let ok = OkResponse(length, ByteBuffer(payload))
+        let(length, number, payload) = read()
+        checkError(length, number, payload)
+        let ok = OkResponse(length, number, payload)
         return ChangeResult(ok.effectRows, ok.index)
     }
 
-    private func checkError(length: UInt32, payload: Array<Byte>) {
-        if (payload[1] == ResponseCode.Error.value()) {
-            let error = ErrorResponse(length, ByteBuffer(payload))
+    private func checkError(length: UInt64, number: UInt8, payload: ByteBuffer) {
+        if (payload.bytes()[0] == ResponseCode.Error.value()) {
+            let error = ErrorResponse(length, number, payload)
             throw ResponseErrorException(error.message)
         }
     }

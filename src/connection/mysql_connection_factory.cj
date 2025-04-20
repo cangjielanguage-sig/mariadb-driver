@@ -42,9 +42,8 @@ public class MySqlConnectionFactory {
         let sslEnabled = sslable && sslMode != "disabled"
         let authReq = prepareAuthRequest(handshake, option, sslEnabled)
         if (sslEnabled) {
-            connection.write(authReq.setCapability(SSL).sslRequest())
+            connection.writeRequest(authReq.setCapability(SSL).sslRequest())
             sslHandshake(connection, sslMode, option)
-            authReq.clear()
             authReq.setNumber(authReq.number + 1)
         }
             
