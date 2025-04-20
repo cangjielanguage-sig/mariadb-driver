@@ -103,19 +103,11 @@ public class MySqlTest {
         stream1.write([])
         let p25 = SqlBlob(stream1)
         //blob
-        let p26 = SqlBinary(
-            [145, 67, 34, 12, 45, 32, 76, 90, 62, 145, 24, 56, 234, 34, 235, 56, 67, 145, 67, 34, 12, 45, 32, 76, 90, 62,
-                145, 24, 56, 234, 34, 235, 56, 67, 145, 67, 34, 12, 45, 32, 76, 90, 62, 145, 24, 56, 234, 34, 235, 56,
-                67, 145, 67, 34, 12, 45, 32, 76, 90, 62, 145, 24, 56, 234, 34, 235, 56, 67])
+        let p26 = SqlBinary(Array<Byte>(1024, repeat: 0))
         //mediumblob
-        let stream3 = ByteBuffer()
-        stream3.write(
-            [145, 67, 34, 12, 45, 32, 76, 90, 62, 145, 24, 56, 234, 34, 235, 56, 67, 145, 67, 34, 12, 45, 32, 76, 90, 62,
-                145, 24, 56, 234, 34, 235, 56, 67, 145, 67, 34, 12, 45, 32, 76, 90, 62, 145, 24, 56, 234, 34, 235, 56,
-                67, 145, 67, 34, 12, 45, 32, 76, 90, 62, 145, 24, 56, 234, 34, 235, 56, 67])
+        let stream3 = ByteBuffer(Array<Byte>(10485760, repeat: 0))
         let p27 = SqlBlob(stream3)
         //longblob
-        // let stream4 = ByteBuffer(Array<Byte>(10485760, repeat: 0))
         let stream4 = ByteBuffer(Array<Byte>(1048576 * 5, repeat: 0))
         let p28 = SqlBlob(stream4)
         //json
