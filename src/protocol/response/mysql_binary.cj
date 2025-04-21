@@ -840,8 +840,7 @@ extend DateTime {
                 let hour = buffer.readFix1Integer()
                 let minute = buffer.readFix1Integer()
                 let second = buffer.readFix1Integer()
-                return DateTime.of(year: Int64(year), month: Int64(month), dayOfMonth: Int64(day), hour: Int64(hour),
-                    minute: Int64(minute), second: Int64(second), timeZone: TimeZone.Local)
+                return DateTime.of(year: Int64(year), month: Int64(month), dayOfMonth: Int64(day), hour: Int64(hour), minute: Int64(minute), second: Int64(second), timeZone: TimeZone.Local)
             case 11 =>
                 let year = buffer.readFix2Integer()
                 let month = buffer.readFix1Integer()
@@ -850,8 +849,7 @@ extend DateTime {
                 let minute = buffer.readFix1Integer()
                 let second = buffer.readFix1Integer()
                 let micorSecond = buffer.readFix4Integer()
-                return DateTime.of(year: Int64(year),month: Int64(month),dayOfMonth: Int64(day),hour: Int64(hour),
-                    minute: Int64(minute),second: Int64(second),nanosecond: Int64(micorSecond),timeZone: TimeZone.Local)
+                return DateTime.of(year: Int64(year),month: Int64(month),dayOfMonth: Int64(day),hour: Int64(hour), minute: Int64(minute),second: Int64(second),nanosecond: Int64(micorSecond),timeZone: TimeZone.Local)
             case _ => throw InvalidPacketException("")
         }
     }
@@ -866,8 +864,7 @@ extend DateTime {
                 let hour = buffer.readFix1Integer()
                 let minute = buffer.readFix1Integer()
                 let second = buffer.readFix1Integer()
-                return DateTime.of(year: 1970,month: 1,dayOfMonth: 1, hour: Int64(hour),
-                    minute: Int64(minute),second: Int64(second),timeZone: TimeZone.UTC)
+                return DateTime.of(year: 1970,month: 1,dayOfMonth: 1, hour: Int64(hour), minute: Int64(minute),second: Int64(second),timeZone: TimeZone.UTC)
             case 12 =>
                 let _ = buffer.readFix1Integer() //negative
                 let _ = buffer.readFix4Integer() //day
@@ -875,9 +872,7 @@ extend DateTime {
                 let minute = buffer.readFix1Integer()
                 let second = buffer.readFix1Integer()
                 let micorSecond = buffer.readFix4Integer()
-                return DateTime.of(year: 1970, month: 1, dayOfMonth: 1, hour: Int64(hour), minute: Int64(minute),
-                    second: Int64(second), nanosecond: Int64(micorSecond), timeZone: TimeZone.Local
-                )
+                return DateTime.of(year: 1970, month: 1, dayOfMonth: 1, hour: Int64(hour), minute: Int64(minute),second: Int64(second), nanosecond: Int64(micorSecond), timeZone: TimeZone.Local)
             case _ => throw InvalidPacketException("")
         }
     }

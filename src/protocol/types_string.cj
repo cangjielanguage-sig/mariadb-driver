@@ -1,5 +1,17 @@
 /*
- * Copyright (c) Yesokim. 2024-2025. All rights reserved.
+ * Copyright (c) 2024 Yesokim
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 protected package mysql.protocol
 
@@ -12,23 +24,15 @@ import mysql.util.LittleEndian
 * Strings are sequences of bytes and appear in a few forms in the protocol.
 * referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_basic_dt_strings.html
 */
-public interface FixedLengthStringReader {
+public interface MySqlStringReader {
+
+    func readFixedArray(size: Int64): Array<Byte>
 
     func readFixedString(size: Int64): String
-
-    func readFixedStringRaw(size: Int64): Array<Byte>
     
-}
-
-public interface NullTerminatedStringReader {
-
     func readNullTerminatedString(): String
 
     func readNullTerminatedStringRaw(): Array<Byte>
-
-}
-
-public interface LengthEncodedStringReader {
 
     func readLengthEncodedString(): ?String
 
@@ -48,34 +52,35 @@ protected interface ToNullTerminated {
 
 }
 
-extend ByteBuffer <: FixedLengthStringReader {
+extend ByteBuffer <: MySqlStringReader {
+
+    public func readFixedArray(length: Int64): Array<Byte> {
+        if (length == 0) {
+            return []
+        }
+        let data = Array<Byte>(length, repeat: 0)
+        if(read(data) != length) {
+            throw InvalidPacketException("read fixed array failed")
+        }
+        // let data = this.bytes().slice(0, length)
+        // this.seek(Current(length))
+        return data
+    }
 
     public func readFixedString(size: Int64): String {
-        return String.fromUtf8(slice(size))
+        return String.fromUtf8(readFixedArray(size))
     }
-
-    public func readFixedStringRaw(size: Int64): Array<Byte> {
-        return slice(size)
-    }
-
-}
-
-extend ByteBuffer <: NullTerminatedStringReader {
 
     public func readNullTerminatedString(): String {
         return String.fromUtf8(readNullTerminatedStringRaw())
     }
 
     public func readNullTerminatedStringRaw(): Array<Byte> {
-        let index = this.bytes().indexOf(0) ?? throw InvalidPacketException("read a null terminated string failed")
-        let data = slice(index)
+        let offset = this.bytes().indexOf(0) ?? throw InvalidPacketException("read a null terminated string failed")
+        let data = readFixedArray(offset)
         this.readByte()//skip \0
         return data
     }
-
-}
-
-extend ByteBuffer <: LengthEncodedStringReader {
 
     public func readLengthEncodedString(): ?String {
         match (readLengthEncodedStringRaw()) {
@@ -87,7 +92,7 @@ extend ByteBuffer <: LengthEncodedStringReader {
     public func readLengthEncodedStringRaw(): ?Array<Byte> {
         match (readLengthEncodedInteger()) {
             case None => return None
-            case Some(length) => return slice(Int64(length))
+            case Some(length) => return readFixedArray(Int64(length))
         }
     }
 
@@ -133,22 +138,6 @@ extend Array<Byte> <: ToLengthEncoded & ToNullTerminated {
         buf.add(all: this)
         buf.add(0)
         return buf.toArray()
-    }
-
-}
-
-extend ByteBuffer {
-
-    public func slice(length: Int64): Array<Byte> {
-        if (length == 0) {
-            return []
-        }
-        let data = this.bytes().slice(0, length)
-        if(data.size != length) {
-            throw InvalidPacketException()
-        }
-        this.seek(Current(length))
-        return data
     }
 
 }

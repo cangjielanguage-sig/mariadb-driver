@@ -1,5 +1,17 @@
 /*
- * Copyright (c) Yesokim. 2024-2025. All rights reserved.
+ * Copyright (c) 2024 Yesokim
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 protected package mysql.protocol
 
@@ -11,7 +23,7 @@ import mysql.util.LittleEndian
 * The MySQL Protocol has a set of possible encodings for integers.
 * referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_basic_dt_integers.html#sect_protocol_basic_dt_int_fixed
 */
-protected interface FixedLengthIntegerReader {
+protected interface MySqlIntegerReader {
     
     func readFix1Integer(): UInt8
 
@@ -25,80 +37,37 @@ protected interface FixedLengthIntegerReader {
 
     func readFix8Integer(): UInt64
 
-    func readFix1IntegerRaw(): Array<Byte>
-
-    func readFix2IntegerRaw(): Array<Byte>
-
-    func readFix3IntegerRaw(): Array<Byte>
-
-    func readFix4IntegerRaw(): Array<Byte>
-
-    func readFix6IntegerRaw(): Array<Byte>
-
-    func readFix8IntegerRaw(): Array<Byte>
-
-}
-
-protected interface LengthEncodeIntegerReader {
-    
     func readLengthEncodedInteger(): ?UInt64
 
     func readLengthEncodedIntegerRaw(): ?Array<Byte>
 
 }
 
-extend ByteBuffer <: FixedLengthIntegerReader {
+extend ByteBuffer <: MySqlIntegerReader {
 
     public func readFix1Integer(): UInt8 {
-        return UInt8.fromLittleEndian(readFix1IntegerRaw())
+        return UInt8.fromLittleEndian(readFixedArray(1))
     }
 
     public func readFix2Integer(): UInt16 {
-        return UInt16.fromLittleEndian(readFix2IntegerRaw())
+        return UInt16.fromLittleEndian(readFixedArray(2))
     }
 
     public func readFix3Integer(): UInt32 {
-        return UInt32.fromLittleEndian(readFix3IntegerRaw())
+        return UInt32.fromLittleEndian(readFixedArray(3))
     }
 
     public func readFix4Integer(): UInt32 {
-        return UInt32.fromLittleEndian(readFix4IntegerRaw())
+        return UInt32.fromLittleEndian(readFixedArray(4))
     }
 
     public func readFix6Integer(): UInt64 {
-        return UInt64.fromLittleEndian(readFix6IntegerRaw())
+        return UInt64.fromLittleEndian(readFixedArray(6))
     }
 
     public func readFix8Integer(): UInt64 {
-        return UInt64.fromLittleEndian(readFix8IntegerRaw())
+        return UInt64.fromLittleEndian(readFixedArray(8))
     }
-
-    public func readFix1IntegerRaw(): Array<Byte> {
-        return slice(1)
-    }
-
-    public func readFix2IntegerRaw(): Array<Byte> {
-        return slice(2)
-    }
-
-    public func readFix3IntegerRaw(): Array<Byte> {
-        return slice(3)
-    }
-
-    public func readFix4IntegerRaw(): Array<Byte> {
-        return slice(4)
-    }
-
-    public func readFix6IntegerRaw(): Array<Byte> {
-        return slice(6)
-    }
-
-    public func readFix8IntegerRaw(): Array<Byte> {
-        return slice(8)
-    }
-}
-
-extend ByteBuffer <: LengthEncodeIntegerReader {
 
     public func readLengthEncodedInteger(): ?UInt64 {
         match (readLengthEncodedIntegerRaw()) {
@@ -108,18 +77,17 @@ extend ByteBuffer <: LengthEncodeIntegerReader {
     }
 
     public func readLengthEncodedIntegerRaw(): ?Array<Byte> {
-        let single = slice(1)
-        let flag = single[0]
+        let flag = readFix1Integer()
         match (flag) {
             case 0xFB => return None
             case 0xFC =>
-                return slice(2)
+                return readFixedArray(2)
             case 0xFD =>
-                return slice(3)
+                return readFixedArray(3)
             case 0xFE =>
-                return slice(8)
+                return readFixedArray(8)
             case 0xFF => throw InvalidPacketException("This packet is Error packet")
-            case _ => return single
+            case _ => return [flag]
         }
     }
 

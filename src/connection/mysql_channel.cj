@@ -1,5 +1,17 @@
 /*
- * Copyright (c) Yesokim. 2024-2025. All rights reserved.
+ * Copyright (c) 2024 Yesokim
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 protected package mysql.connection
 
@@ -12,7 +24,7 @@ import mysql.util.*
 */
 protected class MySqlChannel <: Resource {
 
-    private static let SINGLE_PACKAGE_MAX: UInt64 = (1 << 24) - 1
+    private static let MAX_PACKAEG_SIZE: Int64 = (1 << 24) - 1
 
     private let length: Array<Byte> = Array<Byte>(3, repeat: 0)
 
@@ -35,39 +47,39 @@ protected class MySqlChannel <: Resource {
     }
 
     protected func read(): (UInt64, UInt8, ByteBuffer) {
-        let bytes = ByteBuffer()
-        var total = 0u64
+        var total = 0
         fillIn(length)
         fillIn(number)
         var len = UInt32.fromLittleEndian(length)
         var num = UInt8.fromLittleEndian(number)
+        let bytes = ByteBuffer(Int64(len))
         //对超过16mb的数据包进行整合                     
-        while (UInt64(len) == SINGLE_PACKAGE_MAX) {
-            fillIn(SINGLE_PACKAGE_MAX, bytes)
-            total += UInt64(len)
+        while (Int64(len) == MAX_PACKAEG_SIZE) {
+            fillIn(MAX_PACKAEG_SIZE, bytes)
+            total += Int64(len)
             fillIn(length)
             fillIn(number)
             len = UInt32.fromLittleEndian(length)
             num = UInt8.fromLittleEndian(number)
         }
-        fillIn(UInt64(len), bytes)
-        total += UInt64(len)
-        return (total, num, bytes)
+        fillIn(Int64(len), bytes)
+        total += Int64(len)
+        return (UInt64(total), num, bytes)
     }
 
-    private func fillIn(length: UInt64, dest: ByteBuffer) {
-        var readed = 0u64
+    private func fillIn(length: Int64, dest: ByteBuffer) {
+        var readed = 0
         while(readed < length) {
             let remaining = length - readed
-            if(remaining >= UInt64(buffer.size)) {
+            if(remaining >= Int64(buffer.size)) {
                 let len = socket.read(buffer)
                 dest.write(buffer.slice(0, len))
-                readed += UInt64(len)
+                readed += Int64(len)
             }else {
                 let temp = Array<Byte>(Int64(remaining), repeat: 0)
                 let len = socket.read(temp)
                 dest.write(temp.slice(0, len))
-                readed += UInt64(len)
+                readed += Int64(len)
             }
         }
     }

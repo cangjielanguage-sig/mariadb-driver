@@ -116,7 +116,7 @@ protected class BinaryResult <: Response {
         let columnCount = columnInfos.size
         //null数据位图
         let size = (columnCount + 7 + 2) / 8
-        this.nullMap = buffer.readFixedStringRaw(size)
+        this.nullMap = buffer.readFixedArray(size)
         //二进制数据
         this.binaryData = Array<?Array<Byte>>(columnCount, repeat: [])
         for (i in 0..columnCount){
@@ -128,18 +128,18 @@ protected class BinaryResult <: Response {
                 let columnType = columnInfo.columnType
                 match (columnType) {
                     case Tiny =>
-                        binaryData[i] = buffer.readFix1IntegerRaw()
+                        binaryData[i] = buffer.readFixedArray(1)
                     case Short | Year =>
-                        binaryData[i] = buffer.readFix2IntegerRaw()
+                        binaryData[i] = buffer.readFixedArray(2)
                     case Long | Int24 | Float =>
-                        binaryData[i] = buffer.readFix4IntegerRaw()
+                        binaryData[i] = buffer.readFixedArray(4)
                     case LongLong | Double =>
-                        binaryData[i] = buffer.readFix8IntegerRaw()
+                        binaryData[i] = buffer.readFixedArray(8)
                     case String | NewDecimal | Json | Enum | Set | TinyBlob | MediumBlob | LongBlob | Blob | VarString =>
                          binaryData[i] = buffer.readLengthEncodedStringRaw()
                     case Date | DateTime | Timestamp | Time =>
                         let flag = buffer.readFix1Integer()
-                        binaryData[i] = buffer.readFixedStringRaw(Int64(flag))
+                        binaryData[i] = buffer.readFixedArray(Int64(flag))
                     //case _ => throw Exception("Unsupport MySQL binary type")
                 }
             }
