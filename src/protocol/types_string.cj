@@ -58,12 +58,9 @@ extend ByteBuffer <: MySqlStringReader {
         if (length == 0) {
             return []
         }
-        let data = Array<Byte>(length, repeat: 0)
-        if(read(data) != length) {
-            throw InvalidPacketException("read fixed array failed")
-        }
-        // let data = this.bytes().slice(0, length)
-        // this.seek(Current(length))
+        // Use slicing operations instead of copying
+        let data = this.bytes().slice(0, length)
+        this.seek(Current(length))
         return data
     }
 
