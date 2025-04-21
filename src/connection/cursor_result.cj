@@ -20,7 +20,6 @@ import std.time.*
 import std.math.numeric.*
 import encoding.json.*
 import mysql.result.*
-import mysql.protocol.*
 import mysql.protocol.response.*
 
 protected class CursorResultSet <: ResultSet {

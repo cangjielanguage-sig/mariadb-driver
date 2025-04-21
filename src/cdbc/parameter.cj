@@ -17,7 +17,6 @@ package mysql.cdbc
 
 import std.database.sql.*
 import mysql.util.*
-import mysql.protocol.*
 
 public interface Parameter {
     

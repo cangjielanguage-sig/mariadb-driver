@@ -15,11 +15,8 @@
  */
 package mysql.cdbc
 
-import std.sync.*
-import std.time.*
 import std.collection.*
 import std.database.sql.*
-import mysql.protocol.*
 
 public class ClientPrepareStatement <: Statement {
 
@@ -29,12 +26,12 @@ public class ClientPrepareStatement <: Statement {
 
     private let options: HashMap<String, String>
 
-    private let closed: AtomicBool
+    private var closed: Bool
 
     public ClientPrepareStatement(originSql: String, connection: ConnectionImpl) {
         this.connection = connection
         this.originSql = originSql
-        this.closed = AtomicBool(false)
+        this.closed = false
         this.options = HashMap<String, String>()
     }
 
@@ -90,11 +87,12 @@ public class ClientPrepareStatement <: Statement {
     }
 
     public override func close() {
-        closed.store(true)
+        checkResource()
+        closed = true
     }
 
     public override func isClosed(): Bool {
-        return closed.load()
+        return closed
     }
 
 }

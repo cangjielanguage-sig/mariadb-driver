@@ -15,7 +15,6 @@
  */
 package mysql.cdbc
 
-import std.sync.*
 import std.convert.*
 import std.collection.*
 import std.database.sql.*
@@ -35,7 +34,7 @@ public class ServerPrepareStatement <: Statement {
 
     private let originSql: String
 
-    private let closed: AtomicBool
+    private var closed: Bool
 
     public ServerPrepareStatement(originSql: String, connection: ConnectionImpl) {
         this.connection = connection
@@ -43,7 +42,7 @@ public class ServerPrepareStatement <: Statement {
         this.options = HashMap<String, String>()
         this.id = prepareResult.id
         this.originSql = originSql
-        this.closed = AtomicBool(false)
+        this.closed = false
         let array = ArrayList<ColumnInfo>()
         for(i in prepareResult.columns) {
             array.add(ColumnInfoImpl(i))
@@ -108,11 +107,11 @@ public class ServerPrepareStatement <: Statement {
     public override func close() {
         checkResource()
         connection.closePrepare(id)
-        closed.store(true)
+        closed = true
     }
 
     public override func isClosed(): Bool {
-        return closed.load()
+        return closed
     }
     
 }

@@ -1,5 +1,17 @@
 /*
- * Copyright (c) Yesokim. 2024-2025. All rights reserved.
+ * Copyright (c) 2024 Yesokim
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 protected package mysql.protocol.response
 
@@ -16,29 +28,14 @@ import mysql.protocol.*
 * MySQL Binary Protocol Value
 * referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_binary_resultset.html#sect_protocol_binary_resultset_row_value
 */
-protected interface ToMySqlBinary {
-
-    func toBinary(definition: ColumnDefinition): Array<Byte>
-
-}
-
-protected interface FromMysqlBinary<T> {
+protected interface FromMySqlBinary<T> {
 
     static func fromBinary(definition: ColumnDefinition, data: ?Array<Byte>): ?T
 
 }
 
 
-protected interface MySqlBinary<T> <: ToMySqlBinary & FromMysqlBinary<T> {
-
-}
-
-extend Bool <: MySqlBinary<Bool> {
-
-    public func toBinary(definition: ColumnDefinition): Array<Byte> {
-        let value: UInt8 = if(this){ 1 }else { 0 }
-        return value.toBinary(definition)
-    }
+extend Bool <: FromMySqlBinary<Bool> {
 
     public static func fromBinary(definition: ColumnDefinition, data: ?Array<Byte>): ?Bool {
         let value = UInt8.fromBinary(definition, data)
@@ -52,28 +49,7 @@ extend Bool <: MySqlBinary<Bool> {
 
 }
 
-extend Int8 <: MySqlBinary<Int8> {
-
-    public func toBinary(definition: ColumnDefinition): Array<Byte> {
-        match (definition.columnType) {
-            case Tiny => 
-                this.toLittleEndian()
-            case Short =>
-                Int16(this).toLittleEndian()
-            case Int24 | Long | Year => 
-                Int32(this).toLittleEndian()
-            case LongLong =>
-                Int64(this).toLittleEndian()
-            case Float => 
-                Float32(this).toLittleEndian()
-            case Double => 
-                Float64(this).toLittleEndian()
-            case String | VarString | NewDecimal | TinyBlob | Blob | MediumBlob | LongBlob => 
-                this.toString().toLengthEncoded()
-            case _ => 
-                throw IllegalArgumentException("")
-        }
-    }
+extend Int8 <: FromMySqlBinary<Int8> {
 
     public static func fromBinary(definition: ColumnDefinition, data: ?Array<Byte>): ?Int8 {
         match (data) {
@@ -102,27 +78,7 @@ extend Int8 <: MySqlBinary<Int8> {
 
 }
 
-extend UInt8 <: MySqlBinary<UInt8> {
-
-    public func toBinary(definition: ColumnDefinition): Array<Byte> {
-        match (definition.columnType) {
-            case Tiny => this.toLittleEndian()
-            case Short => 
-                UInt16(this).toLittleEndian()
-            case Long | Int24 | Year => 
-                UInt32(this).toLittleEndian()
-            case LongLong => 
-                UInt64(this).toLittleEndian()
-            case Float => 
-                Float32(this).toLittleEndian()
-            case Double => 
-                Float64(this).toLittleEndian()
-            case String | VarString | NewDecimal | TinyBlob | Blob | MediumBlob | LongBlob => 
-                this.toString().toLengthEncoded()
-            case _ => 
-                throw IllegalArgumentException("")
-        }
-    }
+extend UInt8 <: FromMySqlBinary<UInt8> {
 
     public static func fromBinary(definition: ColumnDefinition, data: ?Array<Byte>): ?UInt8 {
         match (data) {
@@ -151,28 +107,7 @@ extend UInt8 <: MySqlBinary<UInt8> {
 
 }
 
-extend Int16 <: MySqlBinary<Int16> {
-
-    public func toBinary(definition: ColumnDefinition): Array<Byte> {
-        match (definition.columnType) {
-            case Tiny => 
-                Int8(this).toLittleEndian()
-            case Short => 
-                Int16(this).toLittleEndian()
-            case Int24 | Long | Year => 
-                Int32(this).toLittleEndian()
-            case LongLong => 
-                Int64(this).toLittleEndian()
-            case Float => 
-                Float32(this).toLittleEndian()
-            case Double => 
-                Float64(this).toLittleEndian()
-            case String | VarString | NewDecimal | TinyBlob | Blob | MediumBlob | LongBlob => 
-                this.toString().toLengthEncoded()
-            case _ => 
-                throw IllegalArgumentException("")
-        }
-    }
+extend Int16 <: FromMySqlBinary<Int16> {
 
     public static func fromBinary(definition: ColumnDefinition, data: ?Array<Byte>): ?Int16 {
         match (data) {
@@ -201,28 +136,7 @@ extend Int16 <: MySqlBinary<Int16> {
 
 }
 
-extend UInt16 <: MySqlBinary<UInt16> {
-
-    public func toBinary(definition: ColumnDefinition): Array<Byte> {
-        match (definition.columnType) {
-            case Tiny => 
-                UInt8(this).toLittleEndian() // possible overflow
-            case Short => 
-                this.toLittleEndian()
-            case Long | Int24 | Year => 
-                UInt32(this).toLittleEndian()
-            case LongLong => 
-                UInt64(this).toLittleEndian()
-            case Float => 
-                Float32(this).toLittleEndian()
-            case Double => 
-                Float64(this).toLittleEndian()
-            case String | VarString | NewDecimal | TinyBlob | Blob | MediumBlob | LongBlob => 
-                this.toString().toBinary(definition)
-            case _ => 
-                throw IllegalArgumentException("")
-        }
-    }
+extend UInt16 <: FromMySqlBinary<UInt16> {
 
     public static func fromBinary(definition: ColumnDefinition, data: ?Array<Byte>):? UInt16 {
         match (data) {
@@ -251,28 +165,7 @@ extend UInt16 <: MySqlBinary<UInt16> {
 
 }
 
-extend Int32 <: MySqlBinary<Int32> {
-
-    public func toBinary(definition: ColumnDefinition): Array<Byte> {
-        match (definition.columnType) {
-            case Tiny => 
-                Int8(this).toLittleEndian()
-            case Short => 
-                Int16(this).toLittleEndian()
-            case Int24 | Long | Year => 
-                Int32(this).toLittleEndian()
-            case LongLong => 
-                Int64(this).toLittleEndian()
-            case Float => 
-                Float32(this).toLittleEndian()
-            case Double => 
-                Float64(this).toLittleEndian()
-            case String | VarString | NewDecimal | TinyBlob | Blob | MediumBlob | LongBlob => 
-                this.toString().toLengthEncoded()
-            case _ => 
-                throw IllegalArgumentException("")      
-        }
-    }
+extend Int32 <: FromMySqlBinary<Int32> {
 
     public static func fromBinary(definition: ColumnDefinition, data: ?Array<Byte>): ?Int32 {
         match (data) {
@@ -300,28 +193,7 @@ extend Int32 <: MySqlBinary<Int32> {
     }
 }
 
-extend UInt32 <: MySqlBinary<UInt32> {
-
-    public func toBinary(definition: ColumnDefinition): Array<Byte> {
-        match (definition.columnType) {
-            case Tiny => 
-                UInt8(this).toLittleEndian() // possible overflow
-            case Short =>
-                UInt16(this).toLittleEndian() // possible overflow
-            case Int24 | Long | Year => 
-                this.toLittleEndian() 
-            case LongLong => 
-                UInt64(this).toLittleEndian()
-            case Float => 
-                Float32(this).toLittleEndian()
-            case Double => 
-                Float64(this).toLittleEndian()
-            case String | VarString | NewDecimal | TinyBlob | Blob | MediumBlob | LongBlob => 
-                this.toString().toLengthEncoded()
-            case _ => 
-                throw IllegalArgumentException("")
-        }
-    }
+extend UInt32 <: FromMySqlBinary<UInt32> {
 
     public static func fromBinary(definition: ColumnDefinition, data: ?Array<Byte>): ?UInt32 {
         match (data) {
@@ -349,28 +221,7 @@ extend UInt32 <: MySqlBinary<UInt32> {
     }
 }
 
-extend Int64 <: MySqlBinary<Int64> {
-
-    public func toBinary(definition: ColumnDefinition): Array<Byte> {
-        match (definition.columnType) {
-            case Tiny => 
-                Int8(this).toLittleEndian()
-            case Short => 
-                Int16(this).toLittleEndian()
-            case Int24 | Long | Year => 
-                Int32(this).toLittleEndian()
-            case LongLong => 
-                Int64(this).toLittleEndian()
-            case Float => 
-                Float32(this).toLittleEndian()
-            case Double => 
-                Float64(this).toLittleEndian()
-            case String | VarString | NewDecimal | TinyBlob | Blob | MediumBlob | LongBlob => 
-                this.toString().toLengthEncoded()
-            case _ => 
-                throw IllegalArgumentException("")
-        }
-    }
+extend Int64 <: FromMySqlBinary<Int64> {
 
     public static func fromBinary(definition: ColumnDefinition, data: ?Array<Byte>): ?Int64 {
         match (data) {
@@ -399,29 +250,7 @@ extend Int64 <: MySqlBinary<Int64> {
 
 }
 
-extend UInt64 <: MySqlBinary<UInt64> {
-
-
-    public func toBinary(definition: ColumnDefinition): Array<Byte> {
-        match (definition.columnType) {
-            case Tiny => 
-                UInt8(this).toLittleEndian() // possible overflow
-            case Short => 
-                UInt16(this).toLittleEndian() // possible overflow
-            case Int24 | Long | Year => 
-                UInt32(this).toLittleEndian() // possible overflow
-            case LongLong => 
-                this.toLittleEndian()
-            case Float => 
-                Float32(this).toLittleEndian()
-            case Double => 
-                Float64(this).toLittleEndian()
-            case String | VarString | NewDecimal | TinyBlob | Blob | MediumBlob | LongBlob => 
-                this.toString().toLengthEncoded()
-            case _ => 
-                throw IllegalArgumentException("")
-        }
-    }
+extend UInt64 <: FromMySqlBinary<UInt64> {
 
     public static func fromBinary(definition: ColumnDefinition, data: ?Array<Byte>): ?UInt64 {
         match (data) {
@@ -450,28 +279,7 @@ extend UInt64 <: MySqlBinary<UInt64> {
 
 }
 
-extend Float16 <: MySqlBinary<Float16> {
-
-    public func toBinary(definition: ColumnDefinition): Array<Byte> {
-        match (definition.columnType) {
-            case Float =>
-                Float32(this).toLittleEndian()
-            case Double => 
-                Float64(this).toLittleEndian()
-            case Tiny => 
-                Int8(this).toLittleEndian()
-            case Short =>
-                Int16(this).toLittleEndian()
-            case Int24 | Long  => 
-                Int32(this).toLittleEndian()
-            case LongLong => 
-                Int64(this).toLittleEndian()
-            case String | VarString | NewDecimal | TinyBlob | Blob | MediumBlob | LongBlob => 
-                this.toString().toLengthEncoded()
-            case _ => 
-                throw IllegalArgumentException()
-        }
-    }
+extend Float16 <: FromMySqlBinary<Float16> {
 
     public static func fromBinary(definition: ColumnDefinition, data: ?Array<Byte>): ?Float16 {
         match (data) {
@@ -492,28 +300,7 @@ extend Float16 <: MySqlBinary<Float16> {
 
 }
 
-extend Float32 <: MySqlBinary<Float32> {
-
-    public func toBinary(definition: ColumnDefinition): Array<Byte> {
-        match (definition.columnType) {
-            case Float =>
-                this.toLittleEndian()
-            case Double => 
-                Float64(this).toLittleEndian()
-            case Tiny => 
-                Int8(this).toLittleEndian()
-            case Short =>
-                Int16(this).toLittleEndian()
-            case Int24 | Long  => 
-                Int32(this).toLittleEndian()
-            case LongLong => 
-                Int64(this).toLittleEndian()
-            case String | VarString | NewDecimal | TinyBlob | Blob | MediumBlob | LongBlob => 
-                this.toString().toLengthEncoded()
-            case _ => 
-                throw IllegalArgumentException("")
-        }
-    }
+extend Float32 <: FromMySqlBinary<Float32> {
 
     public static func fromBinary(definition: ColumnDefinition, data: ?Array<Byte>): ?Float32 {
         match(data) {
@@ -534,29 +321,7 @@ extend Float32 <: MySqlBinary<Float32> {
 
 }
 
-extend Float64 <: MySqlBinary<Float64> {
-
-
-    public func toBinary(definition: ColumnDefinition): Array<Byte> {
-        match (definition.columnType) {
-            case Float =>
-                Float32(this).toLittleEndian()
-            case Double => 
-                this.toLittleEndian()
-            case Tiny => 
-                Int8(this).toLittleEndian()
-            case Short =>
-                Int16(this).toLittleEndian()
-            case Int24 | Long  => 
-                Int32(this).toLittleEndian()
-            case LongLong => 
-                Int64(this).toLittleEndian()
-            case String | VarString | NewDecimal | TinyBlob | Blob | MediumBlob | LongBlob => 
-                this.toString().toLengthEncoded()
-            case _ => 
-                throw IllegalArgumentException("")
-        }
-    }
+extend Float64 <: FromMySqlBinary<Float64> {
 
     public static func fromBinary(definition: ColumnDefinition, data: ?Array<Byte>): ?Float64 {
         match(data) {
@@ -577,46 +342,7 @@ extend Float64 <: MySqlBinary<Float64> {
 
 }
 
-extend String <: MySqlBinary<String> {
-
-    public func toBinary(definition: ColumnDefinition): Array<Byte> {
-        match (definition.columnType) {
-            case String | VarString | NewDecimal | Json | TinyBlob | Blob | MediumBlob | LongBlob =>
-                this.toLengthEncoded()
-            case Tiny | Short | Year | Int24 | Long | LongLong => 
-                try {
-                    Int64.parse(this).toBinary(definition)
-                }catch (e: IllegalArgumentException) {
-                    throw ParameterConvertException("")
-                }
-            case Float | Double => 
-                try {
-                    Float64.parse(this).toBinary(definition)
-                }catch (e: IllegalArgumentException) {
-                    throw ParameterConvertException("")
-                }
-            case Date => 
-                try {
-                    DateTime.parse(this, DB_DATE_FORMAT).toBinary(definition)
-                }catch(e: TimeParseException) {
-                    throw ParameterConvertException("")
-                }
-            case Time =>
-                try {
-                   DateTime.parse(DB_TIME_PREFIX + this, DB_DATE_TIME_FORMAT).toBinary(definition)
-                }catch (e: TimeParseException) {
-                    throw ParameterConvertException("")
-                }
-            case DateTime | Timestamp =>
-                try {
-                    DateTime.parse(this, DB_DATE_TIME_FORMAT).toBinary(definition)
-                }catch (e: TimeParseException) {
-                    throw ParameterConvertException("")
-                }
-            case _ => 
-                throw IllegalArgumentException("")
-            }
-    }
+extend String <: FromMySqlBinary<String> {
 
     public static func fromBinary(definition: ColumnDefinition, data: ?Array<Byte>): ?String {
         match (data) {
@@ -676,23 +402,7 @@ extend String <: MySqlBinary<String> {
 
 }
 
-extend DateTime <: MySqlBinary<DateTime> {
-
-    public func toBinary(definition: ColumnDefinition): Array<Byte> {
-        match (definition.columnType) {
-            case Year =>
-                Int32(this.year).toBinary(definition)
-            case Date => 
-                this.toBinaryDate()
-            case Time =>
-                this.toBinaryTime()
-            case Timestamp | DateTime => 
-                this.toBinaryDateTime()
-            case String | VarString | Blob => 
-                this.format(DB_DATE_TIME_FORMAT).toBinary(definition)
-            case _ => throw IllegalArgumentException("")
-        }
-    }
+extend DateTime <: FromMySqlBinary<DateTime> {
 
     public static func fromBinary(definition: ColumnDefinition, data: ?Array<Byte>): ?DateTime {
         match(data) {
@@ -713,11 +423,7 @@ extend DateTime <: MySqlBinary<DateTime> {
 
 }
 
-extend BigInt <: MySqlBinary<BigInt> {
-
-    public func toBinary(definition: ColumnDefinition): Array<Byte> {
-        this.toString().toBinary(definition)
-    }
+extend BigInt <: FromMySqlBinary<BigInt> {
 
     public static func fromBinary(definition: ColumnDefinition, data: ?Array<Byte>): ?BigInt {
         match (data) {
@@ -742,11 +448,7 @@ extend BigInt <: MySqlBinary<BigInt> {
 
 }
 
-extend Decimal <: MySqlBinary<Decimal> {
-
-    public func toBinary(definition: ColumnDefinition): Array<Byte> {
-        this.toString().toBinary(definition)
-    }
+extend Decimal <: FromMySqlBinary<Decimal> {
 
     public static func fromBinary(definition: ColumnDefinition, data: ?Array<Byte>): ?Decimal {
         match (data) {
@@ -767,11 +469,7 @@ extend Decimal <: MySqlBinary<Decimal> {
 
 }
 
-extend JsonValue <: MySqlBinary<JsonValue> {
-
-    public func toBinary(definition: ColumnDefinition): Array<Byte> {
-        this.toJsonString().toBinary(definition)
-    }
+extend JsonValue <: FromMySqlBinary<JsonValue> {
 
     public static func fromBinary(definition: ColumnDefinition, data: ?Array<Byte>): ?JsonValue {
         match (data) {
@@ -789,40 +487,6 @@ extend JsonValue <: MySqlBinary<JsonValue> {
 
 extend DateTime {
     
-    protected func toBinaryDate(): Array<Byte> {
-        let buf = ArrayList<Byte>(5)
-        buf.add(4)
-        buf.add(all: UInt16(year).toLittleEndian())
-        buf.add(UInt8(month.toInteger()))
-        buf.add(UInt8(dayOfMonth))
-        return buf.toArray()
-    }
-
-    @OverflowWrapping
-    protected func toBinaryTime(): Array<Byte> {
-        let buf = ArrayList<Byte>(9)
-        buf.add(8)
-        buf.add(0x00)
-        buf.add(all: [0x00, 0x00, 0x00, 0x00])
-        buf.add(UInt8(hour))
-        buf.add(UInt8(minute))
-        buf.add(UInt8(second))
-        return buf.toArray()
-    }
-
-    @OverflowWrapping
-    protected func toBinaryDateTime(): Array<Byte> {
-        var buf = ArrayList<Byte>(8)
-        buf.add(7)
-        buf.add(all: UInt16(year).toLittleEndian())
-        buf.add(UInt8(month.toInteger()))
-        buf.add(UInt8(dayOfMonth))
-        buf.add(UInt8(hour))
-        buf.add(UInt8(minute))
-        buf.add(UInt8(second))
-        return buf.toArray()
-    }
-
     protected static func fromBinaryDateTime(data: Array<Byte>): DateTime {
         let buffer = ByteBuffer(data)
         match (data.size) {

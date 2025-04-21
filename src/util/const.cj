@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-protected package mysql.protocol
+protected package mysql.util
 
 //mysql datetime类型的默认格式
 protected const DB_DATE_TIME_FORMAT: String = "yyyy-MM-dd HH:mm:ss"
