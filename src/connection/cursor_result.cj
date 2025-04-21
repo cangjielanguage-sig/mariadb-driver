@@ -148,7 +148,7 @@ protected class CursorResultSet <: ResultSet {
     }
 
     public override func metadata(index: Int64): ColumnDefinition {
-        return columns[index - 1]
+        return columns[index]
     }
 
 }

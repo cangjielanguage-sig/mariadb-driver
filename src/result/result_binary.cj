@@ -35,7 +35,7 @@ protected class BinaryResultSet <: ResultSet {
     protected BinaryResultSet(columns: Array<ColumnDefinition>, rows: Array<Array<?Array<Byte>>>) {
         this.columns = columns
         this.rows = rows
-        this.currentRow = 0
+        this.currentRow = -1
     }
 
     public prop columnDefinitions: Array<ColumnDefinition> {
@@ -45,7 +45,7 @@ protected class BinaryResultSet <: ResultSet {
     }
 
     public func next(): Bool {
-        if (currentRow >= rows.size) {
+        if (currentRow + 1 == rows.size) {
             return false
         } else {
             currentRow++
@@ -160,10 +160,10 @@ protected class BinaryResultSet <: ResultSet {
     }
 
     public override func metadata(index: Int64): ColumnDefinition {
-        return columns[index - 1]
+        return columns[index]
     }
 
     private func getBinaryData(index: Int64): ?Array<Byte> {
-        return this.rows[currentRow - 1][index - 1]
+        return this.rows[currentRow][index]
     }
 }

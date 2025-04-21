@@ -36,7 +36,7 @@ protected class TextResultSet <: ResultSet {
     protected TextResultSet(columns: Array<ColumnDefinition>, rows: Array<TextResult>) {
         this.columns = columns
         this.rows = rows
-        this.currentRow = 0
+        this.currentRow = -1
     }
     
     public prop columnDefinitions: Array<ColumnDefinition> {
@@ -46,7 +46,7 @@ protected class TextResultSet <: ResultSet {
     }
 
     public func next(): Bool {
-        if (currentRow >= rows.size) {
+        if (currentRow + 1 == rows.size) {
             return false
         } else {
             currentRow++
@@ -196,7 +196,7 @@ protected class TextResultSet <: ResultSet {
     }
 
     public override func getArray(index: Int64): ?Array<Byte> {
-        return rows[currentRow - 1].row[index - 1]
+        return rows[currentRow].row[index]
     }
 
     public func getJsonValue(index: Int64): ?JsonValue {
@@ -207,7 +207,7 @@ protected class TextResultSet <: ResultSet {
     }
 
     public override func metadata(index: Int64): ColumnDefinition {
-        return columns[index - 1]
+        return columns[index]
     }
 
     private func stringParseToBool(str: String): Bool {
