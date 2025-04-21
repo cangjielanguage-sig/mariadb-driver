@@ -16,6 +16,8 @@ public interface FixedLengthStringReader {
 
     func readFixedString(size: Int64): String
 
+    func readFixedStringRaw(size: Int64): Array<Byte>
+    
 }
 
 public interface NullTerminatedStringReader {
@@ -52,6 +54,10 @@ extend ByteBuffer <: FixedLengthStringReader {
         return String.fromUtf8(slice(size))
     }
 
+    public func readFixedStringRaw(size: Int64): Array<Byte> {
+        return slice(size)
+    }
+
 }
 
 extend ByteBuffer <: NullTerminatedStringReader {
@@ -85,15 +91,6 @@ extend ByteBuffer <: LengthEncodedStringReader {
         }
     }
 
-    protected func slice(length: Int64): Array<Byte> {
-        if (length == 0) {
-            return []
-        }
-        let data = this.bytes().slice(0, length)
-        this.seek(Current(length))
-        return data
-    }
-
 }
 
 extend String <: ToLengthEncoded & ToNullTerminated {
@@ -111,7 +108,7 @@ extend String <: ToLengthEncoded & ToNullTerminated {
 extend Array<Byte> <: ToLengthEncoded & ToNullTerminated {
 
     public func toLengthEncoded(): Array<Byte> {
-        let buf = ArrayList<Byte>()
+        let buf = ArrayList<Byte>(this.size + 9)
         if (this.size <= 0xFA) {
             buf.add(UInt8(this.size))
             buf.add(all: this)
@@ -136,6 +133,22 @@ extend Array<Byte> <: ToLengthEncoded & ToNullTerminated {
         buf.add(all: this)
         buf.add(0)
         return buf.toArray()
+    }
+
+}
+
+extend ByteBuffer {
+
+    public func slice(length: Int64): Array<Byte> {
+        if (length == 0) {
+            return []
+        }
+        let data = this.bytes().slice(0, length)
+        if(data.size != length) {
+            throw InvalidPacketException()
+        }
+        this.seek(Current(length))
+        return data
     }
 
 }

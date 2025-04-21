@@ -116,18 +116,14 @@ protected class BinaryResult <: Response {
         let columnCount = columnInfos.size
         //null数据位图
         let size = (columnCount + 7 + 2) / 8
-        let nullMap = Array<Byte>(size, repeat: 0)
-        if(buffer.read(nullMap) != size) {
-            throw InvalidPacketException()
-        }
-        this.nullMap = nullMap
+        this.nullMap = buffer.readFixedStringRaw(size)
         //二进制数据
         this.binaryData = Array<?Array<Byte>>(columnCount, repeat: [])
         for (i in 0..columnCount){
             let isNull = (nullMap[(i + 2) / 8] & (1u8 << ((i + 2) % 8))) != 0
             if (isNull) {
                 binaryData[i] = None
-            } else{
+            } else {
                 let columnInfo = columnInfos[i] 
                 let columnType = columnInfo.columnType
                 match (columnType) {
@@ -143,9 +139,7 @@ protected class BinaryResult <: Response {
                          binaryData[i] = buffer.readLengthEncodedStringRaw()
                     case Date | DateTime | Timestamp | Time =>
                         let flag = buffer.readFix1Integer()
-                        let size = Int64(flag)
-                        binaryData[i] = buffer.bytes().slice(0, Int64(size))
-                        buffer.seek(Current(Int64(size)))
+                        binaryData[i] = buffer.readFixedStringRaw(Int64(flag))
                     //case _ => throw Exception("Unsupport MySQL binary type")
                 }
             }

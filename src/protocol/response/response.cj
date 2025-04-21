@@ -20,6 +20,7 @@ protected open class Response <: CommonResponse {
         super(length, number)
         code = ResponseCode.of(buffer.readFix1Integer())
     }
+
 }
 
 /*
@@ -92,11 +93,7 @@ protected class ErrorResponse <: Response {
         //SQL状态标记: 1 byte
         this.serverStatusFlag = buffer.readFix1Integer()
         //SQL状态: 5 byte
-        let temp = Array<Byte>(5, repeat: 0)
-        if(buffer.read(temp) != 5) {
-            throw InvalidPacketException()
-        }
-        this.sqlStatus = temp
+        this.sqlStatus = buffer.readFixedStringRaw(5)
         //错误信息: rest byte
         this.message = buffer.readFixedString(Int64(length - 9))
     }
@@ -112,6 +109,7 @@ protected open class AbstractEOF <: Response {
     protected init(length: UInt64, number: UInt8, buffer: ByteBuffer) {
         super(length, number, buffer)
     }
+    
 }
 
 /*

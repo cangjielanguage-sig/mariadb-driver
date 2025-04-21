@@ -19,12 +19,7 @@ protected open class AuthMoreData <: Response {
 
     internal init(length: UInt64, number: UInt8, buffer: ByteBuffer) {
         super(length, number, buffer)
-        let size = Int64(length - 1)
-        let temp = Array<Byte>(size, repeat: 0)
-        if(buffer.read(temp) != size) {
-            throw InvalidPacketException()
-        }
-        this.authRep = temp
+        this.authRep = buffer.readFixedStringRaw(Int64(length - 1))
     }
 
 }

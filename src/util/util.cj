@@ -9,18 +9,18 @@ import std.database.sql.*
 import encoding.hex.*
 
 protected func toArray(inputStream: InputStream): Array<Byte> {
-    let buffer = Array<Byte>(1024, repeat: 0)
-    let buf = ArrayList<Byte>()
+    let buffer = Array<Byte>(8096, repeat: 0)
+    let bytes = ByteBuffer()
     var len = inputStream.read(buffer)
     do {
-        buf.add(all: buffer.slice(0,len))
+        bytes.write(buffer.slice(0, len))
         len = inputStream.read(buffer)
     } while (len != 0)
-    return buf.toArray()
+    return readToEnd(bytes)
 }
 
 protected func toHexStringWithPrefix(inputStream: InputStream): String {
-    let buffer = Array<Byte>(1024, repeat: 0)
+    let buffer = Array<Byte>(8096, repeat: 0)
     var len = inputStream.read(buffer)
     if(len == 0) {
         return "''"
