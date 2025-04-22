@@ -43,7 +43,7 @@ extend Bool <: FromMySqlBinary<Bool> {
             case None => None
             case Some(0) => false
             case Some(1) => true
-            case Some(_) => throw Exception("")
+            case Some(v) => throw IllegalArgumentException("Value ${v} cannot be converted to Cangjie Bool types")
         }
     }
 
@@ -55,6 +55,7 @@ extend Int8 <: FromMySqlBinary<Int8> {
         match (data) {
             case None => return None
             case Some(v) => 
+                let columnType = definition.columnType
                 match (definition.columnType) {
                     case Tiny => 
                         return Int8.fromLittleEndian(v)
@@ -71,7 +72,8 @@ extend Int8 <: FromMySqlBinary<Int8> {
                     case String | VarString | NewDecimal =>
                         var str = String.fromUtf8(v)
                         return Int8.parse(str)
-                    case _ => throw IllegalArgumentException("")
+                    case _ => 
+                        throw IllegalArgumentException("MySql ${columnType} types cannot be converted to Cangjie Int8 types")
                 }
         }
     }
@@ -84,7 +86,8 @@ extend UInt8 <: FromMySqlBinary<UInt8> {
         match (data) {
             case None => return None
             case Some(v) => 
-                match (definition.columnType) {
+                let columnType = definition.columnType
+                match (columnType) {
                     case Tiny => 
                         return UInt8.fromLittleEndian(v)
                     case Short | Year => 
@@ -100,7 +103,8 @@ extend UInt8 <: FromMySqlBinary<UInt8> {
                     case String | VarString | NewDecimal =>
                         var str = String.fromUtf8(v)
                         return UInt8.parse(str)
-                    case _ => throw UnsupportedException("")
+                    case _ => 
+                        throw IllegalArgumentException("MySql ${columnType} types cannot be converted to Cangjie UInt8 types")
                 }
         }
     }
@@ -113,7 +117,8 @@ extend Int16 <: FromMySqlBinary<Int16> {
         match (data) {
             case None => return None
             case Some(v) => 
-                match (definition.columnType) {
+                let columnType = definition.columnType
+                match (columnType) {
                     case Tiny => 
                         return Int16(Int8.fromLittleEndian(v))
                     case Short | Year => 
@@ -129,7 +134,8 @@ extend Int16 <: FromMySqlBinary<Int16> {
                     case String | VarString | NewDecimal =>
                         var str = String.fromUtf8(v)
                         return Int16.parse(str)
-                    case _ => throw UnsupportedException("")
+                    case _ => 
+                        throw IllegalArgumentException("MySql ${columnType} types cannot be converted to Cangjie Int16 types")
                 }
         }
     }
@@ -142,7 +148,8 @@ extend UInt16 <: FromMySqlBinary<UInt16> {
         match (data) {
             case None => return None
             case Some(v) => 
-                match (definition.columnType) {
+                let columnType = definition.columnType
+                match (columnType) {
                     case Tiny => 
                         return UInt16(UInt8.fromLittleEndian(v))
                     case Short | Year => 
@@ -158,7 +165,8 @@ extend UInt16 <: FromMySqlBinary<UInt16> {
                     case String | VarString | NewDecimal =>
                         var str = String.fromUtf8(v)
                         return UInt16.parse(str)
-                    case _ => throw UnsupportedException("")
+                    case _ => 
+                        throw IllegalArgumentException("MySql ${columnType} types cannot be converted to Cangjie UInt16 types")
                 }
         }
     }
@@ -171,7 +179,8 @@ extend Int32 <: FromMySqlBinary<Int32> {
         match (data) {
             case None => return None
             case Some(v) => 
-                match (definition.columnType) {
+                let columnType = definition.columnType
+                match (columnType) {
                     case Tiny => 
                         return Int32(Int8.fromLittleEndian(v))
                     case Short | Year => 
@@ -187,7 +196,8 @@ extend Int32 <: FromMySqlBinary<Int32> {
                     case String | VarString | NewDecimal =>
                         var str = String.fromUtf8(v)
                         return Int32.parse(str)
-                    case _ => throw UnsupportedException("")
+                    case _ => 
+                        throw IllegalArgumentException("MySql ${columnType} types cannot be converted to Cangjie Int32 types")
                 }
         }
     }
@@ -199,7 +209,8 @@ extend UInt32 <: FromMySqlBinary<UInt32> {
         match (data) {
             case None => return None
             case Some(v) => 
-                match (definition.columnType) {
+                let columnType = definition.columnType
+                match (columnType) {
                     case Tiny => 
                         return UInt32(UInt8.fromLittleEndian(v))
                     case Short | Year => 
@@ -215,7 +226,8 @@ extend UInt32 <: FromMySqlBinary<UInt32> {
                     case String | VarString | NewDecimal =>
                         var str = String.fromUtf8(v)
                         return UInt32.parse(str)
-                    case _ => throw UnsupportedException("")
+                    case _ => 
+                        throw IllegalArgumentException("MySql ${columnType} types cannot be converted to Cangjie UInt32 types")
                 }
         }
     }
@@ -227,7 +239,8 @@ extend Int64 <: FromMySqlBinary<Int64> {
         match (data) {
             case None => return None
             case Some(v) => 
-                match (definition.columnType) {
+                let columnType = definition.columnType
+                match (columnType) {
                     case Tiny => 
                         return Int64(Int8.fromLittleEndian(v))
                     case Short | Year => 
@@ -243,7 +256,8 @@ extend Int64 <: FromMySqlBinary<Int64> {
                     case String | VarString | NewDecimal =>
                         var str = String.fromUtf8(v)
                         return Int64.parse(str)
-                    case _ => throw UnsupportedException("")
+                    case _ => 
+                        throw IllegalArgumentException("MySql ${columnType} types cannot be converted to Cangjie Int64 types")
                 }
         }
     }
@@ -256,7 +270,8 @@ extend UInt64 <: FromMySqlBinary<UInt64> {
         match (data) {
             case None => return None
             case Some(v) => 
-                match (definition.columnType) {
+                let columnType = definition.columnType
+                match (columnType) {
                     case Tiny => 
                         return UInt64(UInt8.fromLittleEndian(v))
                     case Short | Year => 
@@ -272,7 +287,8 @@ extend UInt64 <: FromMySqlBinary<UInt64> {
                     case String | VarString | NewDecimal =>
                         var str = String.fromUtf8(v)
                         return UInt64.parse(str)
-                    case _ => throw UnsupportedException("")
+                    case _ => 
+                        throw IllegalArgumentException("MySql ${columnType} types cannot be converted to Cangjie UInt64 types")
                 }
         }
     }
@@ -285,7 +301,8 @@ extend Float16 <: FromMySqlBinary<Float16> {
         match (data) {
             case None => return None
             case Some(v) => 
-                match (definition.columnType) {
+                let columnType = definition.columnType
+                match (columnType) {
                     case Float => 
                         return Float16(Float32.fromLittleEndian(v))
                     case Double => 
@@ -293,7 +310,7 @@ extend Float16 <: FromMySqlBinary<Float16> {
                     case String | VarString => 
                         return Float16.parse(String.fromUtf8(v))
                     case _ => 
-                        throw IllegalArgumentException()
+                        throw IllegalArgumentException("MySql ${columnType} types cannot be converted to Cangjie Float16 types")
                 }   
         }
     }
@@ -306,7 +323,8 @@ extend Float32 <: FromMySqlBinary<Float32> {
         match(data) {
             case None => return None
             case Some(v) => 
-                match (definition.columnType) {
+                let columnType = definition.columnType
+                match (columnType) {
                     case Float => 
                         return Float32.fromLittleEndian(v)
                     case Double => 
@@ -314,7 +332,7 @@ extend Float32 <: FromMySqlBinary<Float32> {
                     case String | VarString | NewDecimal => 
                         return Float32.parse(String.fromUtf8(v))
                     case _ => 
-                        throw IllegalArgumentException()
+                        throw IllegalArgumentException("MySql ${columnType} types cannot be converted to Cangjie Float32 types")
                 }
         }
     }
@@ -327,7 +345,8 @@ extend Float64 <: FromMySqlBinary<Float64> {
         match(data) {
             case None => return None
             case Some(v) => 
-                match (definition.columnType) {
+                let columnType = definition.columnType
+                match (columnType) {
                     case Float => 
                         return Float64(Float32.fromLittleEndian(v))
                     case Double => 
@@ -335,7 +354,7 @@ extend Float64 <: FromMySqlBinary<Float64> {
                     case String | VarString | NewDecimal => 
                         return Float64.parse(String.fromUtf8(v))
                     case _ => 
-                        throw IllegalArgumentException("")
+                        throw IllegalArgumentException("MySql ${columnType} types cannot be converted to Cangjie Float64 types")
                 }
         }
     }
@@ -402,34 +421,14 @@ extend String <: FromMySqlBinary<String> {
 
 }
 
-extend DateTime <: FromMySqlBinary<DateTime> {
-
-    public static func fromBinary(definition: ColumnDefinition, data: ?Array<Byte>): ?DateTime {
-        match(data) {
-            case None => return None
-            case Some(v) => 
-                match (definition.columnType) {
-                    case Date => 
-                        return DateTime.fromBinaryDateTime(v)
-                    case DateTime | Timestamp => 
-                        return DateTime.fromBinaryDateTime(v)
-                    case Time => 
-                        return DateTime.fromBinaryTime(v)
-                    case _ => 
-                        throw IllegalArgumentException("")
-                }
-        }
-    }
-
-}
-
 extend BigInt <: FromMySqlBinary<BigInt> {
 
     public static func fromBinary(definition: ColumnDefinition, data: ?Array<Byte>): ?BigInt {
         match (data) {
             case None => return None
             case Some(v) => 
-                match (definition.columnType) {
+                let columnType = definition.columnType
+                match (columnType) {
                     case Tiny => 
                         return BigInt(Int8.fromLittleEndian(v))
                     case Short | Year => 
@@ -441,7 +440,7 @@ extend BigInt <: FromMySqlBinary<BigInt> {
                 case String | VarString | Enum | Set | TinyBlob | MediumBlob | LongBlob | Blob | NewDecimal => 
                     return BigInt.parse(String.fromUtf8(v))
                 case _ => 
-                    throw IllegalArgumentException("")
+                    throw IllegalArgumentException("MySql ${columnType} types cannot be converted to Cangjie BigInt types")
                 }
         }
     }
@@ -454,7 +453,8 @@ extend Decimal <: FromMySqlBinary<Decimal> {
         match (data) {
             case None => return None
             case Some(v) => 
-                match (definition.columnType) {
+                let columnType = definition.columnType
+                match (columnType) {
                     case Float => 
                         return Decimal(Float32.fromLittleEndian(v))
                     case Double => 
@@ -462,7 +462,7 @@ extend Decimal <: FromMySqlBinary<Decimal> {
                     case String | VarString | NewDecimal | TinyBlob | MediumBlob | LongBlob | Blob => 
                         Decimal.parse(String.fromUtf8(v))
                     case _ => 
-                        throw IllegalArgumentException("")
+                        throw IllegalArgumentException("MySql ${columnType} types cannot be converted to Cangjie Decimal types")
                 }
         }
     }
@@ -475,10 +475,35 @@ extend JsonValue <: FromMySqlBinary<JsonValue> {
         match (data) {
             case None => return None
             case Some(v) => 
-                match (definition.columnType) {
+                let columnType = definition.columnType
+                match (columnType) {
                     case VarString | String | Json | TinyBlob | MediumBlob | LongBlob | Blob =>
                         return JsonValue.fromStr(String.fromUtf8(v))
-                    case _ => throw Exception("Unsupport MySQL binary type")
+                    case _ => 
+                       throw IllegalArgumentException("MySql ${columnType} types cannot be converted to Cangjie JsonValue types")
+                }
+        }
+    }
+
+}
+
+
+extend DateTime <: FromMySqlBinary<DateTime> {
+
+    public static func fromBinary(definition: ColumnDefinition, data: ?Array<Byte>): ?DateTime {
+        match(data) {
+            case None => return None
+            case Some(v) => 
+                let columnType = definition.columnType
+                match (columnType) {
+                    case Date => 
+                        return DateTime.fromBinaryDateTime(v)
+                    case DateTime | Timestamp => 
+                        return DateTime.fromBinaryDateTime(v)
+                    case Time => 
+                        return DateTime.fromBinaryTime(v)
+                    case _ => 
+                        throw IllegalArgumentException("MySql ${columnType} types cannot be converted to Cangjie DateTime types")
                 }
         }
     }

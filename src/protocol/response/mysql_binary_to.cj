@@ -54,7 +54,7 @@ extend Bool <: ToMySqlBinary {
             case String | VarString | NewDecimal | TinyBlob | Blob | MediumBlob | LongBlob => 
                 this.toString().toLengthEncoded()
             case _ => 
-                throw IllegalArgumentException("Boolean types cannot be converted to ${columnType} types")
+                throw IllegalArgumentException("Cangjie Boolean types cannot be converted to MySql ${columnType} types")
         }
     }
 
@@ -80,7 +80,7 @@ extend Int8 <: ToMySqlBinary {
             case String | VarString | NewDecimal | TinyBlob | Blob | MediumBlob | LongBlob => 
                 this.toString().toLengthEncoded()
             case _ => 
-                throw IllegalArgumentException("Int8 types cannot be converted to ${columnType} types")
+                throw IllegalArgumentException("Cangjie Int8 types cannot be converted to MySql ${columnType} types")
         }
     }
 
@@ -105,7 +105,7 @@ extend UInt8 <: ToMySqlBinary {
             case String | VarString | NewDecimal | TinyBlob | Blob | MediumBlob | LongBlob => 
                 this.toString().toLengthEncoded()
             case _ => 
-                throw IllegalArgumentException("UInt8 types cannot be converted to ${columnType} types")
+                throw IllegalArgumentException("Cangjie UInt8 types cannot be converted to MySql ${columnType} types")
         }
     }
 
@@ -131,7 +131,7 @@ extend Int16 <: ToMySqlBinary {
             case String | VarString | NewDecimal | TinyBlob | Blob | MediumBlob | LongBlob => 
                 this.toString().toLengthEncoded()
             case _ => 
-                throw IllegalArgumentException("Int16 types cannot be converted to ${columnType} types")
+                throw IllegalArgumentException("Cangjie Int16 types cannot be converted to MySql ${columnType} types")
         }
     }
 
@@ -157,7 +157,7 @@ extend UInt16 <: ToMySqlBinary {
             case String | VarString | NewDecimal | TinyBlob | Blob | MediumBlob | LongBlob => 
                 this.toString().toBinary(definition)
             case _ => 
-                throw IllegalArgumentException("UInt16 types cannot be converted to ${columnType} types")
+                throw IllegalArgumentException("Cangjie UInt16 types cannot be converted to MySql ${columnType} types")
         }
     }
 
@@ -183,7 +183,7 @@ extend Int32 <: ToMySqlBinary {
             case String | VarString | NewDecimal | TinyBlob | Blob | MediumBlob | LongBlob => 
                 this.toString().toLengthEncoded()
             case _ => 
-                throw IllegalArgumentException("Int32 types cannot be converted to ${columnType} types")      
+                throw IllegalArgumentException("Cangjie Int32 types cannot be converted to MySql ${columnType} types")      
         }
     }
 
@@ -209,7 +209,7 @@ extend UInt32 <: ToMySqlBinary {
             case String | VarString | NewDecimal | TinyBlob | Blob | MediumBlob | LongBlob => 
                 this.toString().toLengthEncoded()
             case _ => 
-                throw IllegalArgumentException("UInt32 types cannot be converted to ${columnType} types")
+                throw IllegalArgumentException("Cangjie UInt32 types cannot be converted to MySql ${columnType} types")
         }
     }
 
@@ -235,7 +235,7 @@ extend Int64 <: ToMySqlBinary {
             case String | VarString | NewDecimal | TinyBlob | Blob | MediumBlob | LongBlob => 
                 this.toString().toLengthEncoded()
             case _ => 
-                throw IllegalArgumentException("Int64 types cannot be converted to ${columnType} types")
+                throw IllegalArgumentException("Cangjie Int64 types cannot be converted to MySql ${columnType} types")
         }
     }
 
@@ -262,7 +262,7 @@ extend UInt64 <: ToMySqlBinary {
             case String | VarString | NewDecimal | TinyBlob | Blob | MediumBlob | LongBlob => 
                 this.toString().toLengthEncoded()
             case _ => 
-                throw IllegalArgumentException("UInt64 types cannot be converted to ${columnType} types")
+                throw IllegalArgumentException("Cangjie UInt64 types cannot be converted to MySql ${columnType} types")
         }
     }
 
@@ -288,7 +288,7 @@ extend Float16 <: ToMySqlBinary {
             case String | VarString | NewDecimal | TinyBlob | Blob | MediumBlob | LongBlob => 
                 this.toString().toLengthEncoded()
             case _ => 
-                throw IllegalArgumentException("Float16 types cannot be converted to ${columnType} types")
+                throw IllegalArgumentException("Cangjie Float16 types cannot be converted to MySql ${columnType} types")
         }
     }
 
@@ -314,7 +314,7 @@ extend Float32 <: ToMySqlBinary {
             case String | VarString | NewDecimal | TinyBlob | Blob | MediumBlob | LongBlob => 
                 this.toString().toLengthEncoded()
             case _ => 
-                throw IllegalArgumentException("Float32 types cannot be converted to ${columnType} types")
+                throw IllegalArgumentException("Cangjie Float32 types cannot be converted to MySql ${columnType} types")
         }
     }
 
@@ -341,7 +341,7 @@ extend Float64 <: ToMySqlBinary {
             case String | VarString | NewDecimal | TinyBlob | Blob | MediumBlob | LongBlob => 
                 this.toString().toLengthEncoded()
             case _ => 
-                throw IllegalArgumentException("Float64 types cannot be converted to ${columnType} types")
+                throw IllegalArgumentException("Cangjie Float64 types cannot be converted to MySql ${columnType} types")
         }
     }
 
@@ -385,7 +385,7 @@ extend String <: ToMySqlBinary {
                     throw ParameterConvertException("")
                 }
             case _ => 
-                throw IllegalArgumentException("String types cannot be converted to ${columnType} types")
+                throw IllegalArgumentException("Cangjie String types cannot be converted to MySql ${columnType} types")
             }
     }
 
@@ -406,7 +406,7 @@ extend DateTime <: ToMySqlBinary {
                 this.toBinaryDateTime()
             case String | VarString | Blob => 
                 this.format(DB_DATE_TIME_FORMAT).toBinary(definition)
-            case _ => throw IllegalArgumentException("DateTime types cannot be converted to ${columnType} types")
+            case _ => throw IllegalArgumentException("Cangjie DateTime types cannot be converted to MySql ${columnType} types")
         }
     }
 
@@ -425,7 +425,7 @@ extend BigInt <: ToMySqlBinary {
             case Float | Double => 
                 Float64.parse(value).toBinary(definition)
             case _ => 
-                throw IllegalArgumentException("String types cannot be converted to ${columnType} types")
+                throw IllegalArgumentException("Cangjie BigInt types cannot be converted to MySql ${columnType} types")
             }
     }
 
@@ -444,7 +444,7 @@ extend Decimal <: ToMySqlBinary {
             case Float | Double => 
                 Float64.parse(value).toBinary(definition)
             case _ => 
-                throw IllegalArgumentException("String types cannot be converted to ${columnType} types")
+                throw IllegalArgumentException("Cangjie Decimal types cannot be converted to MySql ${columnType} types")
             }
     }
 
@@ -459,7 +459,7 @@ extend JsonValue <: ToMySqlBinary {
             case String | VarString | NewDecimal | Json | TinyBlob | Blob | MediumBlob | LongBlob =>
                 value.toLengthEncoded()
             case _ => 
-                throw IllegalArgumentException("String types cannot be converted to ${columnType} types")
+                throw IllegalArgumentException("Cangjie JsonValue types cannot be converted to MySql ${columnType} types")
             }
     }
 
