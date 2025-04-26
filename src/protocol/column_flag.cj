@@ -40,22 +40,22 @@ protected enum ColumnFlag {
 
     internal func value(): UInt16 {
         match (this) {
-            case NotNull => 1
-            case PrimaryKey => 2
-            case UniqueKey => 4
-            case MultipleKey => 8
-            case Blob => 16
-            case Unsigned => 32
-            case ZeroFill => 64
-            case Binary => 128
-            case Enum => 256
-            case AutoIncrement => 512
-            case Timestamp => 1024
-            case Set => 2048
-            case NoDefaultValue => 4096
-            case OnUpdateNow => 8192
-            case PartKey => 16384
-            case Num => 32768
+            case NotNull => 1 << 0
+            case PrimaryKey => 1 << 1
+            case UniqueKey => 1 << 2
+            case MultipleKey => 1 << 3
+            case Blob => 1 << 4
+            case Unsigned => 1 << 5
+            case ZeroFill => 1 << 6
+            case Binary => 1 << 7
+            case Enum => 1 << 8
+            case AutoIncrement => 1 << 9
+            case Timestamp => 1 << 10
+            case Set => 1 << 11
+            case NoDefaultValue => 1 << 12
+            case OnUpdateNow => 1 << 13
+            case PartKey => 1 << 14
+            case Num => 1 << 15
         }
     }
 }

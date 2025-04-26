@@ -189,14 +189,20 @@ protected class TextResultSet <: ResultSet {
     }
 
     public override func getString(index: Int64): ?String {
-        match (getArray(index)) {
+        match (rows[currentRow].row[index]) {
             case None => None
             case Some(v) => String.fromUtf8(v)
         }
     }
 
     public override func getArray(index: Int64): ?Array<Byte> {
-        return rows[currentRow].row[index]
+        match (rows[currentRow].row[index]) {
+            case None => None
+            case Some(v) => 
+                let data = Array<Byte>(v.size, repeat: 0)
+                v.copyTo(data)
+                return data
+        }
     }
 
     public func getJsonValue(index: Int64): ?JsonValue {

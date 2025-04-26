@@ -56,22 +56,22 @@ protected enum Capability {
 
     internal func value(): UInt32 {
         match (this) {
-            case LongPassword => return 1
-            case FoundRows => return 2
-            case LongFlags => return 4
-            case ConnectWithDB => return 8
-            case NoSchema => return 16
-            case Compress => return 32
-            case ODBC => return 64
-            case LocalFiles => return 128
-            case IgnoreSpace => return 256
-            case Protocol41 => return 512
-            case Interactive => return 1024
-            case SSL => return 2048
-            case IgnoreSigpipe => return 4096
-            case Transactions => return 8192
-            case Reserved => return 16384
-            case Reserved2 => return 32768
+            case LongPassword => return 1 << 0
+            case FoundRows => return 1 << 1
+            case LongFlags => return 1 << 2
+            case ConnectWithDB => return 1 << 3
+            case NoSchema => return 1 << 4
+            case Compress => return 1 << 5
+            case ODBC => return 1 << 6
+            case LocalFiles => return 1 << 7
+            case IgnoreSpace => return 1 << 8
+            case Protocol41 => return 1 << 9
+            case Interactive => return 1 << 10
+            case SSL => return 1 << 11
+            case IgnoreSigpipe => return 1 << 12
+            case Transactions => return 1 << 13
+            case Reserved => return 1 << 14
+            case Reserved2 => return 1 << 15
             case MultiStatements => return 1 << 16
             case MultiResults => return 1 << 17
             case PsMultiResults => return 1 << 18

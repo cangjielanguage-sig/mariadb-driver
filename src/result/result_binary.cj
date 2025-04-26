@@ -132,7 +132,10 @@ protected class BinaryResultSet <: ResultSet {
     public override func getInputStream(index: Int64): ?InputStream {
         match (getBinaryData(index)) {
             case None => return None
-            case Some(v) => return ByteBuffer(v)
+            case Some(v) => 
+                let data = Array<Byte>(v.size, repeat: 0)
+                v.copyTo(data)
+                return ByteBuffer(data)
         }
     }
 
@@ -148,7 +151,9 @@ protected class BinaryResultSet <: ResultSet {
                 let columnType = metadata(index).columnType
                 match (columnType) {
                     case String | VarString | Json | Enum | Set | TinyBlob | Blob | MediumBlob | LongBlob => 
-                        return v
+                        let data = Array<Byte>(v.size, repeat: 0)
+                        v.copyTo(data)
+                        return data
                     case _ => 
                         throw UnsupportedException("Unsupported database type ${columnType} convert to Array")
                 }
