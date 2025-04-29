@@ -22,12 +22,12 @@ mysql-driver是使用Cangjie编写的mysql原生驱动程序，适配TIDB、Ocea
 ├── doc
     └── readme-image
 └── src
-    ├── cdbc 		//cdbc接口实现
-    ├── connection 	//驱动内部使用的mysql连接对象
-    ├── protocol 	//对协议的封装
-    ├── result 		//对结果集的封装
-    ├── test 		//测试
-    └── xa          //xa协议实现
+    ├── cdbc 		
+    ├── connection 	
+    ├── protocol 	
+    ├── result 		
+    ├── test 	
+    └── xa      
 ├── CHANGELOG
 ├── cjpm.lock
 ├── cjpm.toml
