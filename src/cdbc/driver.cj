@@ -18,7 +18,7 @@ package mysql.cdbc
 import std.convert.*
 import std.collection.*
 import std.database.sql.*
-import encoding.url.*
+import stdx.encoding.url.*
 import mysql.connection.*
 import std.database.sql.DriverManager
 

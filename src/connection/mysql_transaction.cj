@@ -66,7 +66,7 @@ protected class MySqlTransaction {
         match (autoCommit) {
             case "0" => false
             case "1" => true
-            case _ => throw ResponseErrorException("Unknown transaction isolation level")
+            case value => throw ResponseErrorException("Unknown transaction isolation level ${value}")
         }
     }
 

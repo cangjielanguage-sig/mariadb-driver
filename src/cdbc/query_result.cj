@@ -17,6 +17,9 @@ package mysql.cdbc
 
 import std.collection.*
 import std.database.sql.*
+import std.io.*
+import std.time.*
+import std.math.numeric.*
 import mysql.result.*
 
 public class QueryResultImpl <: QueryResult {
@@ -44,6 +47,7 @@ public class QueryResultImpl <: QueryResult {
         closed = false
     }
 
+    @Deprecated
     public override func next(values: Array<SqlDbType>): Bool {
         checkResourceAvailability()
         if (!result.next()) {
@@ -69,7 +73,6 @@ public class QueryResultImpl <: QueryResult {
                 case v: SqlTimestamp => v.value = result.getTimestamp(i).getOrThrow()
                 case v: SqlBinary => v.value = result.getArray(i).getOrThrow()
                 case v: SqlVarBinary => v.value = result.getArray(i).getOrThrow()
-                case v: SqlJson => v.value = result.getJsonValue(i).getOrThrow()
 
                 case v: SqlNullableBool => v.value = result.getBool(i)
                 case v: SqlNullableByte => v.value = result.getInt8(i)
@@ -89,11 +92,64 @@ public class QueryResultImpl <: QueryResult {
                 case v: SqlNullableTimestamp => v.value = result.getTimestamp(i)
                 case v: SqlNullableBinary => v.value = result.getArray(i)
                 case v: SqlNullableVarBinary => v.value = result.getArray(i)
-                case v: SqlNullableJson => v.value = result.getJsonValue(i)
                 case _ => throw UnsupportedException("Unsupported SqlDbType")
             }
         }
         return true
+    }
+
+    public func next(): Bool {
+        return result.next()
+    }
+
+    public func get<T>(index: Int): T {
+        let instance: Option<T> = None
+        match (instance) {
+            case v: Option<Bool> => (result.getBool(index) as Option<T> ?? throw Exception()) ?? throw Exception()
+            case v: Option<Int8> => (result.getInt8(index) as Option<T> ?? throw Exception()) ?? throw Exception()
+            case v: Option<Int16> => (result.getInt16(index) as Option<T> ?? throw Exception()) ?? throw Exception()
+            case v: Option<Int32> => (result.getInt32(index) as Option<T> ?? throw Exception()) ?? throw Exception()
+            case v: Option<Int64> => (result.getInt64(index) as Option<T> ?? throw Exception()) ?? throw Exception()
+            case v: Option<UInt8> => (result.getInt8(index) as Option<T> ?? throw Exception()) ?? throw Exception()
+            case v: Option<UInt16> => (result.getInt16(index) as Option<T> ?? throw Exception()) ?? throw Exception()
+            case v: Option<UInt32> => (result.getInt32(index) as Option<T> ?? throw Exception()) ?? throw Exception()
+            case v: Option<UInt64> => (result.getInt64(index) as Option<T> ?? throw Exception()) ?? throw Exception()
+            case v: Option<Float16> => (result.getFloat16(index) as Option<T> ?? throw Exception()) ?? throw Exception()
+            case v: Option<Float32> => (result.getFloat32(index) as Option<T> ?? throw Exception()) ?? throw Exception()
+            case v: Option<Float64> => (result.getFloat64(index) as Option<T> ?? throw Exception()) ?? throw Exception()
+            case v: Option<String> => (result.getString(index) as Option<T> ?? throw Exception()) ?? throw Exception()
+            case v: Option<Array<Byte>> => (result.getArray(index) as Option<T> ?? throw Exception()) ?? throw Exception()
+            case v: Option<InputStream> => (result.getInputStream(index) as Option<T> ?? throw Exception()) ?? throw Exception()
+            case v: Option<DateTime> => (result.getDateTime(index) as Option<T> ?? throw Exception()) ?? throw Exception()
+            case v: Option<BigInt> => (result.getBigInt(index) as Option<T> ?? throw Exception()) ?? throw Exception()
+            case v: Option<Decimal> => (result.getDecimal(index) as Option<T> ?? throw Exception()) ?? throw Exception()
+            case _ => throw UnsupportedException("unsupport type")
+        }
+    }
+
+    public func getOrNull<T>(index: Int): ?T {
+        let instance: Option<T> = None
+        match (instance) {
+            case v: Option<Bool> => (result.getBool(index) as Option<T> ?? throw Exception())
+            case v: Option<Int8> => (result.getInt8(index) as Option<T> ?? throw Exception())
+            case v: Option<Int16> => (result.getInt16(index) as Option<T> ?? throw Exception())
+            case v: Option<Int32> => (result.getInt32(index) as Option<T> ?? throw Exception())
+            case v: Option<Int64> => (result.getInt64(index) as Option<T> ?? throw Exception())
+            case v: Option<UInt8> => (result.getInt8(index) as Option<T> ?? throw Exception())
+            case v: Option<UInt16> => (result.getInt16(index) as Option<T> ?? throw Exception())
+            case v: Option<UInt32> => (result.getInt32(index) as Option<T> ?? throw Exception())
+            case v: Option<UInt64> => (result.getInt64(index) as Option<T> ?? throw Exception()) 
+            case v: Option<Float16> => (result.getFloat16(index) as Option<T> ?? throw Exception()) 
+            case v: Option<Float32> => (result.getFloat32(index) as Option<T> ?? throw Exception()) 
+            case v: Option<Float64> => (result.getFloat64(index) as Option<T> ?? throw Exception())
+            case v: Option<String> => (result.getString(index) as Option<T> ?? throw Exception()) 
+            case v: Option<Array<Byte>> => (result.getArray(index) as Option<T> ?? throw Exception())
+            case v: Option<InputStream> => (result.getInputStream(index) as Option<T> ?? throw Exception())
+            case v: Option<DateTime> => (result.getDateTime(index) as Option<T> ?? throw Exception()) 
+            case v: Option<BigInt> => (result.getBigInt(index) as Option<T> ?? throw Exception()) 
+            case v: Option<Decimal> => (result.getDecimal(index) as Option<T> ?? throw Exception())
+            case _ => throw UnsupportedException("unsupport type")
+        }
     }
 
     public override func close() {

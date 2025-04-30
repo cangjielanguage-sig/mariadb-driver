@@ -19,7 +19,6 @@ import std.time.*
 import std.convert.*
 import std.collection.*
 import std.math.numeric.*
-import encoding.json.*
 import mysql.util.*
 import mysql.protocol.*
 
@@ -445,21 +444,6 @@ extend Decimal <: ToMySqlBinary {
                 Float64.parse(value).toBinary(definition)
             case _ => 
                 throw IllegalArgumentException("Cangjie Decimal types cannot be converted to MySql ${columnType} types")
-            }
-    }
-
-}
-
-extend JsonValue <: ToMySqlBinary {
-
-    public func toBinary(definition: ColumnDefinition): Array<Byte> {
-        let columnType = definition.columnType
-        let value = this.toJsonString()
-        match (columnType) {
-            case String | VarString | NewDecimal | Json | TinyBlob | Blob | MediumBlob | LongBlob =>
-                value.toLengthEncoded()
-            case _ => 
-                throw IllegalArgumentException("Cangjie JsonValue types cannot be converted to MySql ${columnType} types")
             }
     }
 

@@ -16,8 +16,8 @@
 protected package mysql.connection
 
 import std.io.*
-import crypto.keys.*
-import crypto.digest.*
+import stdx.crypto.keys.*
+import stdx.crypto.digest.*
 
 /*
 caching_sha2_password 插件

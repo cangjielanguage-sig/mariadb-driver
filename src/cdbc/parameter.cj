@@ -15,8 +15,147 @@
  */
 package mysql.cdbc
 
+import std.io.*
+import std.time.*
+import std.math.numeric.*
 import std.database.sql.*
 import mysql.util.*
+
+public interface SqlParameter {
+
+    func asParameter(): String
+
+}
+
+extend Bool <: SqlParameter {
+
+    public func asParameter(): String {
+        if (this) {
+            return "1"
+        }else {
+            return "0"
+        }
+    }
+
+}
+
+extend Int8 <: SqlParameter {
+
+    public func asParameter(): String {
+        return this.toString()
+    }
+
+}
+
+extend UInt8 <: SqlParameter {
+
+    public func asParameter(): String {
+        return this.toString()
+    }
+
+}
+
+extend Int16 <: SqlParameter {
+    public func asParameter(): String {
+        return this.toString()
+    }
+}
+
+extend UInt16 <: SqlParameter {
+    public func asParameter(): String {
+        return this.toString()
+    }
+}
+
+extend Int32 <: SqlParameter {
+    public func asParameter(): String {
+        return this.toString()
+    }
+}
+
+extend UInt32 <: SqlParameter {
+    public func asParameter(): String {
+        return this.toString()
+    }
+}
+
+extend Int64 <: SqlParameter {
+    public func asParameter(): String {
+        return this.toString()
+    }
+}
+
+extend UInt64 <: SqlParameter {
+    public func asParameter(): String {
+        return this.toString()
+    }
+}
+
+extend Float16 <: SqlParameter {
+    public func asParameter(): String {
+        return this.toString()
+    }
+}
+
+extend Float32 <: SqlParameter {
+    public func asParameter(): String {
+        return this.toString()
+    }
+}
+
+extend Float64 <: SqlParameter {
+    public func asParameter(): String {
+        return this.toString()
+    }
+}
+
+extend ByteBuffer <: SqlParameter {
+
+    public func asParameter(): String {
+        return toHexStringWithPrefix(this)
+    }
+    
+}
+
+extend Array<Byte> <: SqlParameter {
+
+    public func asParameter(): String {
+        return toHexStringWithPrefix(this)
+    }
+
+}
+
+extend String <: SqlParameter {
+
+    public func asParameter(): String {
+        return escapeString(this)
+    }
+
+}
+
+extend DateTime <: SqlParameter {
+
+    public func asParameter(): String {
+        return "'" + this.format(DB_DATE_TIME_FORMAT) + "'"
+    }
+
+}
+
+extend BigInt <: SqlParameter {
+
+    public func asParameter(): String {
+        return "'" + this.toString() + "'"
+    }
+
+}
+
+extend Decimal <: SqlParameter {
+
+    public func asParameter(): String {
+        return "'" + this.toString() + "'"
+    }
+
+}
 
 public interface Parameter {
     
@@ -238,18 +377,6 @@ extend SqlVarBinary <: Parameter {
     
     public func asParameter(): String {
         return toHexStringWithPrefix(this.value)
-    }
-
-    public func unbox(): Any {
-        return this.value
-    }
-
-}
-
-extend SqlJson <: Parameter {
-    
-    public func asParameter(): String {
-        return escapeString(this.value.toJsonString())
     }
 
     public func unbox(): Any {
@@ -582,22 +709,4 @@ extend SqlNullableVarBinary <: Parameter {
             case Some(s) => return s
         }
     }
-}
-
-extend SqlNullableJson <: Parameter {
-    
-    public func asParameter(): String {
-        match (this.value) {
-            case None => "NULL"
-            case Some(s) => escapeString(s.toJsonString())
-        }
-    }
-
-    public func unbox(): Any {
-        match (this.value) {
-            case None => return Option<Any>.None
-            case Some(s) => return s
-        }
-    }
-
 }

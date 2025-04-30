@@ -24,8 +24,12 @@ protected class ResponseErrorException <: Exception {
        super()
     }
 
-    internal ResponseErrorException(message: String) {
+    protected ResponseErrorException(message: String) {
         super(message)    
+    }
+
+    public func toString(): String {
+        return "ResponseErrorException: ${message}"
     }
 
 }
@@ -34,11 +38,17 @@ protected class ResponseErrorException <: Exception {
 *  连接失败异常
 */
 protected class ConnectFailedException <: Exception {
+
     init() {
        super()
     }
 
-    internal ConnectFailedException(message: String) {
+    protected ConnectFailedException(message: String) {
         super(message)    
     }
+
+    public func toString(): String {
+        return "ConnectFailedException: ${message}"
+    }
+
 }

@@ -18,7 +18,6 @@ protected package mysql.connection
 import std.io.*
 import std.time.*
 import std.math.numeric.*
-import encoding.json.*
 import mysql.result.*
 import mysql.protocol.response.*
 
@@ -42,7 +41,6 @@ protected class CursorResultSet <: ResultSet {
         this.resultSet = connection.fetchRows(prepareId, columns, fetchSize)
     }
 
-
     public prop columnDefinitions: Array<ColumnDefinition> {
         get() {
             columns
@@ -57,7 +55,6 @@ protected class CursorResultSet <: ResultSet {
         }
         return true
     }
-
 
     public override func getBool(index: Int64): ?Bool {
         return resultSet.getBool(index)
@@ -141,10 +138,6 @@ protected class CursorResultSet <: ResultSet {
 
     public override func getArray(index: Int64): ?Array<Byte> {
         return resultSet.getArray(index)
-    }
-
-    public override func getJsonValue(index: Int64): ?JsonValue {
-        return resultSet.getJsonValue(index)
     }
 
     public override func metadata(index: Int64): ColumnDefinition {

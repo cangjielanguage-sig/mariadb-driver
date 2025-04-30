@@ -20,7 +20,6 @@ import std.time.*
 import std.convert.*
 import std.collection.*
 import std.math.numeric.*
-import encoding.json.*
 import mysql.protocol.*
 import mysql.protocol.response.*
 
@@ -158,10 +157,6 @@ protected class BinaryResultSet <: ResultSet {
                         throw UnsupportedException("Unsupported database type ${columnType} convert to Array")
                 }
         }
-    }
-
-    public override func getJsonValue(index: Int64): ?JsonValue {
-        return JsonValue.fromBinary(metadata(index), getBinaryData(index))
     }
 
     public override func metadata(index: Int64): ColumnDefinition {

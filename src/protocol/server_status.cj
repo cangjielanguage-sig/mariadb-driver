@@ -38,20 +38,20 @@ protected enum ServerStatus {
 
     protected func value(): UInt16 {
         match (this) {
-            case InTransaction => return 1 << 0
-            case AutoCommit => return 1 << 1
-            case MoreResults => return 1 << 2
-            case NoGoodIndexUsed => return 1 << 3
-            case NoIndexUsed => return 1 << 4
-            case CursorExists => return 1 << 5
-            case LastRowSend => return 1 << 6
-            case DbDropped => return 1 << 7
-            case NoBackslashEscapes => return 1 << 8
-            case MetaDataChanged => return 1 << 9
-            case QueryWasSlow => return 1 << 10
-            case PsOutParams => return 1 << 11
-            case InStransReadOnly => return 1 << 12
-            case SessionStateChanged => return 1 << 13
+            case InTransaction => 1 << 0
+            case AutoCommit => 1 << 1
+            case MoreResults => 1 << 2
+            case NoGoodIndexUsed => 1 << 3
+            case NoIndexUsed => 1 << 4
+            case CursorExists => 1 << 5
+            case LastRowSend => 1 << 6
+            case DbDropped => 1 << 7
+            case NoBackslashEscapes => 1 << 8
+            case MetaDataChanged => 1 << 9
+            case QueryWasSlow => 1 << 10
+            case PsOutParams => 1 << 11
+            case InStransReadOnly => 1 << 12
+            case SessionStateChanged => 1 << 13
         }
     }
 }

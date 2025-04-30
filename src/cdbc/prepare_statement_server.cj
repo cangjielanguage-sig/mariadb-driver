@@ -22,6 +22,8 @@ import mysql.result.*
 
 public class ServerPrepareStatement <: Statement {
 
+    private let alloctor: ArrayList<Any> = ArrayList<Any>()
+
     private let id: UInt32
 
     private let options: HashMap<String, String>
@@ -57,6 +59,7 @@ public class ServerPrepareStatement <: Statement {
         }
     }
 
+    @Deprecated
     public override func query(params: Array<SqlDbType>): QueryResult {
         checkResource()
         let parameters = getBasicValues(params)
@@ -70,6 +73,7 @@ public class ServerPrepareStatement <: Statement {
         return QueryResultImpl(result)
     }
 
+    @Deprecated
     public override func update(params: Array<SqlDbType>): UpdateResult {
         checkResource()
         let parameters = getBasicValues(params)
@@ -79,6 +83,36 @@ public class ServerPrepareStatement <: Statement {
             lastInsertId += Int64(result.lastInsertId) + insertCount(originSql) - 1
         }
         return UpdateResultImpl(Int64(result.effectRow), lastInsertId)
+    }
+
+    public func set<T>(index: Int, value: T): Unit {
+        alloctor[index] = value
+    }
+
+    public func setNull(index: Int): Unit {
+        alloctor[index] = Option<Any>.None
+    }
+
+    public func update(): UpdateResult {
+        checkResource()
+        let result = connection.executeUpdatePrepare(prepareResult, alloctor.toArray())
+        var lastInsertId: Int64 = 0
+        if (result.lastInsertId > 0) {
+            lastInsertId += Int64(result.lastInsertId) + insertCount(originSql) - 1
+        }
+        return UpdateResultImpl(Int64(result.effectRow), lastInsertId)
+    }
+
+    public func query(): QueryResult {
+        checkResource()
+        let result = match (options.get("fetchSize")) {
+            case None => 
+                connection.executeQueryPrepare(prepareResult, alloctor.toArray())
+            case Some(v) => 
+                let fetchSize = UInt32.parse(v)
+                connection.executeQueryPrepareWithCurosr(prepareResult, alloctor.toArray(), fetchSize)
+        }
+        return QueryResultImpl(result)
     }
 
     private func getBasicValues(params: Array<SqlDbType>): Array<Any> {

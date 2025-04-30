@@ -56,38 +56,38 @@ protected enum Capability {
 
     internal func value(): UInt32 {
         match (this) {
-            case LongPassword => return 1 << 0
-            case FoundRows => return 1 << 1
-            case LongFlags => return 1 << 2
-            case ConnectWithDB => return 1 << 3
-            case NoSchema => return 1 << 4
-            case Compress => return 1 << 5
-            case ODBC => return 1 << 6
-            case LocalFiles => return 1 << 7
-            case IgnoreSpace => return 1 << 8
-            case Protocol41 => return 1 << 9
-            case Interactive => return 1 << 10
-            case SSL => return 1 << 11
-            case IgnoreSigpipe => return 1 << 12
-            case Transactions => return 1 << 13
-            case Reserved => return 1 << 14
-            case Reserved2 => return 1 << 15
-            case MultiStatements => return 1 << 16
-            case MultiResults => return 1 << 17
-            case PsMultiResults => return 1 << 18
-            case PluginAuth => return 1 << 19
-            case ConnectAttrs => return 1 << 20
-            case PluginAuthLenencClientData => return 1 << 21
-            case CanHandleExpiredPasswords => return 1 << 22
-            case SessionTrack => return 1 << 23
-            case DeprecateEOF => return 1 << 24
-            case OptionalResultSetMetadata => return 1 << 25
-            case ZSTDCompressionAlgorithm => return 1 << 26
-            case QueryAttributes => return 1 << 27
-            case MultiFactorAuthentication => return 1 << 28
-            case CapabilityExtension => return 1 << 29
-            case SSLVerifyServerCert => return 1 << 30
-            case RememberOptions => return 1 << 31
+            case LongPassword => 1 << 0
+            case FoundRows => 1 << 1
+            case LongFlags => 1 << 2
+            case ConnectWithDB => 1 << 3
+            case NoSchema => 1 << 4
+            case Compress => 1 << 5
+            case ODBC => 1 << 6
+            case LocalFiles => 1 << 7
+            case IgnoreSpace => 1 << 8
+            case Protocol41 => 1 << 9
+            case Interactive => 1 << 10
+            case SSL => 1 << 11
+            case IgnoreSigpipe => 1 << 12
+            case Transactions => 1 << 13
+            case Reserved => 1 << 14
+            case Reserved2 => 1 << 15
+            case MultiStatements => 1 << 16
+            case MultiResults => 1 << 17
+            case PsMultiResults => 1 << 18
+            case PluginAuth => 1 << 19
+            case ConnectAttrs => 1 << 20
+            case PluginAuthLenencClientData => 1 << 21
+            case CanHandleExpiredPasswords => 1 << 22
+            case SessionTrack => 1 << 23
+            case DeprecateEOF => 1 << 24
+            case OptionalResultSetMetadata => 1 << 25
+            case ZSTDCompressionAlgorithm => 1 << 26
+            case QueryAttributes => 1 << 27
+            case MultiFactorAuthentication => 1 << 28
+            case CapabilityExtension => 1 << 29
+            case SSLVerifyServerCert => 1 << 30
+            case RememberOptions => 1 << 31
         }
     }
 

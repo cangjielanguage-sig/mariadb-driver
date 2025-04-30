@@ -1,6 +1,6 @@
 [package]
   cjc-version = "0.59.6"
-  compile-option = "-O2"
+  compile-option = "-O2 -Woff deprecated --diagnostic-format=noColor"
   description = ""
   link-option = ""
   name = "mysql"
@@ -8,4 +8,9 @@
   src-dir = ""
   target-dir = ""
   version = "0.7.2"
-[package.package-configuration]
+  [package.package-configuration]
+
+[target]
+  [target.x86_64-w64-mingw32]
+    [target.x86_64-w64-mingw32.bin-dependencies]
+      path-option = [ "C:/Users/30247/Desktop/Cangjie/Cangjie-0.60.5/cangjie-stdx-windows-x64-0.60.5.1/windows_x86_64_llvm/dynamic/stdx" ]

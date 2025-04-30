@@ -20,7 +20,6 @@ import std.time.*
 import std.convert.*
 import std.collection.*
 import std.math.numeric.*
-import encoding.json.*
 import mysql.util.*
 import mysql.protocol.*
 
@@ -463,24 +462,6 @@ extend Decimal <: FromMySqlBinary<Decimal> {
                         Decimal.parse(String.fromUtf8(v))
                     case _ => 
                         throw IllegalArgumentException("MySql ${columnType} types cannot be converted to Cangjie Decimal types")
-                }
-        }
-    }
-
-}
-
-extend JsonValue <: FromMySqlBinary<JsonValue> {
-
-    public static func fromBinary(definition: ColumnDefinition, data: ?Array<Byte>): ?JsonValue {
-        match (data) {
-            case None => return None
-            case Some(v) => 
-                let columnType = definition.columnType
-                match (columnType) {
-                    case VarString | String | Json | TinyBlob | MediumBlob | LongBlob | Blob =>
-                        return JsonValue.fromStr(String.fromUtf8(v))
-                    case _ => 
-                       throw IllegalArgumentException("MySql ${columnType} types cannot be converted to Cangjie JsonValue types")
                 }
         }
     }

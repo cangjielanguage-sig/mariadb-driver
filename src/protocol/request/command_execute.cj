@@ -20,7 +20,6 @@ import std.time.*
 import std.convert.*
 import std.collection.*
 import std.math.numeric.*
-import encoding.json.*
 import mysql.util.*
 import mysql.protocol.*
 import mysql.protocol.response.*

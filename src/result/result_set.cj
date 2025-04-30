@@ -18,7 +18,6 @@ protected package mysql.result
 import std.io.*
 import std.time.*
 import std.math.numeric.*
-import encoding.json.*
 import mysql.protocol.*
 import mysql.protocol.response.*
 
@@ -69,8 +68,6 @@ protected interface ResultSet {
     func getString(index: Int64): ?String
 
     func getArray(index: Int64): ?Array<Byte>
-
-    func getJsonValue(index: Int64): ?JsonValue
 
     func metadata(index: Int64): ColumnDefinition
 

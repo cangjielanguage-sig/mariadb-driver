@@ -19,9 +19,9 @@ import std.fs.*
 import std.net.*
 import std.collection.*
 import std.convert.*
-import net.tls.*
-import crypto.x509.*
-import crypto.keys.*
+import stdx.net.tls.*
+import stdx.crypto.x509.*
+import stdx.crypto.keys.*
 import mysql.protocol.*
 import mysql.protocol.request.*
 import mysql.protocol.response.*
@@ -34,17 +34,17 @@ public class MySqlConnectionFactory {
 
     /**
      * 创建一个完成认证的mysql连接
-     * @params option: Map<String, String> 连接参数
+     * @params params: Map<String, String> 连接参数
      */
-    protected static func createAuthedConnection(option: Map<String, String>): MySqlConnection {
+    protected static func createAuthedConnection(params: Map<String, String>): MySqlConnection {
         // 1. 建立TCP连接,设置参数
-        let socket = connectToServer(option)
+        let socket = connectToServer(params)
 
         // 2. 读取握手报文
         let connection = MySqlConnection(socket)
         let handshake = connection.readHandhake()
 
-        let sslMode = option.get(Params.SSLMode) ?? "preferred"
+        let sslMode = params.get(Params.SSLMode) ?? "preferred"
         let sslable = handshake.hasCapability(Capability.SSL)
         if (!sslable && sslMode != "disabled" && sslMode != "preferred") {
             throw ConnectFailedException("Can't Switch to SSL after handshake")
@@ -52,23 +52,22 @@ public class MySqlConnectionFactory {
 
         // 3. 建立安全连接
         let sslEnabled = sslable && sslMode != "disabled"
-        let authReq = prepareAuthRequest(handshake, option, sslEnabled)
+        let authReq = prepareAuthRequest(handshake, params, sslEnabled)
         if (sslEnabled) {
             connection.writeRequest(authReq.setCapability(SSL).sslRequest())
-            sslHandshake(connection, sslMode, option)
+            sslHandshake(connection, sslMode, params)
             authReq.setNumber(authReq.number + 1)
         }
-            
+
         // 4.发送认证报文
         connection.writeRequest(authReq)
         connection.flush()
 
         // 5. 处理认证响应,可能是 ErrorResponse, OkResponse, PublicKey ,AuthStatePacket 和 AuthSwitch这几种数据包
-        let originPassword = option.get(Params.Password).getOrThrow({=> ConnectFailedException("Required connection parameters: password")})
+        let originPassword = params.get(Params.Password) ?? throw ConnectFailedException("Required connection parameters: password")
 
         match (connection.readResponse()) {
             case ok: OkResponse => return connection
-            case error: ErrorResponse => throw ConnectFailedException(error.message)
             case key: PublicKeyResponse => 
                 let encryptedPwd = performFullAuthentication(key.publicKey, originPassword.toNullTerminated(), handshake.salt)
                 return sendPassword(connection, encryptedPwd, key.number)
@@ -77,100 +76,88 @@ public class MySqlConnectionFactory {
                     case "caching_sha2_password" =>
                         let encryptedPwd = cachingSha2Password(originPassword.toArray(), authSwitch.salt)
                         connection.writeRequest(SendPassword(authSwitch.number + 1, encryptedPwd))
-                        let response = connection.readResponse()
-                        return checkCachingSha2PasswordAuthStatus(connection, response, originPassword, authSwitch.salt, sslEnabled)
+                        match (connection.readResponse()) {
+                            case authStatus: AuthStatus => 
+                                return checkCachingSha2PasswordAuthStatus(connection, authStatus, originPassword, authSwitch.salt, sslEnabled)
+                            case response => throw ConnectFailedException("Out expect Response")
+                        }
                     case "sha256_password" => 
                         if(sslEnabled) {
                             return sendPassword(connection, originPassword.toNullTerminated(), authSwitch.number)
-                        }else{
-                            let (publicKey, lastPacketNumber) = requestPublicKey(connection, SHA256_REQUESET_KEY_CODE,authSwitch.number)
-                            let encryptedPwd = performFullAuthentication(publicKey, originPassword.toNullTerminated(), authSwitch.salt)
-                            return sendPassword(connection, encryptedPwd, lastPacketNumber)
+                        } else {
+                            let response = requestPublicKey(connection, SHA256_REQUESET_KEY_CODE, authSwitch.number)
+                            let encryptedPwd = performFullAuthentication(response.publicKey, originPassword.toNullTerminated(), authSwitch.salt)
+                            return sendPassword(connection, encryptedPwd, response.number)
                         }
                     case "mysql_native_password" =>
                         let encryptedPwd = mysqlNativePassword(originPassword.toArray(), authSwitch.salt)
                         return sendPassword(connection, encryptedPwd, authSwitch.number);
                     case _ => throw ConnectFailedException("Unsupported auth plugin")
                 }
-            case authStatus: AuthStatus => 
-                return checkCachingSha2PasswordAuthStatus(connection, authStatus, originPassword, handshake.salt, sslEnabled)
-            case _ => throw ConnectFailedException("connect to mysql failed")
+            case authStatus: AuthStatus => return checkCachingSha2PasswordAuthStatus(connection, authStatus, originPassword, handshake.salt, sslEnabled)
+            case error: ErrorResponse => throw ConnectFailedException(error.message)
+            case _ => throw ConnectFailedException("Out expect Response")
         }
     }
 
-    private static func connectToServer(option: Map<String, String>): TcpSocket {
-        let host = option.get(Params.Host) ?? "localhost"
-        let port = option.get(Params.Port) ?? "3306"
+    private static func connectToServer(params: Map<String, String>): TcpSocket {
+        let host = params.get(Params.Host) ?? "localhost"
+        let port = params.get(Params.Port) ?? "3306"
         let socket = TcpSocket(host, UInt16.parse(port))
-        let timeout = option.get(Params.ConnectionTimeout)
+        let timeout = params.get(Params.ConnectionTimeout)
         match (timeout) {
-            case None => 
-                try {
-                    socket.connect()
-                }catch (e: SocketException | SocketTimeoutException) {
-                    throw ConnectFailedException(e.message)
-                }
+            case None => socket.connect()
             case Some(v) => 
-                try {
+                // try {
                     let timeout = Int64.parse(v)
                     socket.connect(timeout: Duration.millisecond * timeout)
-                } catch (e: IllegalArgumentException) {
-                    throw IllegalArgumentException("parse connection timeout failed")
-                } catch (e: SocketException | SocketTimeoutException) {
-                    throw ConnectFailedException(e.message)
-                }
+                // } catch (e: IllegalArgumentException) {
+                //     throw IllegalArgumentException("parse connection timeout failed")
+                // }
         }
         return socket
     }
 
-    private static func prepareAuthRequest(handshake: Handshake, option: Map<String, String>, sslEnabled: Bool): HandshakeResponse {
-        let username = option.get(Params.Username).getOrThrow() { 
-            => IllegalArgumentException("Required connection parameters: username")
-        }
-        let originPassword = option.get(Params.Password).getOrThrow() {
-            => IllegalArgumentException("Required connection parameters: password")
-        }
-        let database = option.get(Params.Database) ?? ""
+    private static func prepareAuthRequest(handshake: Handshake, params: Map<String, String>, sslEnabled: Bool): HandshakeResponse {
+        let username = params.get(Params.Username) ?? throw IllegalArgumentException("Required connection parameters: username")
+        let originPassword = params.get(Params.Password) ?? throw IllegalArgumentException("Required connection parameters: password")
+        let database = params.get(Params.Database)
         let authReq = HandshakeResponse.getDefault(handshake.number + 1)
         let encryptedPassword: Array<Byte>
         match (handshake.authPlugin) {
-            case "caching_sha2_password" =>
-                encryptedPassword = cachingSha2Password(originPassword.toArray(),handshake.salt)
+            case "caching_sha2_password" => encryptedPassword = cachingSha2Password(originPassword.toArray(),handshake.salt)
             case "sha256_password" => 
-                if(sslEnabled){
+                if(sslEnabled) {
                     encryptedPassword = originPassword.toNullTerminated()
-                }else {
+                } else {
                     encryptedPassword =  [1]
                 }
-            case "mysql_native_password" =>
-                encryptedPassword = mysqlNativePassword(originPassword.toArray(),handshake.salt)
+            case "mysql_native_password" => encryptedPassword = mysqlNativePassword(originPassword.toArray(),handshake.salt)
             case _ => throw ConnectFailedException("Unknow authentication plugin")
         }
-        authReq.setUsername(username)
-               .setAuthResponse(encryptedPassword)
-               .setClientAuthPlugin(handshake.authPlugin)
-        if (database != "") {
-            authReq.setCapability(ConnectWithDB).setDatabase(database)
+        authReq.setUsername(username).setAuthResponse(encryptedPassword).setClientAuthPlugin(handshake.authPlugin)
+        if (let Some(v) <- database) {
+            authReq.setCapability(ConnectWithDB).setDatabase(v)
         }
         return authReq
     }
 
-    private static func sslHandshake(connection: MySqlConnection, sslMode: String, option: Map<String, String>) {
+    private static func sslHandshake(connection: MySqlConnection, sslMode: String, params: Map<String, String>) {
         var config = TlsClientConfig()
         if (sslMode == "preferred" || sslMode == "required") {
             config.verifyMode = CertificateVerifyMode.TrustAll
         } else if (sslMode == "verify_ca") {
-            match (option.get(Params.SSLCA)) {
+            match (params.get(Params.SSLCA)) {
                 case None => throw ConnectFailedException("ssl.mode=verify_ca must set ssl.ca")
                 case Some(v) => 
                     let certificates = X509Certificate.decodeFromPem(String.fromUtf8(File.readFrom(v)))
                     config.verifyMode = CertificateVerifyMode.CustomCA(certificates)
             }
         }
-        config.clientCertificate = getClientCertificate(option)
-        config.domain = option.get(Params.SSLSni)
-        config.cipherSuitesV1_2 = (option.get(Params.Tls12Ciphersuites) ?? "").split(":", removeEmpty: true)
-        config.cipherSuitesV1_3 = (option.get(Params.Tls13Ciphersuites) ?? "").split(":", removeEmpty: true)
+        config.clientCertificate = getClientCertificate(params)
+        config.domain = params.get(Params.SSLSni)
+        config.cipherSuitesV1_2 = (params.get(Params.Tls12Ciphersuites) ?? "").split(":", removeEmpty: true)
+        config.cipherSuitesV1_3 = (params.get(Params.Tls13Ciphersuites) ?? "").split(":", removeEmpty: true)
         //(config.minVersion, config.maxVersion) = getMinAndMaxTlsVersion(option.get(Params.TlsVersion))
         let lastSession: ?TlsSession = None
         try {
@@ -186,26 +173,22 @@ public class MySqlConnectionFactory {
         connection.writeRequest(SendPassword(lastPacketNumber + 1, password))
         let response = connection.readResponse()
         match (response) {
-            case r: OkResponse =>
-                return connection
-            case r: ErrorResponse => 
-                throw ConnectFailedException(r.message)
-            case _ => 
-                throw ConnectFailedException("Out expect connection response")
+            case ok: OkResponse => return connection
+            case error: ErrorResponse => throw ConnectFailedException(error.message)
+            case _ => throw ConnectFailedException("Out expect connection response")
         }
     }
 
-    private static func checkCachingSha2PasswordAuthStatus(connection: MySqlConnection, response: Response, originPassword: String, salt: Array<Byte>, sslEnabled: Bool): MySqlConnection{
-        let authState = (response as AuthStatus).getOrThrow()
-        if (authState.state == AuthState.PerformFullAuthentication) {
+    private static func checkCachingSha2PasswordAuthStatus(connection: MySqlConnection, authStatus: AuthStatus, originPassword: String, salt: Array<Byte>, sslEnabled: Bool): MySqlConnection{
+        if (authStatus.state == AuthState.PerformFullAuthentication) {
             if (sslEnabled) {
-                return sendPassword(connection, originPassword.toNullTerminated(), authState.number)    
+                return sendPassword(connection, originPassword.toNullTerminated(), authStatus.number)    
             } else {
-                let (publicKey, lastPacketNumber) = requestPublicKey(connection, CACHING_SHA2_REQUEST_KEY_CODE,authState.number)
-                let encryptedPwd = performFullAuthentication(publicKey, originPassword.toNullTerminated(), salt)
-                return sendPassword(connection, encryptedPwd, lastPacketNumber)
+                let response = requestPublicKey(connection, CACHING_SHA2_REQUEST_KEY_CODE, authStatus.number)
+                let encryptedPwd = performFullAuthentication(response.publicKey, originPassword.toNullTerminated(), salt)
+                return sendPassword(connection, encryptedPwd, response.number)
             }
-        } else if (authState.state == AuthState.FastAuthSuccess) {
+        } else if (authStatus.state == AuthState.FastAuthSuccess) {
             let response = connection.readResponse()
             match (response) {
                 case r: OkResponse => return connection
@@ -216,16 +199,14 @@ public class MySqlConnectionFactory {
         throw ConnectFailedException("connect to mysql failed")
     }
 
-    private static func requestPublicKey(connection: MySqlConnection, requestKeyCode: Byte, lastPacketNumber: UInt8): (String, UInt8) {
+    private static func requestPublicKey(connection: MySqlConnection, requestKeyCode: Byte, lastPacketNumber: UInt8): PublicKeyResponse {
         let requestkey = RequestPublicKey(lastPacketNumber + 1, requestKeyCode)
         connection.writeRequest(requestkey)
-        let response = connection.readResponse()
-        if (response is ErrorResponse) {
-            let error = (response as ErrorResponse).getOrThrow()
-            throw ConnectFailedException(error.message)
+        match (connection.readResponse()) {
+            case error: ErrorResponse => throw ConnectFailedException(error.message)
+            case publicKey: PublicKeyResponse => return publicKey
+            case response => throw ConnectFailedException("Out expect Response")
         }
-        let publicKey = (response as PublicKeyResponse).getOrThrow().publicKey
-        return (publicKey, response.number)
     }
 
     // private static func getMinAndMaxTlsVersion(val: ?String): (TlsVersion, TlsVersion) {
@@ -254,17 +235,17 @@ public class MySqlConnectionFactory {
     //     }
     // }
 
-    private static func getClientCertificate(option: Map<String, String>): ?(Array<X509Certificate>, PrivateKey) {
-        match (option.get(Params.SSLCert)) {
+    private static func getClientCertificate(params: Map<String, String>): ?(Array<X509Certificate>, PrivateKey) {
+        match (params.get(Params.SSLCert)) {
             case None => None
             case Some(publicKeyPath) => 
-                match (option.get(Params.SSLKey)) {
+                match (params.get(Params.SSLKey)) {
                     case None => throw ConnectFailedException()
                     case Some(privateKeyPath) => 
                         let certificates = X509Certificate.decodeFromPem(String.fromUtf8(File.readFrom(publicKeyPath)))
                         let privateKey: PrivateKey = match (certificates[0].publicKeyAlgorithm) {
-                            case PublicKeyAlgorithm.RSA => RSAPrivateKey.decodeFromPem(privateKeyPath, password: option.get(Params.SSLKeyPassword))
-                            case PublicKeyAlgorithm.ECDSA => ECDSAPrivateKey.decodeFromPem(privateKeyPath, password: option.get(Params.SSLKeyPassword))
+                            case PublicKeyAlgorithm.RSA => RSAPrivateKey.decodeFromPem(privateKeyPath, password: params.get(Params.SSLKeyPassword))
+                            case PublicKeyAlgorithm.ECDSA => ECDSAPrivateKey.decodeFromPem(privateKeyPath, password: params.get(Params.SSLKeyPassword))
                             case _ => throw ConnectFailedException("Unsupported protected key algorithm")
                         }
                         return (certificates, privateKey)

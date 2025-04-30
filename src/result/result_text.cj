@@ -20,7 +20,6 @@ import std.time.*
 import std.convert.*
 import std.collection.*
 import std.math.numeric.*
-import encoding.json.*
 import mysql.util.*
 import mysql.protocol.*
 import mysql.protocol.response.*
@@ -202,13 +201,6 @@ protected class TextResultSet <: ResultSet {
                 let data = Array<Byte>(v.size, repeat: 0)
                 v.copyTo(data)
                 return data
-        }
-    }
-
-    public func getJsonValue(index: Int64): ?JsonValue {
-        match (getString(index)) {
-            case None => None
-            case Some(v) => JsonValue.fromStr(v)
         }
     }
 

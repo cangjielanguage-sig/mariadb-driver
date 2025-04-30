@@ -20,6 +20,8 @@ import std.database.sql.*
 
 public class ClientPrepareStatement <: Statement {
 
+    private let alloctor: ArrayList<Any> = ArrayList<Any>()
+
     private let connection: ConnectionImpl
 
     private let originSql: String
@@ -58,9 +60,52 @@ public class ClientPrepareStatement <: Statement {
         return UpdateResultImpl(Int64(result.effectRow), lastInsertId)
     }
 
+    public func set<T>(index: Int, value: T): Unit {
+        alloctor[index] = value
+    }
+
+    public func setNull(index: Int): Unit {
+        alloctor[index] = Option<Any>.None
+    }
+
+    public func update(): UpdateResult {
+        checkResource()
+        let executeableSql = getExecuteableSql()
+        let result = connection.sendUpdate(executeableSql)
+        var lastInsertId: Int64 = 0
+        if (result.lastInsertId > 0) {
+            lastInsertId += Int64(result.lastInsertId) + insertCount(originSql) - 1
+        }
+        return UpdateResultImpl(Int64(result.effectRow), lastInsertId)
+    }
+
+    public func query(): QueryResult {
+        checkResource()
+        let executeableSql = getExecuteableSql()
+        return QueryResultImpl(connection.sendQuery(executeableSql))
+    }
+
     public override func setOption(key: String, value: String): Unit {
         checkResource()
         options.add(key, value)
+    }
+
+    private func getExecuteableSql(): String {
+        if (alloctor.size != originSql.count("?")) {
+            throw SqlException("The number of placeholders does not match the number of parameters")
+        }
+        let sqlBuilder = StringBuilder()
+        let parts = originSql.split("?", removeEmpty: true)
+        for(i in 0..parts.size) {
+            sqlBuilder.append(parts[i])
+            if(i < alloctor.size) {
+                match (alloctor[i]) {
+                    case param: SqlParameter =>sqlBuilder.append(param.asParameter())
+                    case _ =>  throw UnsupportedException("an unsupported sql type")
+                }
+            }
+        }
+        return sqlBuilder.toString()
     }
 
     private func getExecuteableSql(params: Array<SqlDbType>): String {

@@ -18,7 +18,7 @@ protected package mysql.util
 import std.io.*
 import std.collection.*
 import std.database.sql.*
-import encoding.hex.*
+import stdx.encoding.hex.*
 
 protected func toArray(inputStream: InputStream): Array<Byte> {
     let buffer = Array<Byte>(1024, repeat: 0)
