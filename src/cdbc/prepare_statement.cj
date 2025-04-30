@@ -20,9 +20,9 @@ import std.collection.*
 import std.database.sql.*
 import mysql.result.*
 
-public class ServerPrepareStatement <: Statement {
+public class PrepareStatement <: Statement {
 
-    private let alloctor: ArrayList<Any> = ArrayList<Any>()
+    private let alloctor: Array<Any>
 
     private let id: UInt32
 
@@ -38,7 +38,7 @@ public class ServerPrepareStatement <: Statement {
 
     private var closed: Bool
 
-    public ServerPrepareStatement(originSql: String, connection: ConnectionImpl) {
+    public init(originSql: String, connection: ConnectionImpl) {
         this.connection = connection
         this.prepareResult = connection.sendPrepare(originSql)
         this.options = HashMap<String, String>()
@@ -50,6 +50,7 @@ public class ServerPrepareStatement <: Statement {
             array.add(ColumnInfoImpl(i))
         }
         this.paramsInfo = array.toArray()
+        this.alloctor = Array<Any>(originSql.count("?"), repeat: Option<Any>.None)
     }
 
     public override prop parameterColumnInfos: Array<ColumnInfo> {
@@ -61,28 +62,12 @@ public class ServerPrepareStatement <: Statement {
 
     @Deprecated
     public override func query(params: Array<SqlDbType>): QueryResult {
-        checkResource()
-        let parameters = getBasicValues(params)
-        let result = match (options.get("fetchSize")) {
-            case None => 
-                connection.executeQueryPrepare(prepareResult, parameters)
-            case Some(v) => 
-                let fetchSize = UInt32.parse(v)
-                connection.executeQueryPrepareWithCurosr(prepareResult, parameters, fetchSize)
-        }
-        return QueryResultImpl(result)
+        throw UnsupportedException("Deprecated method")
     }
 
     @Deprecated
     public override func update(params: Array<SqlDbType>): UpdateResult {
-        checkResource()
-        let parameters = getBasicValues(params)
-        let result = connection.executeUpdatePrepare(prepareResult, parameters)
-        var lastInsertId: Int64 = 0
-        if (result.lastInsertId > 0) {
-            lastInsertId += Int64(result.lastInsertId) + insertCount(originSql) - 1
-        }
-        return UpdateResultImpl(Int64(result.effectRow), lastInsertId)
+        throw UnsupportedException("Deprecated method")
     }
 
     public func set<T>(index: Int, value: T): Unit {
@@ -115,17 +100,6 @@ public class ServerPrepareStatement <: Statement {
         return QueryResultImpl(result)
     }
 
-    private func getBasicValues(params: Array<SqlDbType>): Array<Any> {
-        let parameters = Array<Any>(params.size, repeat: 0)
-        for (i in 0..params.size) {
-            match (params[i]) {
-                case param: Parameter => 
-                    parameters[i] = param.unbox()
-                case _ => throw UnsupportedException("an unsupported sql type")
-            }
-        }
-        return parameters
-    }
 
     public override func setOption(key: String, value: String): Unit {
         checkResource()

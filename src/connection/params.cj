@@ -139,11 +139,5 @@ protected class Params {
     */
     protected static const PoolMaxSize = "pool.max_size"
 
-    /**
-    * PrepareStatemet模式,
-    * 可取值: 
-    * client: 使用客户端模拟的PrepareStatemtn，默认值
-    * server: 使用服务器提供的PrepareStatement(仅支持mysql服务器，TiDB、OceanBase的支持不完善)
-    */
-    protected static const PrepareMode ="prepare.mode"
+    
 }

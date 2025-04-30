@@ -130,7 +130,7 @@ public class MySqlConnectionFactory {
                 if(sslEnabled) {
                     encryptedPassword = originPassword.toNullTerminated()
                 } else {
-                    encryptedPassword =  [1]
+                    encryptedPassword = [1]
                 }
             case "mysql_native_password" => encryptedPassword = mysqlNativePassword(originPassword.toArray(),handshake.salt)
             case _ => throw ConnectFailedException("Unknow authentication plugin")

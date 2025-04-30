@@ -61,14 +61,7 @@ public class ConnectionImpl <: Connection {
     override public func prepareStatement(sql: String): Statement {
         checkResource()
         checkEmptySql(sql)
-        let prepareMode = options.get(Params.PrepareMode) ?? "client"
-        if (prepareMode == "server") {
-            ServerPrepareStatement(sql, this)
-        } else if (prepareMode == "client") {
-            return ClientPrepareStatement(sql, this)
-        } else {
-            throw SqlException("Unknow prepare mode: ${prepareMode} option: server or client")
-        }
+        return PrepareStatement(sql, this)
     }
 
     override public func createTransaction(): Transaction {
