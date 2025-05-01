@@ -141,8 +141,8 @@ public class ConnectionImpl <: Connection {
         return connection.closePrepare(id)
     }
 
-    protected func getConnectionMutex(): ReentrantMutex {
-        return connection.mutex
+    protected func getConnectionMutex(): Mutex {
+        return connection.connectionMutex
     }
 
     private func checkEmptySql(sql: String) {

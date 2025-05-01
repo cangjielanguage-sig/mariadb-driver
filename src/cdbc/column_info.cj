@@ -33,8 +33,9 @@ public class ColumnInfoImpl <: ColumnInfo {
     private let colNullable: Bool
 
     protected init(definition: ColumnDefinition) {
+        let unsigned = definition.hasFlag(Unsigned)
         this.colName = definition.name
-        this.colType = sqlType(definition)
+        this.colType = definition.columnType.cangjieType(unsigned)
         this.colSize = Int64(definition.columnLength)
         this.colLength = Int64(definition.columnLength)
         this.colScale = Int64(definition.decimals)
@@ -74,62 +75,6 @@ public class ColumnInfoImpl <: ColumnInfo {
     public override prop nullable: Bool {
         get() {
             return colNullable
-        }
-    }
-}
-
-private func sqlType(definition: ColumnDefinition): String {
-    if (definition.hasFlag(NotNull)) {
-        match (definition.columnType) {
-            case Tiny where definition.columnLength == 1 => "SqlBool"
-            case Tiny => "SqlByte"
-            case Short => "SqlSmallInt"
-            case Int24 => "SqlInteger"
-            case Long => "SqlInteger"
-            case LongLong => "SqlBigInt"
-            case Float => "SqlReal"
-            case Double => "SqlDouble"
-            case NewDecimal => "SqlDecimal"
-            case Date => "SqlDate"
-            case Time => "SqlTime"
-            case DateTime => "SqlTimestamp"
-            case Timestamp => "SqlTimestamp"
-            case Year => "SqlSmallInt"
-            case TinyBlob => "SqlBlob"
-            case Blob => "SqlBlob"
-            case MediumBlob => "SqlBlob"
-            case LongBlob => "SqlBlob"
-            case String => "SqlChar"
-            case VarString => "SqlVarchar"
-            case Enum => "SqlChar"
-            case Set => "SqlChar"
-            case Json => "SqlJson"
-        }
-    } else {
-        match (definition.columnType) {
-            case Tiny where definition.columnLength == 1 => "SqlNullableBool"
-            case Tiny => "SqlNullableByte"
-            case Short => "SqlNullableSmallInt"
-            case Int24 => "SqlNullableInteger"
-            case Long => "SqlNullableInteger"
-            case LongLong => "SqlNullableBigInt"
-            case Float => "SqlNullableReal"
-            case Double => "SqlNullableDouble"
-            case NewDecimal => "SqlNullableDecimal"
-            case Date => "SqlNullableDate"
-            case Time => "SqlNullableTime"
-            case DateTime => "SqlNullableTimestamp"
-            case Timestamp => "SqlNullableTimestamp"
-            case Year => "SqlNullableSmallInt"
-            case TinyBlob => "SqlNullableBlob"
-            case Blob => "SqlNullableBlob"
-            case MediumBlob => "SqlNullableBlob"
-            case LongBlob => "SqlNullableBlob"
-            case String => "SqlNullableChar"
-            case VarString => "SqlNullableVarchar"
-            case Enum => "SqlNullableChar"
-            case Set => "SqlNullableChar"
-            case Json => "SqlNullableJson"
         }
     }
 }

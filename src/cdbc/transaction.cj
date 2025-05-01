@@ -56,7 +56,7 @@ class TransactionImpl <: Transaction {
         set(value) {
             checkResource()
             if (value != isolationLevel) {
-                synchronized(transaction.connection.mutex) {
+                synchronized(connectionMutex()) {
                     let level = match (value) {
                         case ReadUncommitted => "READ-UNCOMMITTED"
                         case ReadCommitted => "READ-COMMITTED"
@@ -78,7 +78,7 @@ class TransactionImpl <: Transaction {
         }
         set(value) {
             checkResource()
-            synchronized(transaction.connection.mutex) {
+            synchronized(connectionMutex()) {
                 if(value != accessMode){
                     match(value){
                         case ReadWrite => transaction.setReadOnly(false)
@@ -128,6 +128,10 @@ class TransactionImpl <: Transaction {
     public override func release(savePointName: String): Unit {
         checkResource()
         transaction.releaseSavepoint(savePointName)
+    }
+
+    private func connectionMutex() {
+        transaction.connection.connectionMutex
     }
 
     private func checkResource(){

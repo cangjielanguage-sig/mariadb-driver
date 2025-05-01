@@ -30,7 +30,7 @@ import mysql.protocol.response.*
 */
 protected class MySqlConnection <: Resource {
     
-    private let connectionMutex: ReentrantMutex = ReentrantMutex()
+    private let mutex: Mutex = Mutex()
 
     private var channel: MySqlChannel
 
@@ -38,9 +38,9 @@ protected class MySqlConnection <: Resource {
         this.channel = MySqlChannel(socket)
     }
 
-    protected prop mutex: ReentrantMutex {
+    protected prop connectionMutex: Mutex {
         get() {
-            connectionMutex
+            mutex
         }
     }
 

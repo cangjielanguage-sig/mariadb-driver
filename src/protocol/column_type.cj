@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2024 Yesokim
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,10 +15,10 @@
  */
 protected package mysql.protocol
 
- /*
-* Column types for MySQL
-* referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/field__types_8h.html
-*/
+/*
+ * Column types for MySQL
+ * referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/field__types_8h.html
+ */
 protected enum ColumnType <: ToString {
     //| Decimal
     | Tiny
@@ -28,7 +28,7 @@ protected enum ColumnType <: ToString {
     | Double
     //| Null
     | Timestamp
-    | LongLong 
+    | LongLong
     | Int24
     | Date
     | Time
@@ -54,7 +54,6 @@ protected enum ColumnType <: ToString {
     | VarString
     | String
     //| Geometry
-
 
     protected static func of(value: Byte): ColumnType {
         match (value) {
@@ -100,17 +99,17 @@ protected enum ColumnType <: ToString {
         match (this) {
             //case Decimal => 0x00
             case Tiny => 0x01
-            case Short => 0x02 
-            case Long => 0x03 
+            case Short => 0x02
+            case Long => 0x03
             case Float => 0x04
-            case Double => 0x05 
+            case Double => 0x05
             //case Null => 0x06 
-            case Timestamp => 0x07 
-            case LongLong => 0x08 
-            case Int24 => 0x09 
-            case Date =>  0x0A 
-            case Time => 0x0B 
-            case DateTime => 0x0C 
+            case Timestamp => 0x07
+            case LongLong => 0x08
+            case Int24 => 0x09
+            case Date => 0x0A
+            case Time => 0x0B
+            case DateTime => 0x0C
             case Year => 0x0D
             //case NewDate => 0x0E 
             //case Varchar => 0x0F
@@ -134,24 +133,72 @@ protected enum ColumnType <: ToString {
             //case Geometry => 0xFF
         }
     }
-
-    protected operator func == (right: ColumnType) {
-        return this.value() == right.value()
+    
+    public func cangjieType(unsigned: Bool) {
+        match (this) {
+            case Tiny =>
+                if (unsigned) {
+                    "UInt8"
+                } else {
+                    "Int8"
+                }
+            case Short =>
+                if (unsigned) {
+                    "UInt16"
+                } else {
+                    "Int16"
+                }
+            case Int24 =>
+                if (unsigned) {
+                    "UInt32"
+                } else {
+                    "Int32"
+                }
+            case Long =>
+                if (unsigned) {
+                    "UInt32"
+                } else {
+                    "Int32"
+                }
+            case LongLong =>
+                if (unsigned) {
+                    "UInt16"
+                } else {
+                    "Int16"
+                }
+            case Float => "Float32"
+            case Double => "Float64"
+            case Timestamp => "DateTime"
+            case Date => "DateTime"
+            case Time => "DateTime"
+            case DateTime => "DateTime"
+            case Year => "Int32"
+            case Json => "String"
+            case NewDecimal => "Decimal"
+            case Enum => "String"
+            case Set => "String"
+            case TinyBlob => "Array<Byte>"
+            case MediumBlob => "Array<Byte>"
+            case LongBlob => "Array<Byte>"
+            case Blob => "Array<Byte>"
+            case VarString => "String"
+            case String => "String"
+        }
     }
 
-    public override func toString() {
+    public func toString() {
         match (this) {
             //case Decimal => "Decimal"
             case Tiny => "Tiny"
-            case Short => "Short" 
+            case Short => "Short"
             case Long => "Long"
             case Float => "Float"
             case Double => "Double"
             //case Null => "Null"
-            case Timestamp => "Timestamp" 
+            case Timestamp => "Timestamp"
             case LongLong => "Long"
             case Int24 => "Int24"
-            case Date =>  "Date"
+            case Date => "Date"
             case Time => "Time"
             case DateTime => "DateTime"
             case Year => "Year"
@@ -177,4 +224,10 @@ protected enum ColumnType <: ToString {
             //case Geometry => "Geometry"
         }
     }
+
+    protected operator func ==(right: ColumnType) {
+        return this.value() == right.value()
+    }
+
+
 }
