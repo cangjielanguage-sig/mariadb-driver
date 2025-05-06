@@ -15,48 +15,32 @@
  */
 package mysql.cdbc
 
-import std.convert.*
 import std.collection.*
 import std.database.sql.*
-import mysql.result.*
 
-public class ServerPrepareStatement <: Statement {
+public class ClientPrepareStatement <: Statement {
 
     private let parameters: Array<Any>
-
-    private let id: UInt32
-
-    private let options: HashMap<String, String>
-
-    private let paramsInfo: Array<ColumnInfo>
-
-    private let prepareResult: PrepareResult
 
     private let connection: ConnectionImpl
 
     private let originSql: String
 
+    private let options: HashMap<String, String>
+
     private var closed: Bool
 
-    public init(originSql: String, connection: ConnectionImpl) {
+    public ClientPrepareStatement(originSql: String, connection: ConnectionImpl) {
         this.connection = connection
-        this.prepareResult = connection.sendPrepare(originSql)
-        this.options = HashMap<String, String>()
-        this.id = prepareResult.id
         this.originSql = originSql
         this.closed = false
-        let array = ArrayList<ColumnInfo>()
-        for(i in prepareResult.columns) {
-            array.add(ColumnInfoImpl(i))
-        }
-        this.paramsInfo = array.toArray()
+        this.options = HashMap<String, String>()
         this.parameters = Array<Any>(originSql.count("?"), repeat: Option<Any>.None)
     }
 
     public override prop parameterColumnInfos: Array<ColumnInfo> {
         get() {
-            checkResource()
-            return paramsInfo
+            throw UnsupportedException("get parameters info must set prepare.mode=server in connection")
         }
     }
 
@@ -80,7 +64,8 @@ public class ServerPrepareStatement <: Statement {
 
     public func update(): UpdateResult {
         checkResource()
-        let result = connection.executeUpdatePrepare(prepareResult, parameters)
+        let executeableSql = getExecuteableSql()
+        let result = connection.sendUpdate(executeableSql)
         var lastInsertId: Int64 = 0
         if (result.lastInsertId > 0) {
             lastInsertId += Int64(result.lastInsertId) + insertCount(originSql) - 1
@@ -90,20 +75,28 @@ public class ServerPrepareStatement <: Statement {
 
     public func query(): QueryResult {
         checkResource()
-        let result = match (options.get("fetchSize")) {
-            case None => 
-                connection.executeQueryPrepare(prepareResult, parameters)
-            case Some(v) => 
-                let fetchSize = UInt32.parse(v)
-                connection.executeQueryPrepareWithCurosr(prepareResult, parameters, fetchSize)
-        }
-        return QueryResultImpl(result)
+        let executeableSql = getExecuteableSql()
+        return QueryResultImpl(connection.sendQuery(executeableSql))
     }
-
 
     public override func setOption(key: String, value: String): Unit {
         checkResource()
         options.add(key, value)
+    }
+
+    private func getExecuteableSql(): String {
+        let sqlBuilder = StringBuilder()
+        let parts = originSql.split("?", removeEmpty: true)
+        for(i in 0..parts.size) {
+            sqlBuilder.append(parts[i])
+            if(i < parameters.size) {
+                match (parameters[i]) {
+                    case param: SqlParameter =>sqlBuilder.append(param.asParameter())
+                    case _ =>  throw UnsupportedException("an unsupported sql type")
+                }
+            }
+        }
+        return sqlBuilder.toString()
     }
 
     private func checkResource() {
@@ -114,12 +107,11 @@ public class ServerPrepareStatement <: Statement {
 
     public override func close() {
         checkResource()
-        connection.closePrepare(id)
         closed = true
     }
 
     public override func isClosed(): Bool {
         return closed
     }
-    
+
 }

@@ -35,3 +35,20 @@ protected func insertCount(sql: String): Int {
     }
     return count
 }
+
+func escapeString(value: String): String {
+    let builder = StringBuilder()
+    builder.append("'")
+    for(i in value.toRuneArray()) {
+        match (i) {
+            case r'\n' => builder.append("\\n")
+            case r'\r' => builder.append("\\r")
+            case r'\\' => builder.append("\\\\")
+            case r'\'' => builder.append("\'\'")
+            case r'"' => builder.append("\"")
+            case _ => builder.append(i)
+            }
+        }
+        builder.append("'")
+        return builder.toString()
+}

@@ -61,7 +61,14 @@ public class ConnectionImpl <: Connection {
     override public func prepareStatement(sql: String): Statement {
         checkResource()
         checkEmptySql(sql)
-        return ServerPrepareStatement(sql, this)
+        let first = sql[0..(sql.indexOf(" ") ?? sql.size)].toAsciiLower()
+        let crud = ["select", "upate", "insert", "delete"]
+        for(i in crud) {
+            if(first == i) {
+                return ServerPrepareStatement(sql, this)
+            }
+        }
+        return ClientPrepareStatement(sql, this)
     }
 
     override public func createTransaction(): Transaction {

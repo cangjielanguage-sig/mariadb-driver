@@ -244,7 +244,7 @@ protected class MySqlConnection <: Resource {
     private func readQueryPrepareResponse(): ResultSet {
         var (length, number, payload) = read()
         checkErrorResponse(length, number, payload)
-        checkInexpectantOkResponse(length, number, payload)
+        checkInexpectantOkResponse(payload)
         let filedsCount = ColumnCount(length, number, payload)
         let fields = ArrayList<ColumnDefinition>()
         for (_ in 0..filedsCount.count) {
@@ -362,7 +362,7 @@ protected class MySqlConnection <: Resource {
     private func readQueryResponse(): ResultSet {
         var (length, number, payload) = read()
         checkErrorResponse(length, number, payload)
-        checkInexpectantOkResponse(length, number, payload)
+        checkInexpectantOkResponse(payload)
         let columnCount = ColumnCount(length, number, payload)
         let fields = ArrayList<ColumnDefinition>()
         for (_ in 0..columnCount.count) {
@@ -392,7 +392,7 @@ protected class MySqlConnection <: Resource {
         return ChangeResult(ok.effectRows, ok.index)
     }
 
-    private func checkInexpectantOkResponse(length: UInt64, number: UInt8, payload: ByteBuffer) {
+    private func checkInexpectantOkResponse(payload: ByteBuffer) {
         if(payload.bytes()[0] == ResponseCode.Ok.value()) {
             throw MySqlException("Execute non-select statements using the query method.")
         }
