@@ -20,7 +20,7 @@ import std.collection.*
 import std.database.sql.*
 import mysql.result.*
 
-public class PrepareStatement <: Statement {
+public class ServerPrepareStatement <: Statement {
 
     private let alloctor: Array<Any>
 

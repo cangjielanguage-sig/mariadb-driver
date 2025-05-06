@@ -354,35 +354,15 @@ extend String <: ToMySqlBinary {
             case String | VarString | NewDecimal | Json | TinyBlob | Blob | MediumBlob | LongBlob =>
                 this.toLengthEncoded()
             case Tiny | Short | Year | Int24 | Long | LongLong => 
-                try {
                     Int64.parse(this).toBinary(definition)
-                }catch (e: IllegalArgumentException) {
-                    throw ParameterConvertException("")
-                }
             case Float | Double => 
-                try {
                     Float64.parse(this).toBinary(definition)
-                }catch (e: IllegalArgumentException) {
-                    throw ParameterConvertException("")
-                }
             case Date => 
-                try {
                     DateTime.parse(this, DB_DATE_FORMAT).toBinary(definition)
-                }catch(e: TimeParseException) {
-                    throw ParameterConvertException("")
-                }
             case Time =>
-                try {
-                   DateTime.parse(DB_TIME_PREFIX + this, DB_DATE_TIME_FORMAT).toBinary(definition)
-                }catch (e: TimeParseException) {
-                    throw ParameterConvertException("")
-                }
+                    DateTime.parse(DB_TIME_PREFIX + this, DB_DATE_TIME_FORMAT).toBinary(definition)
             case DateTime | Timestamp =>
-                try {
                     DateTime.parse(this, DB_DATE_TIME_FORMAT).toBinary(definition)
-                }catch (e: TimeParseException) {
-                    throw ParameterConvertException("")
-                }
             case _ => 
                 throw IllegalArgumentException("Cangjie String types cannot be converted to MySql ${columnType} types")
             }

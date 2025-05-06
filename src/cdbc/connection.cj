@@ -61,7 +61,7 @@ public class ConnectionImpl <: Connection {
     override public func prepareStatement(sql: String): Statement {
         checkResource()
         checkEmptySql(sql)
-        return PrepareStatement(sql, this)
+        return ServerPrepareStatement(sql, this)
     }
 
     override public func createTransaction(): Transaction {
@@ -84,7 +84,7 @@ public class ConnectionImpl <: Connection {
     protected func sendCommand(sql: String) {
         try {
             return connection.sendCommand(sql)
-        }catch (e: ResponseErrorException) {
+        }catch (e: MySqlException) {
             throw SqlException(e.message)
         }
     }
@@ -92,7 +92,7 @@ public class ConnectionImpl <: Connection {
     protected func sendQuery(sql: String): ResultSet {
         try {
             return connection.sendQuery(sql)
-        }catch (e: ResponseErrorException) {
+        }catch (e: MySqlException) {
             throw SqlException(e.message)
         }
     }
@@ -100,7 +100,7 @@ public class ConnectionImpl <: Connection {
     protected func sendUpdate(sql: String): ChangeResult {
         try {
             return connection.sendUpdate(sql)
-        }catch (e: ResponseErrorException) {
+        }catch (e: MySqlException) {
             throw SqlException(e.message)
         }
     }
@@ -108,7 +108,7 @@ public class ConnectionImpl <: Connection {
     protected func sendPrepare(sql: String): PrepareResult {
         try {
             return connection.sendPrepare(sql)
-        }catch (e: ResponseErrorException) {
+        }catch (e: MySqlException) {
             throw SqlException(e.message)
         }
     }
@@ -116,7 +116,7 @@ public class ConnectionImpl <: Connection {
     protected func executeQueryPrepare(prepare: PrepareResult, params: Array<Any>): ResultSet {
         try {
             return connection.executeQueryPrepare(prepare, params)
-        }catch (e: ResponseErrorException | ParameterConvertException) {
+        }catch (e: MySqlException) {
             throw SqlException(e.message)
         }
     }
@@ -124,7 +124,7 @@ public class ConnectionImpl <: Connection {
     protected func executeQueryPrepareWithCurosr(prepare: PrepareResult, params: Array<Any>, fetchSize: UInt32): ResultSet {
         try {
             return connection.executeQueryPrepareWithCurosr(prepare, params, fetchSize)
-        }catch (e: ResponseErrorException) {
+        }catch (e: MySqlException) {
             throw SqlException(e.message)
         }
     }
@@ -132,7 +132,7 @@ public class ConnectionImpl <: Connection {
     protected func executeUpdatePrepare(prepare: PrepareResult, params: Array<Any>): ChangeResult {
         try {
             return connection.executeUpdatePrepare(prepare, params)
-        }catch (e: ResponseErrorException  | ParameterConvertException) {
+        }catch (e: MySqlException) {
             throw SqlException(e.message)
         }
     }

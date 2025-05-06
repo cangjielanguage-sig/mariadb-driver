@@ -15,10 +15,28 @@
  */
 protected package mysql.protocol
 
+
+protected open class MySqlException <: Exception & ToString {
+
+    protected init() {
+       super()
+    }
+
+    protected init(message: String) {
+        super(message)    
+    }
+
+    public open func toString(): String {
+        return "MySqlException: ${message}"
+    }
+
+}
+
+
 /*
 * 无效数据包异常类,表示数据包解析异常
 */
-protected class InvalidPacketException <: Exception {
+protected class InvalidPacketException <: MySqlException {
 
     init() {
        super()
@@ -27,16 +45,9 @@ protected class InvalidPacketException <: Exception {
     protected init(message: String) {
         super(message)    
     }
-}
 
-protected class ParameterConvertException <: Exception {
-
-    init() {
-        super()
-    }
-
-    protected init(message: String) {
-        super(message)
+    public func toString(): String {
+        return "InvalidPacketException: ${message}"
     }
 
 }

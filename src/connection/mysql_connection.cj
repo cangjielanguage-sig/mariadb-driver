@@ -217,7 +217,7 @@ protected class MySqlConnection <: Resource {
      */
     private func readPrepareResponse(): PrepareResult {
         let (length, number, payload) = read()
-        checkError(length, number, payload)
+        checkErrorResponse(length, number, payload)
         let prepareResponse = PrepareResposne(length, number, payload)
         let parameters = ArrayList<ColumnDefinition>(Int64(prepareResponse.numParams))
         if(prepareResponse.numParams > 0) {
@@ -243,7 +243,8 @@ protected class MySqlConnection <: Resource {
     */
     private func readQueryPrepareResponse(): ResultSet {
         var (length, number, payload) = read()
-        checkError(length, number, payload)
+        checkErrorResponse(length, number, payload)
+        checkInexpectantOkResponse(length, number, payload)
         let filedsCount = ColumnCount(length, number, payload)
         let fields = ArrayList<ColumnDefinition>()
         for (_ in 0..filedsCount.count) {
@@ -268,7 +269,7 @@ protected class MySqlConnection <: Resource {
     */
     private func readFetchResponse(columnInfos: Array<ColumnDefinition>): ResultSet {
         var (length, number, payload) = read()
-        checkError(length, number, payload)
+        checkErrorResponse(length, number, payload)
         let rows = ArrayList<Array<?Array<Byte>>>()
         while (payload.bytes()[0] != ResponseCode.Eof.value() || payload.bytes().size > 5) {
             let row = BinaryResult(length, number, payload, columnInfos)
@@ -283,7 +284,7 @@ protected class MySqlConnection <: Resource {
     */
     private func readQueryPrepareResponseWithCursor(prepareId: UInt32, fetchSize: UInt32): ResultSet {
         let (length, number, payload) = read()
-        checkError(length, number, payload) 
+        checkErrorResponse(length, number, payload) 
         let filedsCount = ColumnCount(length, number, payload)
         let fields = ArrayList<ColumnDefinition>()
         for (_ in 0..filedsCount.count) {
@@ -360,7 +361,8 @@ protected class MySqlConnection <: Resource {
      */
     private func readQueryResponse(): ResultSet {
         var (length, number, payload) = read()
-        checkError(length, number, payload)
+        checkErrorResponse(length, number, payload)
+        checkInexpectantOkResponse(length, number, payload)
         let columnCount = ColumnCount(length, number, payload)
         let fields = ArrayList<ColumnDefinition>()
         for (_ in 0..columnCount.count) {
@@ -385,12 +387,18 @@ protected class MySqlConnection <: Resource {
      */
     private func readUpdateResponse(): ChangeResult {
         let(length, number, payload) = read()
-        checkError(length, number, payload)
+        checkErrorResponse(length, number, payload)
         let ok = OkResponse(length, number, payload)
         return ChangeResult(ok.effectRows, ok.index)
     }
 
-    private func checkError(length: UInt64, number: UInt8, payload: ByteBuffer) {
+    private func checkInexpectantOkResponse(length: UInt64, number: UInt8, payload: ByteBuffer) {
+        if(payload.bytes()[0] == ResponseCode.Ok.value()) {
+            throw MySqlException("Execute non-select statements using the query method.")
+        }
+    }
+
+    private func checkErrorResponse(length: UInt64, number: UInt8, payload: ByteBuffer) {
         if (payload.bytes()[0] == ResponseCode.Error.value()) {
             let error = ErrorResponse(length, number, payload)
             throw ResponseErrorException(error.message)

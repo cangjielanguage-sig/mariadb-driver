@@ -15,13 +15,15 @@
  */
 protected package mysql.connection
 
+import mysql.protocol.*
+
 /*
 * 服务器响应Error异常,表示执行命令后服务器响应Error
 */
-protected class ResponseErrorException <: Exception {
+protected class ResponseErrorException <: MySqlException {
 
     init() {
-       super()
+        super()
     }
 
     protected ResponseErrorException(message: String) {
@@ -37,10 +39,10 @@ protected class ResponseErrorException <: Exception {
 /*
 *  连接失败异常
 */
-protected class ConnectFailedException <: Exception {
+protected class ConnectFailedException <: MySqlException {
 
     init() {
-       super()
+        super()
     }
 
     protected ConnectFailedException(message: String) {
