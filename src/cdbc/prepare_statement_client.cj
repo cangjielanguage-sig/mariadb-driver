@@ -45,12 +45,12 @@ public class ClientPrepareStatement <: Statement {
     }
 
     @Deprecated
-    public override func query(params: Array<SqlDbType>): QueryResult {
+    public override func query(_: Array<SqlDbType>): QueryResult {
         throw UnsupportedException("Deprecated method")
     }
 
     @Deprecated
-    public override func update(params: Array<SqlDbType>): UpdateResult {
+    public override func update(_: Array<SqlDbType>): UpdateResult {
         throw UnsupportedException("Deprecated method")
     }
 

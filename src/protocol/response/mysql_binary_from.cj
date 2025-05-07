@@ -413,7 +413,7 @@ extend String <: FromMySqlBinary<String> {
                         return DateTime.fromBinaryDateTime(v).format(DB_DATE_TIME_FORMAT)
                     case Time => 
                         return DateTime.fromBinaryTime(v).format(DB_TIME_FORMAT)
-                        //case _ => throw Exception("Unsupport MySQL binary type")
+                        case _ => throw UnsupportedException("Unsupport MySQL binary type")
                     }
         }
     }

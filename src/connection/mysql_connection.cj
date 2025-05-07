@@ -84,7 +84,7 @@ protected class MySqlConnection <: Resource {
     protected func sendCommand(sql: String): Unit {
         synchronized(connectionMutex) {
             writeRequest(QueryCommand(sql))
-            readCommandResponse()
+            readOkResponse()
         }
     }
 
@@ -108,6 +108,13 @@ protected class MySqlConnection <: Resource {
     protected func sendUpdate(sql: String): ChangeResult {
         synchronized(connectionMutex) {
             writeRequest(QueryCommand(sql))
+            let count = countSqlStatements(sql)
+            if(count > 1) {
+                for(_ in 0..count) {
+                    readOkResponse()
+                }
+                return ChangeResult(0, 0)
+            }
             return readUpdateResponse()
         }
     }
@@ -131,10 +138,10 @@ protected class MySqlConnection <: Resource {
     * @result ResultSet 
     * @throws ResponseErrorException
     */
-    protected func executeQueryPrepare(prepare: PrepareResult, params: Array<Any>): ResultSet {
+    protected func executeQueryPrepare(statementId: UInt32, params: Array<Any>): ResultSet {
         synchronized(connectionMutex) {
-            handleLongData(prepare.id, params)
-            writeRequest(ExecuteCommand.default(prepare.id, prepare.params, params))
+            handleLongData(statementId, params)
+            writeRequest(ExecuteCommand.default(statementId, params))
             return readQueryPrepareResponse()
         }
     }
@@ -146,11 +153,11 @@ protected class MySqlConnection <: Resource {
     * @result ResultSet 
     * @throws ResponseErrorException
     */
-    protected func executeQueryPrepareWithCurosr(prepare: PrepareResult, params: Array<Any>, fetchSize: UInt32): ResultSet {
+    protected func executeQueryPrepareWithCurosr(statementId: UInt32, params: Array<Any>, fetchSize: UInt32): ResultSet {
         synchronized(connectionMutex) {
-            handleLongData(prepare.id, params)
-            writeRequest(ExecuteCommand.withReadOnly(prepare.id, prepare.params, params))
-            return readQueryPrepareResponseWithCursor(prepare.id, fetchSize)
+            handleLongData(statementId, params)
+            writeRequest(ExecuteCommand.withReadOnly(statementId, params))
+            return readQueryPrepareResponseWithCursor(statementId, fetchSize)
         }
     }
 
@@ -164,7 +171,7 @@ protected class MySqlConnection <: Resource {
     protected func executeUpdatePrepare(prepare: PrepareResult, params: Array<Any>): ChangeResult {
         synchronized(connectionMutex) {
             handleLongData(prepare.id, params)
-            writeRequest(ExecuteCommand.default(prepare.id, prepare.params, params))
+            writeRequest(ExecuteCommand.default(prepare.id, params))
             return readUpdateResponse()
         }
     }
@@ -205,7 +212,6 @@ protected class MySqlConnection <: Resource {
             let param = params[i]
             match (param) {
                 case v: InputStream => writeRequest(SendLongDataCommand(statementId, UInt16(i), toArray(v)))
-                case v: Array<Byte> => writeRequest(SendLongDataCommand(statementId, UInt16(i), v))
                 case _ => continue
             }
         }
@@ -345,21 +351,26 @@ protected class MySqlConnection <: Resource {
     }
 
 
-    /*
-    * handle response of execute command
-    */
-    private func readCommandResponse(): Unit {
-        var response = readResponse()
-        if (response is ErrorResponse) {
-            let error = response as ErrorResponse
-            throw ResponseErrorException(error.getOrThrow().message)
+    private func readOkResponse(): OkResponse {
+        match (readResponse()) {
+            case error: ErrorResponse => throw ResponseErrorException(error.message)
+            case ok: OkResponse => ok
+            case other => throw MySqlException("Inexpect response: ${other.code}")
         }
+    }
+
+    /*
+     * handler response of execute update
+     */
+    private func readUpdateResponse(): ChangeResult {
+        let ok = readOkResponse()
+        return ChangeResult(ok.effectRows, ok.index)
     }
 
     /*
      * handler response of execute query
      */
-    private func readQueryResponse(): ResultSet {
+    private func readQueryResponse(): TextResultSet {
         var (length, number, payload) = read()
         checkErrorResponse(length, number, payload)
         checkInexpectantOkResponse(payload)
@@ -382,16 +393,6 @@ protected class MySqlConnection <: Resource {
         return TextResultSet(fields.toArray(), rowPackets.toArray())
     }
 
-    /*
-     * handler response of execute update
-     */
-    private func readUpdateResponse(): ChangeResult {
-        let(length, number, payload) = read()
-        checkErrorResponse(length, number, payload)
-        let ok = OkResponse(length, number, payload)
-        return ChangeResult(ok.effectRows, ok.index)
-    }
-
     private func checkInexpectantOkResponse(payload: ByteBuffer) {
         if(payload.bytes()[0] == ResponseCode.Ok.value()) {
             throw MySqlException("Execute non-select statements using the query method.")
@@ -409,6 +410,11 @@ protected class MySqlConnection <: Resource {
         if (isClosed()) {
             throw Exception("The database Connection has been closed")
         }
+    }
+
+    private func countSqlStatements(sql: String): Int64 {
+        //后续替换更安全的算法
+        return sql.split(";", removeEmpty: true).size
     }
 
 }

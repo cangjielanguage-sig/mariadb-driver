@@ -26,7 +26,7 @@ protected enum ColumnType <: ToString {
     | Long
     | Float
     | Double
-    //| Null
+    | Null
     | Timestamp
     | LongLong
     | Int24
@@ -63,7 +63,7 @@ protected enum ColumnType <: ToString {
             case 0x03 => Long
             case 0x04 => Float
             case 0x05 => Double
-            //case 0x06 => Null
+            case 0x06 => Null
             case 0x07 => Timestamp
             case 0x08 => LongLong
             case 0x09 => Int24
@@ -103,7 +103,7 @@ protected enum ColumnType <: ToString {
             case Long => 0x03
             case Float => 0x04
             case Double => 0x05
-            //case Null => 0x06 
+            case Null => 0x06 
             case Timestamp => 0x07
             case LongLong => 0x08
             case Int24 => 0x09
@@ -168,6 +168,7 @@ protected enum ColumnType <: ToString {
                 }
             case Float => "Float32"
             case Double => "Float64"
+            case Null => "Option<Any>"
             case Timestamp => "DateTime"
             case Date => "DateTime"
             case Time => "DateTime"
@@ -194,7 +195,7 @@ protected enum ColumnType <: ToString {
             case Long => "Long"
             case Float => "Float"
             case Double => "Double"
-            //case Null => "Null"
+            case Null => "Null"
             case Timestamp => "Timestamp"
             case LongLong => "Long"
             case Int24 => "Int24"

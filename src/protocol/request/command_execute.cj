@@ -16,13 +16,8 @@
 protected package mysql.protocol.request
 
 import std.io.*
-import std.time.*
-import std.convert.*
-import std.collection.*
-import std.math.numeric.*
 import mysql.util.*
 import mysql.protocol.*
-import mysql.protocol.response.*
 
 /*
  * It sends the values for the placeholders of the prepared statement (if it contained any) in Binary Protocol Value form.
@@ -42,32 +37,25 @@ protected class ExecuteCommand <: Command {
 
     private let newParamsBindFlag: UInt8
 
-    private let paramDefinitions: Array<ColumnDefinition>
-
     private let params: Array<Any>
 
-    private init(id: UInt32, flags: CursorType, iterationCount: UInt32, parameterCount: UInt64, boundFlag: UInt8, 
-                parameterDefinition: Array<ColumnDefinition>, params: Array<Any>) {
+    private init(id: UInt32, flags: CursorType, iterationCount: UInt32, boundFlag: UInt8, params: Array<Any>) {
         super(CommandType.StmtExecute)
-        if (parameterDefinition.size != params.size) {
-            throw IllegalArgumentException("values size must equals parameter size")
-        }
         this.statementId = id
         this.flags = flags
         this.iterationCount = iterationCount
-        this.parameterCount = parameterCount
-        this.nullBitMap = Array<Byte>((Int64(parameterCount) + 7) / 8, repeat: 0)
+        this.parameterCount = UInt64(params.size)
+        this.nullBitMap = Array<Byte>((params.size + 7) / 8, repeat: 0)
         this.newParamsBindFlag = boundFlag
-        this.paramDefinitions = parameterDefinition
         this.params = params
     }
 
-    public static func default(id: UInt32, paramDefinitions: Array<ColumnDefinition>, params: Array<Any>): ExecuteCommand {
-        return ExecuteCommand(id, ParameterCountAvailable, 1, UInt64(paramDefinitions.size), 1, paramDefinitions, params)
+    public static func default(id: UInt32, params: Array<Any>): ExecuteCommand {
+        return ExecuteCommand(id, NoCursor, 1, 1, params)
     }
 
-    public static func withReadOnly(id: UInt32, paramDefinitions: Array<ColumnDefinition>, params: Array<Any>): ExecuteCommand {
-        return ExecuteCommand(id, ReadOnly , 1, UInt64(paramDefinitions.size), 1, paramDefinitions, params)
+    public static func withReadOnly(id: UInt32, params: Array<Any>): ExecuteCommand {
+        return ExecuteCommand(id, ReadOnly, 1, 1, params)
     }
 
     public override func pack(): Unit {
@@ -96,38 +84,25 @@ protected class ExecuteCommand <: Command {
                 this.newParamsBindFlag |> pack
                 if (newParamsBindFlag == 1) {
                     //parameter_type
-                    for (i in 0..paramDefinitions.size) {
+                    for(i in 0..params.size) {
                         let value = params[i]
-                        let paramType = paramDefinitions[i].columnType
-                        if (value is ?Any && (value as ?Any).getOrThrow().isNone()) {
-                            //buf.append(ColumnType.Null.value())
-                            0x06 |> pack
-                        }else {
-                            if(paramType == Year){
-                               ColumnType.Long.value() |> pack
-                            }else{
-                                paramType.value() |> pack
-                            }
+                        match (value) {
+                            case v: ToMySqlBinary => v.typeFlag() |> pack
+                            case v: InputStream => [ColumnType.LongBlob.value(), 0x00] |> pack
+                            case _ => throw UnsupportedException("")
                         }
-                        if (paramDefinitions[i].hasFlag(Unsigned)) {
-                            0x80 |> pack
-                        } else {
-                            0x00 |> pack
-                        }
-                        if (HandshakeResponse.getDefault(0).hasCapability(QueryAttributes)) {
-                            0x00 |> pack//paramter name: default null
-                        }
+                    }
+                    if (HandshakeResponse.getDefault(0).hasCapability(QueryAttributes)) {
+                        0x00 |> pack //paramter name: default null
                     }
                 }
                 //parameter_values
                 for (i in 0..params.size) {
                     let value = params[i]
                     match (value) {
-                        case v: ToMySqlBinary => v.toBinary(paramDefinitions[i]) |> pack
-                        case _: Array<Byte> => continue
-                        case _: InputStream => continue
-                        case _: ?Any => continue
-                        case _ => throw UnsupportedException("Unsupport type")
+                        case v: ToMySqlBinary => v.toBinary() |> pack
+                        case _: ?Any => { => }
+                        case _ => throw UnsupportedException("")
                     }
                 }
             }

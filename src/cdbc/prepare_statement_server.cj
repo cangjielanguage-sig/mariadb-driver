@@ -41,6 +41,9 @@ public class ServerPrepareStatement <: Statement {
     public init(originSql: String, connection: ConnectionImpl) {
         this.connection = connection
         this.prepareResult = connection.sendPrepare(originSql)
+        for(i in prepareResult.params) {
+            println(i.columnType)
+        }
         this.options = HashMap<String, String>()
         this.id = prepareResult.id
         this.originSql = originSql

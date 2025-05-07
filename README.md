@@ -49,7 +49,7 @@ mysql-driver是使用Cangjie编写的mysql原生驱动程序，适配TIDB、Ocea
 
 ### 3.1 编译构建（Win/Linux/Mac）
 
-cjpm.toml文件添加以下配置后，再执行cjpm update，即可在项目中引入mysql-driver。
+cjpm.toml文件添加以下配置后，再执行cjpm update，即可在项目中引入mysql-driver。（需要额外设置环境变量CANGJIE_STDX，值为stdx的路径）
 
 ```toml
 [dependencies]

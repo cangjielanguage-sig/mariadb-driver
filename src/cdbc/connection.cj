@@ -122,7 +122,7 @@ public class ConnectionImpl <: Connection {
 
     protected func executeQueryPrepare(prepare: PrepareResult, params: Array<Any>): ResultSet {
         try {
-            return connection.executeQueryPrepare(prepare, params)
+            return connection.executeQueryPrepare(prepare.id, params)
         }catch (e: MySqlException) {
             throw SqlException(e.message)
         }
@@ -130,7 +130,7 @@ public class ConnectionImpl <: Connection {
 
     protected func executeQueryPrepareWithCurosr(prepare: PrepareResult, params: Array<Any>, fetchSize: UInt32): ResultSet {
         try {
-            return connection.executeQueryPrepareWithCurosr(prepare, params, fetchSize)
+            return connection.executeQueryPrepareWithCurosr(prepare.id, params, fetchSize)
         }catch (e: MySqlException) {
             throw SqlException(e.message)
         }

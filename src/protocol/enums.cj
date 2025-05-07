@@ -47,7 +47,7 @@ protected enum AuthState {
 /*
  * 响应码枚举
  */
-protected enum ResponseCode {
+protected enum ResponseCode <: ToString {
 
     | Ok
     | AuthMoreData
@@ -69,12 +69,21 @@ protected enum ResponseCode {
             case 0xFF => Error
             case 0xFE => Eof
             case 0x01 => AuthMoreData
-            case _ => throw Exception("Don't have this ResponseCode by value: ${value}")
+            case _ => throw MySqlException("Inexpect response code: ${value}")
         }
     }
 
     public operator func ==(right: ResponseCode): Bool {
         return right.value() == this.value()
+    }
+
+    public func toString(): String {
+        match (this) {
+            case Ok => "Ok"
+            case Error => "Error"
+            case Eof => "Eof"
+            case AuthMoreData => "AuthMoreData"
+        }
     }
 }
 
