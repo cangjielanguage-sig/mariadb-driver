@@ -139,7 +139,7 @@ protected class BinaryResult <: Response {
                 let columnInfo = columnInfos[i] 
                 let columnType = columnInfo.columnType
                 match (columnType) {
-                    case Null => { => }
+                    case Null => continue
                     case Tiny =>
                         binaryData[i] = buffer.readFixedArray(1)
                     case Short | Year =>

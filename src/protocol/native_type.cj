@@ -23,17 +23,17 @@ import mysql.util.*
 * MySQL Binary Protocol Value
 * referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_binary_resultset.html#sect_protocol_binary_resultset_row_value
 */
-protected interface ToMySqlBinary {
+protected interface NativeType {
 
-    func toBinary(): Array<Byte>
+    func mysqlValue(): Array<Byte>
 
-    func typeFlag(): Array<Byte>
+    func mysqlFlag(): Array<Byte>
 
 }
 
-extend Bool <: ToMySqlBinary {
+extend Bool <: NativeType {
 
-    public func toBinary(): Array<Byte> {
+    public func mysqlValue(): Array<Byte> {
         if(this) {
             return [1]
         } else {
@@ -41,184 +41,184 @@ extend Bool <: ToMySqlBinary {
         }
     }
 
-    public func typeFlag(): Array<Byte> {
+    public func mysqlFlag(): Array<Byte> {
         return [ColumnType.Tiny.value(), 0x00]
     }
 
 }
 
-extend Int8 <: ToMySqlBinary {
+extend Int8 <: NativeType {
 
-    public func toBinary(): Array<Byte> {
+    public func mysqlValue(): Array<Byte> {
         return this.toLittleEndian()
     }
 
-    public func typeFlag(): Array<Byte> {
+    public func mysqlFlag(): Array<Byte> {
         return [ColumnType.Tiny.value(), 0x00]
     }
 
 }
 
-extend UInt8 <: ToMySqlBinary {
+extend UInt8 <: NativeType {
 
-    public func toBinary(): Array<Byte> {
+    public func mysqlValue(): Array<Byte> {
         return this.toLittleEndian()
     }
 
-    public func typeFlag(): Array<Byte> {
+    public func mysqlFlag(): Array<Byte> {
         return [ColumnType.Tiny.value(), 0x80]
     }
 
 }
 
-extend Int16 <: ToMySqlBinary {
+extend Int16 <: NativeType {
 
-    public func toBinary(): Array<Byte> {
+    public func mysqlValue(): Array<Byte> {
         return this.toLittleEndian()
     }
 
-    public func typeFlag(): Array<Byte> {
+    public func mysqlFlag(): Array<Byte> {
         return [ColumnType.Short.value(), 0x00]
     }
 
 }
 
-extend UInt16 <: ToMySqlBinary {
+extend UInt16 <: NativeType {
 
-    public func toBinary(): Array<Byte> {
+    public func mysqlValue(): Array<Byte> {
         return this.toLittleEndian()
     }
 
-    public func typeFlag(): Array<Byte> {
+    public func mysqlFlag(): Array<Byte> {
         return [ColumnType.Short.value(), 0x80]
     }
 
 }
 
-extend Int32 <: ToMySqlBinary {
+extend Int32 <: NativeType {
 
-    public func toBinary(): Array<Byte> {
+    public func mysqlValue(): Array<Byte> {
         return this.toLittleEndian()
     }
 
-    public func typeFlag(): Array<Byte> {
+    public func mysqlFlag(): Array<Byte> {
         return [ColumnType.Long.value(), 0x00]
     }
 
 }
 
-extend UInt32 <: ToMySqlBinary {
+extend UInt32 <: NativeType {
 
-    public func toBinary(): Array<Byte> {
+    public func mysqlValue(): Array<Byte> {
         return this.toLittleEndian()
     }
 
-    public func typeFlag(): Array<Byte> {
+    public func mysqlFlag(): Array<Byte> {
         return [ColumnType.Long.value(), 0x80]
     }
 
 }
 
-extend Int64 <: ToMySqlBinary {
+extend Int64 <: NativeType {
 
-    public func toBinary(): Array<Byte> {
+    public func mysqlValue(): Array<Byte> {
         return this.toLittleEndian()
     }
 
-    public func typeFlag(): Array<Byte> {
+    public func mysqlFlag(): Array<Byte> {
         return [ColumnType.LongLong.value(), 0x00]
     }
 
 }
 
-extend UInt64 <: ToMySqlBinary {
+extend UInt64 <: NativeType {
 
 
-    public func toBinary(): Array<Byte> {
+    public func mysqlValue(): Array<Byte> {
         return this.toLittleEndian()
     }
 
-    public func typeFlag(): Array<Byte> {
+    public func mysqlFlag(): Array<Byte> {
         return [ColumnType.LongLong.value(), 0x80]
     }
 
 }
 
-extend Float16 <: ToMySqlBinary {
+extend Float16 <: NativeType {
 
-    public func toBinary(): Array<Byte> {
+    public func mysqlValue(): Array<Byte> {
         return this.toLittleEndian()
     }
 
-    public func typeFlag(): Array<Byte> {
+    public func mysqlFlag(): Array<Byte> {
         return [ColumnType.Float.value(), 0x00]
     }
 
 }
 
-extend Float32 <: ToMySqlBinary {
+extend Float32 <: NativeType {
 
-    public func toBinary(): Array<Byte> {
+    public func mysqlValue(): Array<Byte> {
         return this.toLittleEndian()
     }
 
-    public func typeFlag(): Array<Byte> {
+    public func mysqlFlag(): Array<Byte> {
         return [ColumnType.Float.value(), 0x00]
     }
 
 }
 
-extend Float64 <: ToMySqlBinary {
+extend Float64 <: NativeType {
 
-    public func toBinary(): Array<Byte> {
+    public func mysqlValue(): Array<Byte> {
         return this.toLittleEndian()
     }
 
-    public func typeFlag(): Array<Byte> {
+    public func mysqlFlag(): Array<Byte> {
         return [ColumnType.Double.value(), 0x00]
     }
 
 }
 
-extend Rune <: ToMySqlBinary {
+extend Rune <: NativeType {
 
-    public func toBinary(): Array<Byte> {
+    public func mysqlValue(): Array<Byte> {
         return this.toString().toLengthEncoded()
     }
 
-    public func typeFlag(): Array<Byte> {
+    public func mysqlFlag(): Array<Byte> {
         return [ColumnType.VarString.value(), 0x00]
     }
 
 }
 
-extend Array<Byte> <: ToMySqlBinary {
+extend Array<Byte> <: NativeType {
 
-    public func toBinary(): Array<Byte> {
+    public func mysqlValue(): Array<Byte> {
         return this.toLengthEncoded()
     }
 
-    public func typeFlag(): Array<Byte> {
+    public func mysqlFlag(): Array<Byte> {
         return [ColumnType.LongBlob.value(), 0x00]
     }
 
 }
 
-extend String <: ToMySqlBinary {
+extend String <: NativeType {
 
-    public func toBinary(): Array<Byte> {
+    public func mysqlValue(): Array<Byte> {
         return this.toLengthEncoded()
     }
 
-    public func typeFlag(): Array<Byte> {
+    public func mysqlFlag(): Array<Byte> {
         return [ColumnType.VarString.value(), 0x00]
     }
 
 }
 
-extend DateTime <: ToMySqlBinary {
+extend DateTime <: NativeType {
 
-    public func toBinary(): Array<Byte> {
+    public func mysqlValue(): Array<Byte> {
         var index = 0
         var buf = Array<Byte>(8, repeat: 0)
         buf[index] = 7
@@ -237,31 +237,31 @@ extend DateTime <: ToMySqlBinary {
         return buf.toArray()
     }
 
-    public func typeFlag(): Array<Byte> {
+    public func mysqlFlag(): Array<Byte> {
         return [ColumnType.Timestamp.value(), 0x00]
     }
 
 }
 
-extend BigInt <: ToMySqlBinary {
+extend BigInt <: NativeType {
 
-    public func toBinary(): Array<Byte> {
+    public func mysqlValue(): Array<Byte> {
         return this.toString().toLengthEncoded()
     }
 
-    public func typeFlag(): Array<Byte> {
+    public func mysqlFlag(): Array<Byte> {
         return [ColumnType.VarString.value(), 0x00]
     }
 
 }
 
-extend Decimal <: ToMySqlBinary {
+extend Decimal <: NativeType {
 
-    public func typeFlag(): Array<Byte> {
+    public func mysqlFlag(): Array<Byte> {
         return [ColumnType.VarString.value(), 0x00]
     }
 
-    public func toBinary(): Array<Byte> {
+    public func mysqlValue(): Array<Byte> {
         return this.toString().toLengthEncoded()
     }
 

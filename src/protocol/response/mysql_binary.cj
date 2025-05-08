@@ -27,14 +27,14 @@ import mysql.protocol.*
 * MySQL Binary Protocol Value
 * referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_binary_resultset.html#sect_protocol_binary_resultset_row_value
 */
-protected interface FromMySqlBinary<T> {
+protected interface MySqlBinary<T> {
 
     static func fromBinary(definition: ColumnDefinition, data: ?Array<Byte>): ?T
 
 }
 
 
-extend Bool <: FromMySqlBinary<Bool> {
+extend Bool <: MySqlBinary<Bool> {
 
     public static func fromBinary(definition: ColumnDefinition, data: ?Array<Byte>): ?Bool {
         let value = UInt8.fromBinary(definition, data)
@@ -48,7 +48,7 @@ extend Bool <: FromMySqlBinary<Bool> {
 
 }
 
-extend Int8 <: FromMySqlBinary<Int8> {
+extend Int8 <: MySqlBinary<Int8> {
 
     public static func fromBinary(definition: ColumnDefinition, data: ?Array<Byte>): ?Int8 {
         match (data) {
@@ -79,7 +79,7 @@ extend Int8 <: FromMySqlBinary<Int8> {
 
 }
 
-extend UInt8 <: FromMySqlBinary<UInt8> {
+extend UInt8 <: MySqlBinary<UInt8> {
 
     public static func fromBinary(definition: ColumnDefinition, data: ?Array<Byte>): ?UInt8 {
         match (data) {
@@ -110,7 +110,7 @@ extend UInt8 <: FromMySqlBinary<UInt8> {
 
 }
 
-extend Int16 <: FromMySqlBinary<Int16> {
+extend Int16 <: MySqlBinary<Int16> {
 
     public static func fromBinary(definition: ColumnDefinition, data: ?Array<Byte>): ?Int16 {
         match (data) {
@@ -141,7 +141,7 @@ extend Int16 <: FromMySqlBinary<Int16> {
 
 }
 
-extend UInt16 <: FromMySqlBinary<UInt16> {
+extend UInt16 <: MySqlBinary<UInt16> {
 
     public static func fromBinary(definition: ColumnDefinition, data: ?Array<Byte>):? UInt16 {
         match (data) {
@@ -172,7 +172,7 @@ extend UInt16 <: FromMySqlBinary<UInt16> {
 
 }
 
-extend Int32 <: FromMySqlBinary<Int32> {
+extend Int32 <: MySqlBinary<Int32> {
 
     public static func fromBinary(definition: ColumnDefinition, data: ?Array<Byte>): ?Int32 {
         match (data) {
@@ -202,7 +202,7 @@ extend Int32 <: FromMySqlBinary<Int32> {
     }
 }
 
-extend UInt32 <: FromMySqlBinary<UInt32> {
+extend UInt32 <: MySqlBinary<UInt32> {
 
     public static func fromBinary(definition: ColumnDefinition, data: ?Array<Byte>): ?UInt32 {
         match (data) {
@@ -232,7 +232,7 @@ extend UInt32 <: FromMySqlBinary<UInt32> {
     }
 }
 
-extend Int64 <: FromMySqlBinary<Int64> {
+extend Int64 <: MySqlBinary<Int64> {
 
     public static func fromBinary(definition: ColumnDefinition, data: ?Array<Byte>): ?Int64 {
         match (data) {
@@ -263,7 +263,7 @@ extend Int64 <: FromMySqlBinary<Int64> {
 
 }
 
-extend UInt64 <: FromMySqlBinary<UInt64> {
+extend UInt64 <: MySqlBinary<UInt64> {
 
     public static func fromBinary(definition: ColumnDefinition, data: ?Array<Byte>): ?UInt64 {
         match (data) {
@@ -294,7 +294,7 @@ extend UInt64 <: FromMySqlBinary<UInt64> {
 
 }
 
-extend Float16 <: FromMySqlBinary<Float16> {
+extend Float16 <: MySqlBinary<Float16> {
 
     public static func fromBinary(definition: ColumnDefinition, data: ?Array<Byte>): ?Float16 {
         match (data) {
@@ -316,7 +316,7 @@ extend Float16 <: FromMySqlBinary<Float16> {
 
 }
 
-extend Float32 <: FromMySqlBinary<Float32> {
+extend Float32 <: MySqlBinary<Float32> {
 
     public static func fromBinary(definition: ColumnDefinition, data: ?Array<Byte>): ?Float32 {
         match(data) {
@@ -338,7 +338,7 @@ extend Float32 <: FromMySqlBinary<Float32> {
 
 }
 
-extend Float64 <: FromMySqlBinary<Float64> {
+extend Float64 <: MySqlBinary<Float64> {
 
     public static func fromBinary(definition: ColumnDefinition, data: ?Array<Byte>): ?Float64 {
         match(data) {
@@ -360,7 +360,7 @@ extend Float64 <: FromMySqlBinary<Float64> {
 
 }
 
-extend String <: FromMySqlBinary<String> {
+extend String <: MySqlBinary<String> {
 
     public static func fromBinary(definition: ColumnDefinition, data: ?Array<Byte>): ?String {
         match (data) {
@@ -420,7 +420,7 @@ extend String <: FromMySqlBinary<String> {
 
 }
 
-extend BigInt <: FromMySqlBinary<BigInt> {
+extend BigInt <: MySqlBinary<BigInt> {
 
     public static func fromBinary(definition: ColumnDefinition, data: ?Array<Byte>): ?BigInt {
         match (data) {
@@ -446,7 +446,7 @@ extend BigInt <: FromMySqlBinary<BigInt> {
 
 }
 
-extend Decimal <: FromMySqlBinary<Decimal> {
+extend Decimal <: MySqlBinary<Decimal> {
 
     public static func fromBinary(definition: ColumnDefinition, data: ?Array<Byte>): ?Decimal {
         match (data) {
@@ -469,7 +469,7 @@ extend Decimal <: FromMySqlBinary<Decimal> {
 }
 
 
-extend DateTime <: FromMySqlBinary<DateTime> {
+extend DateTime <: MySqlBinary<DateTime> {
 
     public static func fromBinary(definition: ColumnDefinition, data: ?Array<Byte>): ?DateTime {
         match(data) {

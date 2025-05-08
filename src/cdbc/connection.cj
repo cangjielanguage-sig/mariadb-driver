@@ -61,7 +61,8 @@ public class ConnectionImpl <: Connection {
     override public func prepareStatement(sql: String): Statement {
         checkResource()
         checkEmptySql(sql)
-        let first = sql[0..(sql.indexOf(" ") ?? sql.size)].toAsciiLower()
+        let index = sql.indexOf(" ") ?? sql.size
+        let first = sql[0..index].toAsciiLower()
         let crud = ["select", "upate", "insert", "delete"]
         for(i in crud) {
             if(first == i) {

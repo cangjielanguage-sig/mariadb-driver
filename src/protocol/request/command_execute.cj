@@ -87,8 +87,9 @@ protected class ExecuteCommand <: Command {
                     for(i in 0..params.size) {
                         let value = params[i]
                         match (value) {
-                            case v: ToMySqlBinary => v.typeFlag() |> pack
+                            case v: NativeType => v.mysqlFlag() |> pack
                             case v: InputStream => [ColumnType.LongBlob.value(), 0x00] |> pack
+                            case v: ?Any => continue
                             case _ => throw UnsupportedException("")
                         }
                     }
@@ -100,8 +101,9 @@ protected class ExecuteCommand <: Command {
                 for (i in 0..params.size) {
                     let value = params[i]
                     match (value) {
-                        case v: ToMySqlBinary => v.toBinary() |> pack
-                        case _: ?Any => { => }
+                        case v: NativeType => v.mysqlValue() |> pack
+                        case _: InputStream => continue
+                        case _: ?Any => continue
                         case _ => throw UnsupportedException("")
                     }
                 }
