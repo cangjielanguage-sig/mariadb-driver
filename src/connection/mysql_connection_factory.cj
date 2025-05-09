@@ -23,8 +23,6 @@ import stdx.net.tls.*
 import stdx.crypto.x509.*
 import stdx.crypto.keys.*
 import mysql.protocol.*
-import mysql.protocol.request.*
-import mysql.protocol.response.*
 
 public class MySqlConnectionFactory {
 

@@ -13,9 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-protected package mysql.protocol.request
-
-import mysql.protocol.*
+protected package mysql.protocol
 
 /*
  * Command Phase

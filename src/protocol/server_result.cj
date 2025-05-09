@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-protected package mysql.protocol.response
+protected package mysql.protocol
 
 import std.io.*
-import mysql.protocol.*
 /*
  * Field Count packet
  * referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_com_query_response.html

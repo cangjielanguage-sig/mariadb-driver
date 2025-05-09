@@ -17,7 +17,7 @@ protected class DriverTest {
         let sslMode = ("ssl.mode", "disabled")
         let dataSource = driver.open("mysql://localhost:3306", [username, password, database, sslMode])
         let connection = dataSource.connect()
-        //insetTest(connection)
+        insetTest(connection)
         queryTest(connection)
     }
 

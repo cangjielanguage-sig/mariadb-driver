@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-protected package mysql.protocol.response
+protected package mysql.protocol
 
 import std.io.*
 import std.time.*
 import std.convert.*
 import std.collection.*
 import std.math.numeric.*
-import mysql.protocol.*
 
 /*
 * MySQL Binary Protocol Value

@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-protected package mysql.protocol.response
+protected package mysql.protocol
 
 import std.io.*
 import std.collection.*
-import mysql.protocol.*
 /*
 * Initial handshake packet for protocol version 10.
 * referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_connection_phase_packets_protocol_handshake_v10.html

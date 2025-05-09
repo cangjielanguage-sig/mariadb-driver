@@ -1,6 +1,6 @@
 [package]
   cjc-version = "0.60.5"
-  compile-option = "-O2 --diagnostic-format=noColor"
+  compile-option = "-O2 --diagnostic-format=noColor -Woff deprecated"
   description = ""
   link-option = ""
   name = "mysql"
@@ -10,17 +10,17 @@
   version = "0.8.0"
   [package.package-configuration]
 
-[target]
-  [target.x86_64-w64-mingw32]
-    [target.x86_64-w64-mingw32.bin-dependencies]
-      path-option = [ "C:\\Users\\30247\\Desktop\\Cangjie\\Cangjie-0.60.5\\cangjie-stdx-windows-x64-0.60.5.1\\windows_x86_64_llvm\\static\\stdx" ]
 # [target]
 #   [target.x86_64-w64-mingw32]
 #     [target.x86_64-w64-mingw32.bin-dependencies]
-#       path-option = [ "${CANGJIE_STDX}" ]
-#   [target.x86_64-unknown-linux-gnu]
-#     [target.x86_64-unknown-linux-gnu.bin-dependencies]
-#       path-option = [ "${CANGJIE_STDX}" ]
-#   [target.aarch64-darwin]
-#     [target.aarch64-darwin.bin-dependencies]
-#       path-option = [ "${CANGJIE_STDX}" ]
+#       path-option = [ "C:\\Users\\30247\\Desktop\\Cangjie\\Cangjie-0.60.5\\cangjie-stdx-windows-x64-0.60.5.1\\windows_x86_64_llvm\\dynamic\\stdx" ]
+[target]
+  [target.x86_64-w64-mingw32]
+    [target.x86_64-w64-mingw32.bin-dependencies]
+      path-option = [ "${CANGJIE_STDX}" ]
+  [target.x86_64-unknown-linux-gnu]
+    [target.x86_64-unknown-linux-gnu.bin-dependencies]
+      path-option = [ "${CANGJIE_STDX}" ]
+  [target.aarch64-darwin]
+    [target.aarch64-darwin.bin-dependencies]
+      path-option = [ "${CANGJIE_STDX}" ]

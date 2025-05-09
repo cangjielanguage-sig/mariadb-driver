@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-protected package mysql.protocol.request
+protected package mysql.protocol
 
-import mysql.protocol.*
 
 /*
  * Tells the server that the client wants it to close the connection.

@@ -18,7 +18,7 @@ protected package mysql.connection
 import std.io.*
 import std.time.*
 import std.math.numeric.*
-import mysql.protocol.response.*
+import mysql.protocol.*
 
 protected class CursorResultSet <: ResultSet {
 

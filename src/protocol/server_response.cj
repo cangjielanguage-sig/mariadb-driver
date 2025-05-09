@@ -13,11 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-protected package mysql.protocol.response
+protected package mysql.protocol
 
 import std.io.*
 import std.collection.*
-import mysql.protocol.*
+
+/*
+* MySQL Packet
+* referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_basic_packets.html
+*/
+protected open class CommonResponse {
+
+    protected let length: UInt64
+
+    protected let number: UInt8
+
+    internal init(length: UInt64, number: UInt8) {
+        this.length = length
+        this.number = number
+    }
+
+}
 
 /*
 * Generic Response Packets

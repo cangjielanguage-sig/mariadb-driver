@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-protected package mysql.protocol.request
+protected package mysql.protocol
 
 import std.io.*
-import mysql.protocol.*
 
 /*
  * It sends the values for the placeholders of the prepared statement (if it contained any) in Binary Protocol Value form.

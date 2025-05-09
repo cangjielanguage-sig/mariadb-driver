@@ -15,7 +15,7 @@
  */
 protected package mysql.connection
 
-import mysql.protocol.response.*
+import mysql.protocol.*
 
 protected class ChangeResult {
     

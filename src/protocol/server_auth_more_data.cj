@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-protected package mysql.protocol.response
+protected package mysql.protocol
 
 import std.io.*
-import mysql.protocol.*
+
 /*
 * AuthMoreData Packet
 * referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_connection_phase_packets_protocol_auth_more_data.html

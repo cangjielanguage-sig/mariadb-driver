@@ -20,8 +20,6 @@ import std.net.*
 import std.sync.*
 import std.collection.*
 import mysql.protocol.*
-import mysql.protocol.request.*
-import mysql.protocol.response.*
 
 /**
 * The mysql connection object facilitates the upper-layer driver to interact with the database

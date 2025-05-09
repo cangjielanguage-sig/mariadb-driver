@@ -19,7 +19,6 @@ import std.io.*
 import std.time.*
 import std.math.numeric.*
 import mysql.protocol.*
-import mysql.protocol.response.*
 
 protected interface ResultSet {
 

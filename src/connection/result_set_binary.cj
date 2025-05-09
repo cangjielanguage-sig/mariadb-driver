@@ -21,7 +21,6 @@ import std.convert.*
 import std.collection.*
 import std.math.numeric.*
 import mysql.protocol.*
-import mysql.protocol.response.*
 
 protected class BinaryResultSet <: ResultSet {
     
