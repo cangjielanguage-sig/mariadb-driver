@@ -16,7 +16,6 @@
 protected package mysql.protocol.response
 
 import std.io.*
-import mysql.util.*
 import mysql.protocol.*
 /*
  * Field Count packet
@@ -121,7 +120,7 @@ protected class BinaryResult <: Response {
     
     protected let nullMap: Array<Byte>
 
-    protected let binaryData: Array<?Array<Byte>>
+    protected let row: Array<?Array<Byte>>
 
     protected init(length: UInt64, number: UInt8, buffer: ByteBuffer, columnInfos: Array<ColumnDefinition>) {
         super(length, number, buffer)
@@ -130,29 +129,29 @@ protected class BinaryResult <: Response {
         let size = (columnCount + 7 + 2) / 8
         this.nullMap = buffer.readFixedArray(size)
         //二进制数据
-        this.binaryData = Array<?Array<Byte>>(columnCount, repeat: [])
+        this.row = Array<?Array<Byte>>(columnCount, repeat: [])
         for (i in 0..columnCount){
             let isNull = (nullMap[(i + 2) / 8] & (1u8 << ((i + 2) % 8))) != 0
             if (isNull) {
-                binaryData[i] = None
+                row[i] = None
             } else {
                 let columnInfo = columnInfos[i] 
                 let columnType = columnInfo.columnType
                 match (columnType) {
                     case Null => continue
                     case Tiny =>
-                        binaryData[i] = buffer.readFixedArray(1)
+                        row[i] = buffer.readFixedArray(1)
                     case Short | Year =>
-                        binaryData[i] = buffer.readFixedArray(2)
+                        row[i] = buffer.readFixedArray(2)
                     case Long | Int24 | Float =>
-                        binaryData[i] = buffer.readFixedArray(4)
+                        row[i] = buffer.readFixedArray(4)
                     case LongLong | Double =>
-                        binaryData[i] = buffer.readFixedArray(8)
-                    case String | NewDecimal | Json | Enum | Set | TinyBlob | MediumBlob | LongBlob | Blob | VarString =>
-                         binaryData[i] = buffer.readLengthEncodedStringRaw()
+                        row[i] = buffer.readFixedArray(8)
+                    case String | NewDecimal | Json | Enum | Set | TinyBlob | MediumBlob | LongBlob | Blob | VarString | Bit =>
+                         row[i] = buffer.readLengthEncodedStringRaw()
                     case Date | DateTime | Timestamp | Time =>
                         let flag = buffer.readFix1Integer()
-                        binaryData[i] = buffer.readFixedArray(Int64(flag))
+                        row[i] = buffer.readFixedArray(Int64(flag))
                     //case _ => throw Exception("Unsupport MySQL binary type")
                 }
             }

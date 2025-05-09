@@ -20,7 +20,6 @@ import std.collection.*
 import std.database.sql.*
 import stdx.encoding.url.*
 import mysql.connection.*
-import std.database.sql.DriverManager
 
 let _ = DriverManager.register("mysql", MySqlDriver())
 

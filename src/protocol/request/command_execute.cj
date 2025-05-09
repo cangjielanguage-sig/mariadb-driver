@@ -16,7 +16,6 @@
 protected package mysql.protocol.request
 
 import std.io.*
-import mysql.util.*
 import mysql.protocol.*
 
 /*
@@ -74,22 +73,25 @@ protected class ExecuteCommand <: Command {
             if (parameterCount > 0) {
                 // null_bitmap
                 for (i in 0..params.size) {
-                    let value = params[i]
-                    if (value is ?Any && (value as ?Any).getOrThrow().isNone()) {
-                        nullBitMap[(i / 8)] |= 1u8 << (i % 8)
+                    match (params[i]) {
+                        case v: ?Any => 
+                            if(v.isNone()) {
+                                nullBitMap[(i / 8)] |= 1u8 << (i % 8)
+                            }
+                        case _ => continue
                     }
                 }
                 this.nullBitMap |> pack
+
                 // new_params_bind_flag
                 this.newParamsBindFlag |> pack
                 if (newParamsBindFlag == 1) {
                     //parameter_type
                     for(i in 0..params.size) {
-                        let value = params[i]
-                        match (value) {
+                        match (params[i]) {
                             case v: NativeType => v.mysqlFlag() |> pack
                             case v: InputStream => [ColumnType.LongBlob.value(), 0x00] |> pack
-                            case v: ?Any => continue
+                            case v: ?Any => [ColumnType.Null.value(), 0x00] |> pack
                             case _ => throw UnsupportedException("")
                         }
                     }
@@ -97,16 +99,17 @@ protected class ExecuteCommand <: Command {
                         0x00 |> pack //paramter name: default null
                     }
                 }
+
                 //parameter_values
                 for (i in 0..params.size) {
-                    let value = params[i]
-                    match (value) {
+                    match (params[i]) {
                         case v: NativeType => v.mysqlValue() |> pack
                         case _: InputStream => continue
                         case _: ?Any => continue
                         case _ => throw UnsupportedException("")
                     }
                 }
+
             }
         }
     }

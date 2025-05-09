@@ -17,6 +17,8 @@ protected package mysql.connection
 
 import mysql.protocol.*
 
+
+
 /*
 * 服务器响应Error异常,表示执行命令后服务器响应Error
 */
@@ -51,6 +53,20 @@ protected class ConnectFailedException <: MySqlException {
 
     public func toString(): String {
         return "ConnectFailedException: ${message}"
+    }
+
+}
+
+/*
+* 值转换异常
+*/
+protected class ValueConvertException <: Exception {
+    init() {
+       super()
+    }
+
+    init(message: String) {
+        super(message)    
     }
 
 }

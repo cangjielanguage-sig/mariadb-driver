@@ -20,7 +20,7 @@ import std.database.sql.*
 import std.io.*
 import std.time.*
 import std.math.numeric.*
-import mysql.result.*
+import mysql.connection.*
 
 public class QueryResultImpl <: QueryResult {
 
@@ -52,6 +52,10 @@ public class QueryResultImpl <: QueryResult {
     }
 
     public func get<T>(index: Int): T {
+        checkResource()
+        if(index <= 0) {
+            throw IllegalArgumentException("The index must be greater than 0")
+        }
         let instance: Option<T> = None
         match (instance) {
             case v: Option<Bool> => (result.getBool(index) as Option<T> ?? throw Exception()) ?? throw Exception()
@@ -77,6 +81,10 @@ public class QueryResultImpl <: QueryResult {
     }
 
     public func getOrNull<T>(index: Int): ?T {
+        checkResource()
+        if(index <= 0) {
+            throw IllegalArgumentException("The index must be greater than 0")
+        }
         let instance: Option<T> = None
         match (instance) {
             case v: Option<Bool> => result.getBool(index) as Option<T> ?? throw Exception()
@@ -102,12 +110,12 @@ public class QueryResultImpl <: QueryResult {
     }
 
     @Deprecated
-    public override func next(values: Array<SqlDbType>): Bool {
+    public override func next(_: Array<SqlDbType>): Bool {
         throw UnsupportedException("Deprecated method")
     }
 
     public override func close() {
-        checkResourceAvailability()
+        checkResource()
         closed = true
     }
 
@@ -115,7 +123,7 @@ public class QueryResultImpl <: QueryResult {
         return closed
     }
 
-    private func checkResourceAvailability() {
+    private func checkResource() {
         if (isClosed()) {
             throw SqlException("The database Connection has been closed")
         }

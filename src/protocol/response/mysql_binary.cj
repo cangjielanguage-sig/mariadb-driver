@@ -20,7 +20,6 @@ import std.time.*
 import std.convert.*
 import std.collection.*
 import std.math.numeric.*
-import mysql.util.*
 import mysql.protocol.*
 
 /*
@@ -408,11 +407,11 @@ extend String <: MySqlBinary<String> {
                         //         throw Exception("Unsupported Charset: Latin1SwedishCi")
                         // }
                     case Date => 
-                        return DateTime.fromBinaryDateTime(v).format(DB_DATE_FORMAT)
+                        return DateTime.fromBinaryDateTime(v).toString()
                     case DateTime | Timestamp => 
-                        return DateTime.fromBinaryDateTime(v).format(DB_DATE_TIME_FORMAT)
+                        return DateTime.fromBinaryDateTime(v).toString()
                     case Time => 
-                        return DateTime.fromBinaryTime(v).format(DB_TIME_FORMAT)
+                        return DateTime.fromBinaryTime(v).toString()
                         case _ => throw UnsupportedException("Unsupport MySQL binary type")
                     }
         }

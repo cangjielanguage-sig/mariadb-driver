@@ -83,7 +83,7 @@ protected class MySqlTransaction {
         if (!result.next()) {
             throw ResponseErrorException("Query transaction isolation level failed")
         }
-        return result.getString(0).getOrThrow()
+        return result.getString(1).getOrThrow()
     }
 
     public func setTransactionIsolation(level: String): Unit {
@@ -134,7 +134,7 @@ protected class MySqlTransaction {
         if (!result.next()) {
             throw ResponseErrorException("Query transaction isolation level failed")
         }
-        let accessMode: String = result.getString(0).getOrThrow()
+        let accessMode: String = result.getString(1).getOrThrow()
         match (accessMode) {
             case "0" => false
             case "1" => true

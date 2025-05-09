@@ -19,8 +19,6 @@ import std.io.*
 import std.net.*
 import std.sync.*
 import std.collection.*
-import mysql.util.*
-import mysql.result.*
 import mysql.protocol.*
 import mysql.protocol.request.*
 import mysql.protocol.response.*
@@ -261,10 +259,10 @@ protected class MySqlConnection <: Resource {
         //丢弃Eof包
         read()
         (length, number, payload) = read()
-        let rows = ArrayList<Array<?Array<Byte>>>()
+        let rows = ArrayList<BinaryResult>()
         while (payload.bytes()[0] != ResponseCode.Eof.value() || payload.bytes().size > 5) {
             let row = BinaryResult(length, number, payload, fields.toArray())
-            rows.add(row.binaryData)
+            rows.add(row)
             (length, number, payload) = read()
         }
         return BinaryResultSet(fields.toArray(), rows.toArray())
@@ -276,10 +274,10 @@ protected class MySqlConnection <: Resource {
     private func readFetchResponse(columnInfos: Array<ColumnDefinition>): ResultSet {
         var (length, number, payload) = read()
         checkErrorResponse(length, number, payload)
-        let rows = ArrayList<Array<?Array<Byte>>>()
+        let rows = ArrayList<BinaryResult>()
         while (payload.bytes()[0] != ResponseCode.Eof.value() || payload.bytes().size > 5) {
             let row = BinaryResult(length, number, payload, columnInfos)
-            rows.add(row.binaryData)
+            rows.add(row)
             (length, number, payload) = read()
         }
         return BinaryResultSet(columnInfos, rows.toArray())

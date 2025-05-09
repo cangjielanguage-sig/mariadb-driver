@@ -18,13 +18,13 @@ package mysql.cdbc
 import std.convert.*
 import std.collection.*
 import std.database.sql.*
-import mysql.result.*
+import mysql.connection.*
 
 public class ServerPrepareStatement <: Statement {
 
-    private let parameters: Array<Any>
-
     private let id: UInt32
+
+    private var parameters: Array<Any>
 
     private let options: HashMap<String, String>
 
@@ -41,9 +41,6 @@ public class ServerPrepareStatement <: Statement {
     public init(originSql: String, connection: ConnectionImpl) {
         this.connection = connection
         this.prepareResult = connection.sendPrepare(originSql)
-        for(i in prepareResult.params) {
-            println(i.columnType)
-        }
         this.options = HashMap<String, String>()
         this.id = prepareResult.id
         this.originSql = originSql
@@ -64,26 +61,35 @@ public class ServerPrepareStatement <: Statement {
     }
 
     @Deprecated
-    public override func query(params: Array<SqlDbType>): QueryResult {
+    public override func query(_: Array<SqlDbType>): QueryResult {
         throw UnsupportedException("Deprecated method")
     }
 
     @Deprecated
-    public override func update(params: Array<SqlDbType>): UpdateResult {
+    public override func update(_: Array<SqlDbType>): UpdateResult {
         throw UnsupportedException("Deprecated method")
     }
 
     public func set<T>(index: Int, value: T): Unit {
-        parameters[index] = value
+        checkResource()
+        if(index <= 0) {
+            throw IllegalArgumentException("The parameter index must be greater than 0")
+        }
+        parameters[index - 1] = value
     }
 
     public func setNull(index: Int): Unit {
-        parameters[index] = Option<Any>.None
+        checkResource()
+        if(index <= 0) {
+            throw IllegalArgumentException("The parameter index must be greater than 0")
+        }
+        parameters[index - 1] = Option<Any>.None
     }
 
     public func update(): UpdateResult {
         checkResource()
         let result = connection.executeUpdatePrepare(prepareResult, parameters)
+        parameters = Array<Any>(parameters.size, repeat: Option<Any>.None) 
         var lastInsertId: Int64 = 0
         if (result.lastInsertId > 0) {
             lastInsertId += Int64(result.lastInsertId) + insertCount(originSql) - 1

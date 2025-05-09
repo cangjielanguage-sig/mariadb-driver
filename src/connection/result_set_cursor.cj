@@ -18,7 +18,6 @@ protected package mysql.connection
 import std.io.*
 import std.time.*
 import std.math.numeric.*
-import mysql.result.*
 import mysql.protocol.response.*
 
 protected class CursorResultSet <: ResultSet {
@@ -141,7 +140,7 @@ protected class CursorResultSet <: ResultSet {
     }
 
     public override func metadata(index: Int64): ColumnDefinition {
-        return columns[index]
+        return resultSet.metadata(index)
     }
 
 }

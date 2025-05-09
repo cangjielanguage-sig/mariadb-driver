@@ -16,6 +16,7 @@
 package mysql.cdbc
 
 import std.database.sql.*
+import mysql.protocol.*
 import mysql.protocol.response.*
 
 public class ColumnInfoImpl <: ColumnInfo {

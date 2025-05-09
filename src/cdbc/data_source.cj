@@ -18,6 +18,7 @@ package mysql.cdbc
 import std.sync.*
 import std.collection.*
 import std.database.sql.*
+import mysql.connection.*
 
 public class DatasourceImpl <: Datasource {
 

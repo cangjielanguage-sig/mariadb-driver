@@ -36,7 +36,7 @@ protected enum ColumnType <: ToString {
     | Year
     //| NewDate
     //| Varchar
-    //| Bit
+    | Bit
     //| Timestamp2
     //| DateTime2
     //| Time2
@@ -73,7 +73,7 @@ protected enum ColumnType <: ToString {
             case 0x0D => Year
             //case 0x0E => NewDate
             //case 0x0F => Varchar
-            //case 0x10 => Bit
+            case 0x10 => Bit
             //case 0x11 => Timestamp2
             //case 0x12 => DateTime2
             //case 0x13 => Time2
@@ -91,7 +91,7 @@ protected enum ColumnType <: ToString {
             case 0xFD => VarString
             case 0xFE => String
             //case 0xFF => Geometry
-            case _ => throw Exception("Don't have this AuthState by value ${value}")
+            case _ => throw Exception("Don't have this ColumnType by value ${value}")
         }
     }
 
@@ -113,7 +113,7 @@ protected enum ColumnType <: ToString {
             case Year => 0x0D
             //case NewDate => 0x0E 
             //case Varchar => 0x0F
-            //case Bit => 0x10
+            case Bit => 0x10
             //case Timestamp2 => 0x11
             //case DateTime2 => 0x12
             //case Time2 => 0x13
@@ -174,6 +174,7 @@ protected enum ColumnType <: ToString {
             case Time => "DateTime"
             case DateTime => "DateTime"
             case Year => "Int32"
+            case Bit => "Array<Byte>"
             case Json => "String"
             case NewDecimal => "Decimal"
             case Enum => "String"
@@ -205,7 +206,7 @@ protected enum ColumnType <: ToString {
             case Year => "Year"
             //case NewDate => "NewDate"
             //case Varchar => "Varchar"
-            //case Bit => "Bit"
+            case Bit => "Bit"
             //case Timestamp2 => "Timestamp2"
             //case DateTime2 => "DateTime2"
             //case Time2 => "Time2"

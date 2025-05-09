@@ -16,7 +16,6 @@
 package mysql.xa
 
 import std.collection.*
-import mysql.util.*
 import mysql.protocol.*
 import mysql.connection.*
 

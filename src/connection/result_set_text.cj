@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-protected package mysql.result
+protected package mysql.connection
 
 import std.io.*
 import std.time.*
 import std.convert.*
 import std.collection.*
 import std.math.numeric.*
-import mysql.util.*
 import mysql.protocol.*
 import mysql.protocol.response.*
 
@@ -188,14 +187,14 @@ protected class TextResultSet <: ResultSet {
     }
 
     public override func getString(index: Int64): ?String {
-        match (rows[currentRow].row[index]) {
+        match (rawData(index)) {
             case None => None
             case Some(v) => String.fromUtf8(v)
         }
     }
 
     public override func getArray(index: Int64): ?Array<Byte> {
-        match (rows[currentRow].row[index]) {
+        match (rawData(index)) {
             case None => None
             case Some(v) => 
                 let data = Array<Byte>(v.size, repeat: 0)
@@ -205,7 +204,11 @@ protected class TextResultSet <: ResultSet {
     }
 
     public override func metadata(index: Int64): ColumnDefinition {
-        return columns[index]
+        return columns[index - 1]
+    }
+
+    private func rawData(index: Int64): ?Array<Byte> {
+        return this.rows[currentRow].row[index - 1]
     }
 
     private func stringParseToBool(str: String): Bool {

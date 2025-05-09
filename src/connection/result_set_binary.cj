@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-protected package mysql.result
+protected package mysql.connection
 
 import std.io.*
 import std.time.*
@@ -27,11 +27,11 @@ protected class BinaryResultSet <: ResultSet {
     
     private let columns: Array<ColumnDefinition>
 
-    private let rows: Array<Array<?Array<Byte>>>
+    private let rows: Array<BinaryResult>
 
     private var currentRow: Int64
 
-    protected BinaryResultSet(columns: Array<ColumnDefinition>, rows: Array<Array<?Array<Byte>>>) {
+    protected BinaryResultSet(columns: Array<ColumnDefinition>, rows: Array<BinaryResult>) {
         this.columns = columns
         this.rows = rows
         this.currentRow = -1
@@ -53,83 +53,82 @@ protected class BinaryResultSet <: ResultSet {
     }
 
     public override func getBool(index: Int64): ?Bool {
-        return Bool.fromBinary(metadata(index), getBinaryData(index))
+        return Bool.fromBinary(metadata(index), rawData(index))
     }
 
     public override func getInt8(index: Int64): ?Int8 {
-        return Int8.fromBinary(metadata(index), getBinaryData(index))
+        return Int8.fromBinary(metadata(index), rawData(index))
     }
 
     public override func getUInt8(index: Int64): ?UInt8 {
-        return UInt8.fromBinary(metadata(index), getBinaryData(index))
+        return UInt8.fromBinary(metadata(index), rawData(index))
     }
 
     public override func getInt16(index: Int64): ?Int16 {
-        return Int16.fromBinary(metadata(index), getBinaryData(index))
+        return Int16.fromBinary(metadata(index), rawData(index))
     }
 
     public override func getUInt16(index: Int64): ?UInt16 {
-        return UInt16.fromBinary(metadata(index), getBinaryData(index))
+        return UInt16.fromBinary(metadata(index), rawData(index))
     }
 
     @OverflowWrapping
     public override func getInt32(index: Int64): ?Int32 {
-        return Int32.fromBinary(metadata(index), getBinaryData(index))
+        return Int32.fromBinary(metadata(index), rawData(index))
     }
 
     public override func getUInt32(index: Int64): ?UInt32 {
-        return UInt32.fromBinary(metadata(index), getBinaryData(index))
+        return UInt32.fromBinary(metadata(index), rawData(index))
     }
 
     @OverflowWrapping
     public override func getInt64(index: Int64): ?Int64 {
-        return Int64.fromBinary(metadata(index), getBinaryData(index))
+        return Int64.fromBinary(metadata(index), rawData(index))
     }
 
     public override func getUInt64(index: Int64): ?UInt64 {
-        return UInt64.fromBinary(metadata(index), getBinaryData(index))
+        return UInt64.fromBinary(metadata(index), rawData(index))
     }
 
 
     public override func getFloat16(index: Int64): ?Float16 {
-        return Float16.fromBinary(metadata(index), getBinaryData(index))
+        return Float16.fromBinary(metadata(index), rawData(index))
     }
 
     public override func getFloat32(index: Int64): ?Float32 {
-        return Float32.fromBinary(metadata(index), getBinaryData(index))
+        return Float32.fromBinary(metadata(index), rawData(index))
     }
 
     public override func getFloat64(index: Int64): ?Float64 {
-        return Float64.fromBinary(metadata(index), getBinaryData(index))
+        return Float64.fromBinary(metadata(index), rawData(index))
     }
 
     public override func getBigInt(index: Int64): ?BigInt {
-        return BigInt.fromBinary(metadata(index), getBinaryData(index))
+        return BigInt.fromBinary(metadata(index), rawData(index))
     }
 
     public override func getDecimal(index: Int64): ?Decimal {
-        return Decimal.fromBinary(metadata(index), getBinaryData(index))
-
+        return Decimal.fromBinary(metadata(index), rawData(index))
     }
 
     public override func getDate(index: Int64): ?DateTime {
-        return DateTime.fromBinary(metadata(index), getBinaryData(index))
+        return DateTime.fromBinary(metadata(index), rawData(index))
     }
 
     public override func getTime(index: Int64): ?DateTime {
-        return DateTime.fromBinary(metadata(index), getBinaryData(index))
+        return DateTime.fromBinary(metadata(index), rawData(index))
     }
 
     public func getDateTime(index: Int64): ?DateTime {
-        return DateTime.fromBinary(metadata(index), getBinaryData(index))
+        return DateTime.fromBinary(metadata(index), rawData(index))
     }
 
     public func getTimestamp(index: Int64): ?DateTime {
-        return DateTime.fromBinary(metadata(index), getBinaryData(index))
+        return DateTime.fromBinary(metadata(index), rawData(index))
     }
 
     public override func getInputStream(index: Int64): ?InputStream {
-        match (getBinaryData(index)) {
+        match (rawData(index)) {
             case None => return None
             case Some(v) => 
                 let data = Array<Byte>(v.size, repeat: 0)
@@ -140,16 +139,16 @@ protected class BinaryResultSet <: ResultSet {
 
     @OverflowWrapping
     public override func getString(index: Int64): ?String {
-        return String.fromBinary(metadata(index), getBinaryData(index))
+        return String.fromBinary(metadata(index), rawData(index))
     }
 
     public override func getArray(index: Int64): ?Array<Byte> {
-        match (getBinaryData(index)) {
+        match (rawData(index)) {
             case None => return None
             case Some(v) => 
                 let columnType = metadata(index).columnType
                 match (columnType) {
-                    case String | VarString | Json | Enum | Set | TinyBlob | Blob | MediumBlob | LongBlob => 
+                    case String | VarString | Json | Enum | Set | TinyBlob | Blob | MediumBlob | LongBlob | Bit => 
                         let data = Array<Byte>(v.size, repeat: 0)
                         v.copyTo(data)
                         return data
@@ -160,10 +159,11 @@ protected class BinaryResultSet <: ResultSet {
     }
 
     public override func metadata(index: Int64): ColumnDefinition {
-        return columns[index]
+        return columns[index - 1]
     }
 
-    private func getBinaryData(index: Int64): ?Array<Byte> {
-        return this.rows[currentRow][index]
+    private func rawData(index: Int64): ?Array<Byte> {
+        return this.rows[currentRow].row[index - 1]
     }
+
 }

@@ -17,7 +17,6 @@ protected package mysql.protocol.response
 
 import std.io.*
 import std.collection.*
-import mysql.util.*
 import mysql.protocol.*
 
 /*

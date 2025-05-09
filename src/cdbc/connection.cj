@@ -19,8 +19,6 @@ import std.sync.*
 import std.convert.*
 import std.collection.*
 import std.database.sql.*
-import mysql.result.*
-import mysql.protocol.*
 import mysql.connection.*
 
 public class ConnectionImpl <: Connection {
@@ -92,7 +90,7 @@ public class ConnectionImpl <: Connection {
     protected func sendCommand(sql: String) {
         try {
             return connection.sendCommand(sql)
-        }catch (e: MySqlException) {
+        }catch (e: ResponseErrorException) {
             throw SqlException(e.message)
         }
     }
@@ -100,7 +98,7 @@ public class ConnectionImpl <: Connection {
     protected func sendQuery(sql: String): ResultSet {
         try {
             return connection.sendQuery(sql)
-        }catch (e: MySqlException) {
+        }catch (e: ResponseErrorException) {
             throw SqlException(e.message)
         }
     }
@@ -108,7 +106,7 @@ public class ConnectionImpl <: Connection {
     protected func sendUpdate(sql: String): ChangeResult {
         try {
             return connection.sendUpdate(sql)
-        }catch (e: MySqlException) {
+        }catch (e: ResponseErrorException) {
             throw SqlException(e.message)
         }
     }
@@ -116,7 +114,7 @@ public class ConnectionImpl <: Connection {
     protected func sendPrepare(sql: String): PrepareResult {
         try {
             return connection.sendPrepare(sql)
-        }catch (e: MySqlException) {
+        }catch (e: ResponseErrorException) {
             throw SqlException(e.message)
         }
     }
@@ -124,7 +122,7 @@ public class ConnectionImpl <: Connection {
     protected func executeQueryPrepare(prepare: PrepareResult, params: Array<Any>): ResultSet {
         try {
             return connection.executeQueryPrepare(prepare.id, params)
-        }catch (e: MySqlException) {
+        }catch (e: ResponseErrorException) {
             throw SqlException(e.message)
         }
     }
@@ -132,7 +130,7 @@ public class ConnectionImpl <: Connection {
     protected func executeQueryPrepareWithCurosr(prepare: PrepareResult, params: Array<Any>, fetchSize: UInt32): ResultSet {
         try {
             return connection.executeQueryPrepareWithCurosr(prepare.id, params, fetchSize)
-        }catch (e: MySqlException) {
+        }catch (e: ResponseErrorException) {
             throw SqlException(e.message)
         }
     }
@@ -140,7 +138,7 @@ public class ConnectionImpl <: Connection {
     protected func executeUpdatePrepare(prepare: PrepareResult, params: Array<Any>): ChangeResult {
         try {
             return connection.executeUpdatePrepare(prepare, params)
-        }catch (e: MySqlException) {
+        }catch (e: ResponseErrorException) {
             throw SqlException(e.message)
         }
     }

@@ -17,7 +17,6 @@ protected package mysql.protocol
 
 import std.time.*
 import std.math.numeric.*
-import mysql.util.*
 
 /*s
 * MySQL Binary Protocol Value

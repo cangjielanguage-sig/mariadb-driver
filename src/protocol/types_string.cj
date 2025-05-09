@@ -15,10 +15,8 @@
  */
 protected package mysql.protocol
 
-import std.io.ByteBuffer
-import std.io.SeekPosition
-import std.collection.ArrayList
-import mysql.util.LittleEndian
+import std.io.*
+import std.collection.*
 
 /*
 * Strings are sequences of bytes and appear in a few forms in the protocol.

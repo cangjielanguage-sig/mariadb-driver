@@ -16,7 +16,6 @@
 protected package mysql.protocol.request
 
 import std.io.*
-import mysql.util.*
 import mysql.protocol.*
 
 protected abstract class Request {
