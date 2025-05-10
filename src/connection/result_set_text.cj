@@ -56,133 +56,196 @@ protected class TextResultSet <: ResultSet {
     public override func getBool(index: Int64): ?Bool {
         match (getString(index)) {
             case None => None
-            case Some(v) => stringParseToBool(v)
+            case Some(v) => 
+                if (v == "1") {
+                    return true
+                } else if(v == "0") {
+                    return false
+                }else {
+                    throw ValueConvertException("Parse to Bool failed: column name is '${metadata(index).name}', raw value is ${v}")
+                }
         }
     }
 
     public override func getInt8(index: Int64): ?Int8 {
         match (getString(index)) {
             case None => None
-            case Some(v) => stringParseToInt8(index, v)
+            case Some(v) => 
+                try {
+                    return Int8.parse(v)
+                } catch (e: IllegalArgumentException) {
+                    throw ValueConvertException("Parse to Int8 failed: column name is '${metadata(index).name}', raw value is ${v}")
+                }
         }
     }
 
     public override func getUInt8(index: Int64): ?UInt8 {
         match (getString(index)) {
             case None => None
-            case Some(v) => stringParseToUInt8(index, v)
+            case Some(v) => 
+                try {
+                    return UInt8.parse(v)
+                } catch (e: IllegalArgumentException) {
+                    throw ValueConvertException("Parse to UInt8 failed: column name is '${metadata(index).name}', raw value is ${v}")
+                }
         }
     }
 
     public override func getInt16(index: Int64): ?Int16 {
         match (getString(index)) {
             case None => None
-            case Some(v) => stringParseToInt16(index, v)
+            case Some(v) => 
+                try {
+                    return Int16.parse(v)
+                } catch (e: IllegalArgumentException) {
+                    throw ValueConvertException("Parse to Int16 failed: column name is '${metadata(index).name}', raw value is ${v}")
+                }
         }
     }
 
     public override func getUInt16(index: Int64): ?UInt16 {
         match (getString(index)) {
             case None => None
-            case Some(v) => stringParseToUInt16(index, v)
+            case Some(v) => 
+                try {
+                    return UInt16.parse(v)
+                } catch (e: IllegalArgumentException) {
+                    throw ValueConvertException("Parse to UInt16 failed: column name is '${metadata(index).name}', raw value is ${v}")
+                }
         }
     }
 
     public override func getInt32(index: Int64): ?Int32 {
         match (getString(index)) {
             case None => None
-            case Some(v) => stringParseToInt32(index, v)
+            case Some(v) =>
+                try {
+                    return Int32.parse(v)
+                } catch (e: IllegalArgumentException) {
+                    throw ValueConvertException("Parse to Int32 failed: column name is '${metadata(index).name}', raw value is ${v}")
+                }
         }
     }
 
     public override func getUInt32(index: Int64): ?UInt32 {
         match (getString(index)) {
             case None => None
-            case Some(v) => stringParseToUInt32(index, v)
+            case Some(v) => 
+                try {
+                    return UInt32.parse(v)
+                } catch (e: IllegalArgumentException) {
+                    throw ValueConvertException("Parse to UInt32 failed: column name is '${metadata(index).name}', raw value is ${v}")
+                }
         }
     }
 
     public override func getInt64(index: Int64): ?Int64 {
         match (getString(index)) {
             case None => None
-            case Some(v) => stringParseToInt64(index, v)
+            case Some(v) => 
+                try {
+                    return Int64.parse(v)
+                } catch (e: IllegalArgumentException) {
+                    throw ValueConvertException("Parse to Int64 failed: column name is '${metadata(index).name}', raw value is ${v}")
+                }
         }
     }
 
     public override func getUInt64(index: Int64): ?UInt64 {
         match (getString(index)) {
             case None => None
-            case Some(v) => stringParseToUInt64(index, v)
+            case Some(v) => 
+                try {
+                    return UInt64.parse(v)
+                } catch (e: IllegalArgumentException) {
+                    throw ValueConvertException("Parse to UInt64 failed: column name is '${metadata(index).name}', raw value is ${v}")
+                }
         }
     }
 
     public override func getFloat16(index: Int64): ?Float16 {
         match (getString(index)) {
             case None => None
-            case Some(v) => stringParseToFloat16(index, v)
+            case Some(v) => 
+                try {
+                    return Float16.parse(v)
+                } catch (e: IllegalArgumentException) {
+                    throw ValueConvertException("Parse to Float16 failed: column name is '${metadata(index).name}', raw value is ${v}")
+                }
         }
     }
 
     public override func getFloat32(index: Int64): ?Float32 {
         match (getString(index)) {
             case None => None
-            case Some(v) => stringParseToFloat32(index, v)
+            case Some(v) => 
+                try {
+                    return Float32.parse(v)
+                } catch (e: IllegalArgumentException) {
+                    throw ValueConvertException("Parse to Float32 failed: column name is '${metadata(index).name}', raw value is ${v}")
+                }
         }
     }
 
     public override func getFloat64(index: Int64): ?Float64 {
         match (getString(index)) {
             case None => None
-            case Some(v) => stringParseToFloat64(index, v)
+            case Some(v) => 
+                try {
+                    return Float64.parse(v)
+                } catch (e: IllegalArgumentException) {
+                    throw ValueConvertException("Parse to Float64 failed: column name is '${metadata(index).name}', raw value is ${v}")
+                }
         }
     }
 
     public override func getBigInt(index: Int64): ?BigInt {
         match (getString(index)) {
             case None => None
-            case Some(v) => stringParseToBigInt(index, v)
+            case Some(v) => 
+                try {
+                    return BigInt.parse(v)
+                } catch (e: IllegalArgumentException) {
+                    throw ValueConvertException("Parse to BigInt failed: column name is '${metadata(index).name}', raw value is ${v}")
+                }
         }
     }
 
     public override func getDecimal(index: Int64): ?Decimal {
         match (getString(index)) {
             case None => None
-            case Some(v) => stringParseToDecimal(index, v)
-        }
-    }
-
-    public override func getDate(index: Int64): ?DateTime {
-        match (getString(index)) {
-            case None => None
-            case Some(v) => stringParseToDate(index, v)
-        }
-    }
-
-    public override func getTime(index: Int64): ?DateTime {
-        match (getString(index)) {
-            case None => None
-            case Some(v) => stringParseToTime(index, v)
+            case Some(v) =>         
+                try {
+                    return Decimal.parse(v)
+                } catch (e: IllegalArgumentException) {
+                    throw ValueConvertException("Parse to Float64 failed: column name is '${metadata(index).name}', raw value is ${v}")
+                }
         }
     }
 
     public override func getDateTime(index: Int64): ?DateTime {
         match (getString(index)) {
             case None => None
-            case Some(v) => stringParseToDateTime(index, v)
-        }
-    }
-
-    public override func getTimestamp(index: Int64): ?DateTime {
-        match (getString(index)) {
-            case None => None
-            case Some(v) => stringParseToDateTime(index, v)
+            case Some(v) => 
+                try {
+                    match (v.size) {
+                        case 8 => DateTime.parse(DB_TIME_PREFIX + v, DB_DATE_TIME_FORMAT)
+                        case 10 => DateTime.parse(v + DB_DATE_SUFFIX, DB_DATE_TIME_FORMAT)
+                        case _ => DateTime.parse(v, DB_DATE_TIME_FORMAT)
+                    }
+                } catch (e: TimeParseException) {
+                    throw ValueConvertException("Parse to DateTime failed: column name is '${metadata(index).name}', raw value is ${v}")
+                }
         }
     }
 
     public override func getInputStream(index: Int64): ?InputStream {
         match (getArray(index)) {
             case None => None
-            case Some(v) => ByteBuffer(v)
+            case Some(v) => 
+                let data = Array<Byte>(v.size, repeat: 0)
+                v.copyTo(data)
+                return ByteBuffer(data)
         }
     }
 
@@ -211,139 +274,4 @@ protected class TextResultSet <: ResultSet {
         return this.rows[currentRow].row[index - 1]
     }
 
-    private func stringParseToBool(str: String): Bool {
-        if (str == "1") {
-            return true
-        } else {
-            return false
-        }
-    }
-
-    private func stringParseToInt8(index: Int64, str: String): Int8 {
-        try {
-            return Int8.parse(str)
-        } catch (e: IllegalArgumentException) {
-            throw ValueConvertException("Parse to Int8 failed: column name is '${metadata(index).name}', raw value is ${str}")
-        }
-    }
-
-    private func stringParseToUInt8(index: Int64, str: String): UInt8 {
-        try {
-            return UInt8.parse(str)
-        } catch (e: IllegalArgumentException) {
-            throw ValueConvertException("Parse to UInt8 failed: column name is '${metadata(index).name}', raw value is ${str}")
-        }
-    }
-
-    private func stringParseToInt16(index: Int64, str: String): Int16 {
-        try {
-            return Int16.parse(str)
-        } catch (e: IllegalArgumentException) {
-            throw ValueConvertException("Parse to Int16 failed: column name is '${metadata(index).name}', raw value is ${str}")
-        }
-    }
-
-    private func stringParseToUInt16(index: Int64, str: String): UInt16 {
-        try {
-            return UInt16.parse(str)
-        } catch (e: IllegalArgumentException) {
-            throw ValueConvertException("Parse to UInt16 failed: column name is '${metadata(index).name}', raw value is ${str}")
-        }
-    }
-
-    private func stringParseToInt32(index: Int64, str: String): Int32 {
-        try {
-            return Int32.parse(str)
-        } catch (e: IllegalArgumentException) {
-            throw ValueConvertException("Parse to Int32 failed: column name is '${metadata(index).name}', raw value is ${str}")
-        }
-    }
-
-    private func stringParseToUInt32(index: Int64, str: String): UInt32 {
-        try {
-            return UInt32.parse(str)
-        } catch (e: IllegalArgumentException) {
-            throw ValueConvertException("Parse to UInt32 failed: column name is '${metadata(index).name}', raw value is ${str}")
-        }
-    }
-
-    private func stringParseToInt64(index: Int64, str: String): Int64 {
-        try {
-            return Int64.parse(str)
-        } catch (e: IllegalArgumentException) {
-            throw ValueConvertException("Parse to Int64 failed: column name is '${metadata(index).name}', raw value is ${str}")
-        }
-    }
-
-    private func stringParseToUInt64(index: Int64, str: String): UInt64 {
-        try {
-            return UInt64.parse(str)
-        } catch (e: IllegalArgumentException) {
-            throw ValueConvertException("Parse to UInt64 failed: column name is '${metadata(index).name}', raw value is ${str}")
-        }
-    }
-
-    private func stringParseToFloat16(index: Int64, str: String): Float16 {
-        try {
-            return Float16.parse(str)
-        } catch (e: IllegalArgumentException) {
-            throw ValueConvertException("Parse to Float16 failed: column name is '${metadata(index).name}', raw value is ${str}")
-        }
-    }
-
-    private func stringParseToFloat32(index: Int64, str: String): Float32 {
-        try {
-            return Float32.parse(str)
-        } catch (e: IllegalArgumentException) {
-            throw ValueConvertException("Parse to Float32 failed: column name is '${metadata(index).name}', raw value is ${str}")
-        }
-    }
-
-    private func stringParseToFloat64(index: Int64, str: String): Float64 {
-        try {
-            return Float64.parse(str)
-        } catch (e: IllegalArgumentException) {
-            throw ValueConvertException("Parse to Float64 failed: column name is '${metadata(index).name}', raw value is ${str}")
-        }
-    }
-
-    private func stringParseToBigInt(index: Int64, str: String): ?BigInt {
-        try {
-            return BigInt.parse(str)
-        } catch (e: IllegalArgumentException) {
-            throw ValueConvertException("Parse to BigInt failed: column name is '${metadata(index).name}', raw value is ${str}")
-        }
-    }
-
-    private func stringParseToDecimal(index: Int64, str: String): Decimal {
-        try {
-            return Decimal.parse(str)
-        } catch (e: IllegalArgumentException) {
-            throw ValueConvertException("Parse to Float64 failed: column name is '${metadata(index).name}', raw value is ${str}")
-        }
-    }
-
-    private func stringParseToDate(index: Int64, str: String): DateTime {
-        try {
-            return DateTime.parse(str, DB_DATE_FORMAT)
-        } catch (e: TimeParseException) {
-            throw ValueConvertException("Parse to Date failed: column name is '${metadata(index).name}', raw value is ${str}")
-        }
-    }
-
-    private func stringParseToTime(index: Int64, str: String): DateTime {
-        try {
-            return DateTime.parse(DB_TIME_PREFIX + str, DB_DATE_TIME_FORMAT)
-        } catch (e: TimeParseException) {
-            throw ValueConvertException("Parse to Time failed: column name is '${metadata(index).name}', raw value is ${str}")
-        }
-    }
-
-    private func stringParseToDateTime(index: Int64, str: String): DateTime {
-        try {
-            return DateTime.parse(str, DB_DATE_TIME_FORMAT)
-        } catch (e: TimeParseException) {
-            throw ValueConvertException("Parse to DateTime failed: column name is '${metadata(index).name}', raw value is ${str}")
-        }
-    } 
 }

@@ -28,6 +28,8 @@ protected interface ResultSet {
 
     func getBool(index: Int64): ?Bool
 
+    // func getRune(index: Int64): ?Rune
+
     func getInt8(index: Int64): ?Int8
 
     func getUInt8(index: Int64): ?UInt8
@@ -54,13 +56,7 @@ protected interface ResultSet {
 
     func getDecimal(index: Int64): ?Decimal
 
-    func getDate(index: Int64): ?DateTime
-
-    func getTime(index: Int64): ?DateTime
-
     func getDateTime(index: Int64): ?DateTime
-
-    func getTimestamp(index: Int64): ?DateTime
 
     func getInputStream(index: Int64): ?InputStream
 

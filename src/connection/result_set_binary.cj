@@ -110,19 +110,7 @@ protected class BinaryResultSet <: ResultSet {
         return Decimal.fromBinary(metadata(index), rawData(index))
     }
 
-    public override func getDate(index: Int64): ?DateTime {
-        return DateTime.fromBinary(metadata(index), rawData(index))
-    }
-
-    public override func getTime(index: Int64): ?DateTime {
-        return DateTime.fromBinary(metadata(index), rawData(index))
-    }
-
-    public func getDateTime(index: Int64): ?DateTime {
-        return DateTime.fromBinary(metadata(index), rawData(index))
-    }
-
-    public func getTimestamp(index: Int64): ?DateTime {
+    public override func getDateTime(index: Int64): ?DateTime {
         return DateTime.fromBinary(metadata(index), rawData(index))
     }
 

@@ -111,20 +111,8 @@ protected class CursorResultSet <: ResultSet {
         return resultSet.getDecimal(index)
     }
 
-    public override func getDate(index: Int64): ?DateTime {
-        return resultSet.getDate(index)
-    }
-
-    public override func getTime(index: Int64): ?DateTime {
-        return resultSet.getTime(index)
-    }
-
     public override func getDateTime(index: Int64): ?DateTime {
         return resultSet.getDateTime(index)
-    }
-
-    public override func getTimestamp(index: Int64): ?DateTime {
-        return resultSet.getTimestamp(index)
     }
 
     public override func getInputStream(index: Int64): ?InputStream {
