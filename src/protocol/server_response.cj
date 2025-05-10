@@ -16,7 +16,6 @@
 protected package mysql.protocol
 
 import std.io.*
-import std.collection.*
 
 /*
 * MySQL Packet

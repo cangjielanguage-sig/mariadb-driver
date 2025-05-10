@@ -35,4 +35,3 @@ protected func insertCount(sql: String): Int {
     }
     return count
 }
-

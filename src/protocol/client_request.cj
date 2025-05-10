@@ -21,16 +21,12 @@ protected abstract class Request {
 
     private static let SINGLE_PACKAGE_MAX: Int64 = (1 << 24) - 1
 
-    private let buffer: ByteBuffer = ByteBuffer()
+    protected let buffer: ByteBuffer = ByteBuffer()
 
     protected var number: UInt8
 
     protected init(number: UInt8) {
         this.number = number
-    }
-
-    protected func pack(data: Array<Byte>): Unit {
-        buffer.write(data)
     }
     
     protected open func pack(): Unit

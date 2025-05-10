@@ -15,6 +15,7 @@
  */
 protected package mysql.protocol
 
+import std.io.*
 import std.time.*
 import std.math.numeric.*
 
@@ -24,108 +25,108 @@ import std.math.numeric.*
 */
 protected interface NativeType {
 
-    func mysqlValue(): Array<Byte>
+    func writeValue(buffer: ByteBuffer): Unit
 
-    func mysqlFlag(): Array<Byte>
+    func writeType(buffer: ByteBuffer): Unit
 
 }
 
 extend Bool <: NativeType {
 
-    public func mysqlValue(): Array<Byte> {
+    public func writeValue(buffer: ByteBuffer): Unit {
         if(this) {
-            return [1]
+            [1] |> buffer.write
         } else {
-            [0]
+            [0] |> buffer.write
         }
     }
 
-    public func mysqlFlag(): Array<Byte> {
-        return [ColumnType.Tiny.value(), 0x00]
+    public func writeType(buffer: ByteBuffer): Unit {
+       [ColumnType.Tiny.value(), 0x00] |> buffer.write
     }
 
 }
 
 extend Int8 <: NativeType {
 
-    public func mysqlValue(): Array<Byte> {
-        return this.toLittleEndian()
+    public func writeValue(buffer: ByteBuffer): Unit {
+        this.toLittleEndian() |> buffer.write
     }
 
-    public func mysqlFlag(): Array<Byte> {
-        return [ColumnType.Tiny.value(), 0x00]
+    public func writeType(buffer: ByteBuffer): Unit {
+       [ColumnType.Tiny.value(), 0x00] |> buffer.write
     }
 
 }
 
 extend UInt8 <: NativeType {
 
-    public func mysqlValue(): Array<Byte> {
-        return this.toLittleEndian()
+    public func writeValue(buffer: ByteBuffer): Unit {
+        this.toLittleEndian() |> buffer.write
     }
 
-    public func mysqlFlag(): Array<Byte> {
-        return [ColumnType.Tiny.value(), 0x80]
+    public func writeType(buffer: ByteBuffer): Unit {
+        [ColumnType.Tiny.value(), 0x80] |> buffer.write
     }
 
 }
 
 extend Int16 <: NativeType {
 
-    public func mysqlValue(): Array<Byte> {
-        return this.toLittleEndian()
+    public func writeValue(buffer: ByteBuffer): Unit {
+        this.toLittleEndian() |> buffer.write
     }
 
-    public func mysqlFlag(): Array<Byte> {
-        return [ColumnType.Short.value(), 0x00]
+    public func writeType(buffer: ByteBuffer): Unit {
+        [ColumnType.Short.value(), 0x00] |> buffer.write
     }
 
 }
 
 extend UInt16 <: NativeType {
 
-    public func mysqlValue(): Array<Byte> {
-        return this.toLittleEndian()
+    public func writeValue(buffer: ByteBuffer): Unit {
+        this.toLittleEndian() |> buffer.write
     }
 
-    public func mysqlFlag(): Array<Byte> {
-        return [ColumnType.Short.value(), 0x80]
+    public func writeType(buffer: ByteBuffer): Unit {
+        [ColumnType.Short.value(), 0x80] |> buffer.write
     }
 
 }
 
 extend Int32 <: NativeType {
 
-    public func mysqlValue(): Array<Byte> {
-        return this.toLittleEndian()
+    public func writeValue(buffer: ByteBuffer): Unit {
+        this.toLittleEndian() |> buffer.write
     }
 
-    public func mysqlFlag(): Array<Byte> {
-        return [ColumnType.Long.value(), 0x00]
+    public func writeType(buffer: ByteBuffer): Unit {
+        [ColumnType.Long.value(), 0x00] |> buffer.write
     }
 
 }
 
 extend UInt32 <: NativeType {
 
-    public func mysqlValue(): Array<Byte> {
-        return this.toLittleEndian()
+    public func writeValue(buffer: ByteBuffer): Unit {
+        this.toLittleEndian() |> buffer.write
     }
 
-    public func mysqlFlag(): Array<Byte> {
-        return [ColumnType.Long.value(), 0x80]
+    public func writeType(buffer: ByteBuffer): Unit {
+        [ColumnType.Long.value(), 0x80] |> buffer.write
     }
 
 }
 
 extend Int64 <: NativeType {
 
-    public func mysqlValue(): Array<Byte> {
-        return this.toLittleEndian()
+    public func writeValue(buffer: ByteBuffer): Unit {
+        this.toLittleEndian() |> buffer.write
     }
 
-    public func mysqlFlag(): Array<Byte> {
-        return [ColumnType.LongLong.value(), 0x00]
+    public func writeType(buffer: ByteBuffer): Unit {
+        [ColumnType.LongLong.value(), 0x00] |> buffer.write
     }
 
 }
@@ -133,135 +134,126 @@ extend Int64 <: NativeType {
 extend UInt64 <: NativeType {
 
 
-    public func mysqlValue(): Array<Byte> {
-        return this.toLittleEndian()
+    public func writeValue(buffer: ByteBuffer): Unit {
+        this.toLittleEndian() |> buffer.write
     }
 
-    public func mysqlFlag(): Array<Byte> {
-        return [ColumnType.LongLong.value(), 0x80]
+    public func writeType(buffer: ByteBuffer): Unit {
+        [ColumnType.LongLong.value(), 0x80] |> buffer.write
     }
 
 }
 
 extend Float16 <: NativeType {
 
-    public func mysqlValue(): Array<Byte> {
-        return this.toLittleEndian()
+    public func writeValue(buffer: ByteBuffer): Unit {
+        this.toLittleEndian() |> buffer.write
     }
 
-    public func mysqlFlag(): Array<Byte> {
-        return [ColumnType.Float.value(), 0x00]
+    public func writeType(buffer: ByteBuffer): Unit {
+        [ColumnType.Float.value(), 0x00] |> buffer.write
     }
 
 }
 
 extend Float32 <: NativeType {
 
-    public func mysqlValue(): Array<Byte> {
-        return this.toLittleEndian()
+    public func writeValue(buffer: ByteBuffer): Unit {
+        this.toLittleEndian() |> buffer.write
     }
 
-    public func mysqlFlag(): Array<Byte> {
-        return [ColumnType.Float.value(), 0x00]
+    public func writeType(buffer: ByteBuffer): Unit {
+        [ColumnType.Float.value(), 0x00] |> buffer.write
     }
 
 }
 
 extend Float64 <: NativeType {
 
-    public func mysqlValue(): Array<Byte> {
-        return this.toLittleEndian()
+    public func writeValue(buffer: ByteBuffer): Unit {
+        this.toLittleEndian() |> buffer.write
     }
 
-    public func mysqlFlag(): Array<Byte> {
-        return [ColumnType.Double.value(), 0x00]
+    public func writeType(buffer: ByteBuffer): Unit {
+        [ColumnType.Double.value(), 0x00] |> buffer.write
     }
 
 }
 
 extend Rune <: NativeType {
 
-    public func mysqlValue(): Array<Byte> {
-        return this.toString().toLengthEncoded()
+    public func writeValue(buffer: ByteBuffer): Unit {
+        this.toString() |> buffer.writeLengthEncoded
     }
 
-    public func mysqlFlag(): Array<Byte> {
-        return [ColumnType.VarString.value(), 0x00]
+    public func writeType(buffer: ByteBuffer): Unit {
+        [ColumnType.VarString.value(), 0x00] |> buffer.write
     }
 
 }
 
 extend Array<Byte> <: NativeType {
 
-    public func mysqlValue(): Array<Byte> {
-        return this.toLengthEncoded()
+    public func writeValue(buffer: ByteBuffer): Unit {
+        return this |> buffer.writeLengthEncoded
     }
 
-    public func mysqlFlag(): Array<Byte> {
-        return [ColumnType.LongBlob.value(), 0x00]
+    public func writeType(buffer: ByteBuffer): Unit {
+        [ColumnType.LongBlob.value(), 0x00] |> buffer.write
     }
 
 }
 
 extend String <: NativeType {
 
-    public func mysqlValue(): Array<Byte> {
-        return this.toLengthEncoded()
+    public func writeValue(buffer: ByteBuffer): Unit {
+        this |> buffer.writeLengthEncoded
     }
 
-    public func mysqlFlag(): Array<Byte> {
-        return [ColumnType.VarString.value(), 0x00]
+    public func writeType(buffer: ByteBuffer): Unit {
+        [ColumnType.VarString.value(), 0x00] |> buffer.write
     }
 
 }
 
 extend DateTime <: NativeType {
 
-    public func mysqlValue(): Array<Byte> {
-        var index = 0
-        var buf = Array<Byte>(8, repeat: 0)
-        buf[index] = 7
-        index ++
-        UInt16(year).toLittleEndian().copyTo(buf, 0, index, 2)
-        index += 2
-        buf[index] = UInt8(month.toInteger())
-        index ++
-        buf[index] = UInt8(dayOfMonth)
-        index ++
-        buf[index] = UInt8(hour)
-        index ++
-        buf[index] = UInt8(minute)
-        index ++
-        buf[index] = UInt8(second)
-        return buf.toArray()
+    public func writeValue(buffer: ByteBuffer): Unit {
+        7 |> buffer.write
+        UInt16(year).toLittleEndian() |> buffer.write
+        UInt8(month.toInteger()) |> buffer.write
+        UInt8(dayOfMonth) |> buffer.write
+        UInt8(hour) |> buffer.write
+        UInt8(minute) |> buffer.write
+        UInt8(second) |> buffer.write
     }
 
-    public func mysqlFlag(): Array<Byte> {
-        return [ColumnType.Timestamp.value(), 0x00]
+    public func writeType(buffer: ByteBuffer): Unit {
+        [ColumnType.Timestamp.value(), 0x00] |>  buffer.write
     }
 
 }
 
 extend BigInt <: NativeType {
 
-    public func mysqlValue(): Array<Byte> {
-        return this.toString().toLengthEncoded()
+    public func writeValue(buffer: ByteBuffer): Unit {
+        this.toString() |> buffer.writeLengthEncoded
     }
 
-    public func mysqlFlag(): Array<Byte> {
-        return [ColumnType.VarString.value(), 0x00]
+    public func writeType(buffer: ByteBuffer): Unit {
+        [ColumnType.VarString.value(), 0x00] |>  buffer.write
     }
 
 }
 
 extend Decimal <: NativeType {
 
-    public func mysqlFlag(): Array<Byte> {
-        return [ColumnType.VarString.value(), 0x00]
+    public func writeValue(buffer: ByteBuffer): Unit {
+        this.toString() |> buffer.writeLengthEncoded
     }
 
-    public func mysqlValue(): Array<Byte> {
-        return this.toString().toLengthEncoded()
+    public func writeType(buffer: ByteBuffer): Unit {
+        [ColumnType.VarString.value(), 0x00] |>  buffer.write
     }
 
 }

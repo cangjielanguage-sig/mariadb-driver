@@ -16,41 +16,13 @@
 protected package mysql.protocol
 
 import std.io.*
-import std.collection.*
 
 /*
 * Strings are sequences of bytes and appear in a few forms in the protocol.
 * referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_basic_dt_strings.html
 */
-public interface MySqlStringReader {
 
-    func readFixedArray(size: Int64): Array<Byte>
-
-    func readFixedString(size: Int64): String
-    
-    func readNullTerminatedString(): String
-
-    func readNullTerminatedStringRaw(): Array<Byte>
-
-    func readLengthEncodedString(): ?String
-
-    func readLengthEncodedStringRaw(): ?Array<Byte>
-
-}
-
-protected interface ToLengthEncoded {
-
-    func toLengthEncoded(): Array<Byte>
-
-}
-
-protected interface ToNullTerminated {
-
-    func toNullTerminated(): Array<Byte>
-
-}
-
-extend ByteBuffer <: MySqlStringReader {
+extend ByteBuffer {
 
     public func readFixedArray(length: Int64): Array<Byte> {
         if (length == 0) {
@@ -93,46 +65,40 @@ extend ByteBuffer <: MySqlStringReader {
 
 }
 
-extend String <: ToLengthEncoded & ToNullTerminated {
+extend ByteBuffer {
 
-    public func toLengthEncoded(): Array<Byte> {
-        return this.toArray().toLengthEncoded()
+    public func writeNullTerminated(value: String): Unit {
+        return writeNullTerminated(value.toArray())
     }
 
-    public func toNullTerminated(): Array<Byte> {
-        return this.toArray().toNullTerminated()
+    public func writeNullTerminated(value: Array<Byte>): Unit {
+        write(value)
+        write(0x00)
     }
-    
-}
 
-extend Array<Byte> <: ToLengthEncoded & ToNullTerminated {
+    public func writeLengthEncoded(value: String): Unit {
+        return writeLengthEncoded(value.toArray())
+    }
 
-    public func toLengthEncoded(): Array<Byte> {
-        let buf = ArrayList<Byte>(this.size + 9)
-        if (this.size <= 0xFA) {
-            buf.add(UInt8(this.size))
-            buf.add(all: this)
-        } else if (this.size <= (1 << 16)) {
-            buf.add(0xFC)
-            buf.add(all: UInt16(this.size).toLittleEndian())
-            buf.add(all: this)
-        } else if (this.size <= (1 << 24)) {
-            buf.add(0xFD)
-            buf.add(all: UInt32(this.size).toLittleEndian().slice(0, 3))
-            buf.add(all: this)
+    public func writeLengthEncoded(value: Array<Byte>): Unit {
+        let size = value.size
+        if (size <= 0xFA) {
+            write(UInt8(size))
+            write(value)
+        } else if (size <= (1 << 16)) {
+            write(0xFC)
+            write(UInt16(size).toLittleEndian())
+            write(value)
+        } else if (size <= (1 << 24)) {
+            write(0xFD)
+            write(UInt32(size).toLittleEndian().slice(0, 3))
+            write(value)
         } else {
-            buf.add(0xFE)
-            buf.add(all: UInt64(this.size).toLittleEndian())
-            buf.add(all: this)
+            write(0xFE)
+            write(UInt64(size).toLittleEndian())
+            write(value)
         }
-        buf.toArray()
-    }
-
-    public func toNullTerminated(): Array<Byte> {
-        let buf = ArrayList<Byte>(this.size + 1)
-        buf.add(all: this)
-        buf.add(0)
-        return buf.toArray()
     }
 
 }
+

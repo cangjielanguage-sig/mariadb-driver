@@ -59,15 +59,15 @@ protected class ExecuteCommand <: Command {
     public override func pack(): Unit {
         super.pack()
         // id
-        this.statementId.toLittleEndian() |> pack
+        this.statementId.toLittleEndian() |> buffer.write
         // flag
-        this.flags.value() |> pack
+        this.flags.value() |> buffer.write
         // iteration_count
-        this.iterationCount.toLittleEndian() |> pack
+        this.iterationCount.toLittleEndian() |> buffer.write
         if (parameterCount > 0 || flags == ParameterCountAvailable) {
             if (HandshakeResponse.getDefault(0).hasCapability(QueryAttributes)) {
                 //parameter_count
-                this.parameterCount.toLengthEncoded() |> pack
+                this.parameterCount |> buffer.writeLengthEncoded
             }
             if (parameterCount > 0) {
                 // null_bitmap
@@ -80,29 +80,29 @@ protected class ExecuteCommand <: Command {
                         case _ => continue
                     }
                 }
-                this.nullBitMap |> pack
+                this.nullBitMap |> buffer.write
 
                 // new_params_bind_flag
-                this.newParamsBindFlag |> pack
+                this.newParamsBindFlag |> buffer.write
                 if (newParamsBindFlag == 1) {
                     //parameter_type
                     for(i in 0..params.size) {
                         match (params[i]) {
-                            case v: NativeType => v.mysqlFlag() |> pack
-                            case v: InputStream => [ColumnType.LongBlob.value(), 0x00] |> pack
-                            case v: ?Any => [ColumnType.Null.value(), 0x00] |> pack
+                            case v: NativeType => v.writeType(buffer)
+                            case v: InputStream => [ColumnType.LongBlob.value(), 0x00] |> buffer.write
+                            case v: ?Any => [ColumnType.Null.value(), 0x00] |> buffer.write
                             case _ => throw UnsupportedException("")
                         }
                     }
                     if (HandshakeResponse.getDefault(0).hasCapability(QueryAttributes)) {
-                        0x00 |> pack //paramter name: default null
+                        0x00 |> buffer.write //paramter name: default null
                     }
                 }
 
                 //parameter_values
                 for (i in 0..params.size) {
                     match (params[i]) {
-                        case v: NativeType => v.mysqlValue() |> pack
+                        case v: NativeType => v.writeValue(buffer)
                         case _: InputStream => continue
                         case _: ?Any => continue
                         case _ => throw UnsupportedException("")

@@ -16,7 +16,7 @@
 protected package mysql.protocol
 
 import std.io.*
-import std.collection.*
+
 /*
 * Initial handshake packet for protocol version 10.
 * referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_connection_phase_packets_protocol_handshake_v10.html
@@ -55,10 +55,10 @@ protected class Handshake <: CommonResponse {
 
     protected prop salt: Array<Byte> {
         get() {
-            let buf = ArrayList<Byte>(salt1.size + salt2.size)
-            buf.add(all: salt1)
-            buf.add(all: salt2)
-            return buf.toArray()
+            let salt = Array<Byte>(salt1.size + salt2.size, repeat: 0)
+            salt1.copyTo(salt, 0, 0, salt1.size)
+            salt2.copyTo(salt, 0, salt1.size, salt2.size)
+            return salt
         }
     }
 

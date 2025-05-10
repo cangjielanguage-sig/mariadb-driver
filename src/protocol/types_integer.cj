@@ -16,33 +16,13 @@
 protected package mysql.protocol
 
 import std.io.*
-import std.collection.*
 
 /*
 * The MySQL Protocol has a set of possible encodings for integers.
 * referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_basic_dt_integers.html#sect_protocol_basic_dt_int_fixed
 */
-protected interface MySqlIntegerReader {
-    
-    func readFix1Integer(): UInt8
 
-    func readFix2Integer(): UInt16
-
-    func readFix3Integer(): UInt32
-
-    func readFix4Integer(): UInt32
-
-    func readFix6Integer(): UInt64
-
-    func readFix8Integer(): UInt64
-
-    func readLengthEncodedInteger(): ?UInt64
-
-    func readLengthEncodedIntegerRaw(): ?Array<Byte>
-
-}
-
-extend ByteBuffer <: MySqlIntegerReader {
+extend ByteBuffer {
 
     public func readFix1Integer(): UInt8 {
         return UInt8.fromLittleEndian(readFixedArray(1))
@@ -52,21 +32,21 @@ extend ByteBuffer <: MySqlIntegerReader {
         return UInt16.fromLittleEndian(readFixedArray(2))
     }
 
-    public func readFix3Integer(): UInt32 {
-        return UInt32.fromLittleEndian(readFixedArray(3))
-    }
+    // public func readFix3Integer(): UInt32 {
+    //     return UInt32.fromLittleEndian(readFixedArray(3))
+    // }
 
     public func readFix4Integer(): UInt32 {
         return UInt32.fromLittleEndian(readFixedArray(4))
     }
 
-    public func readFix6Integer(): UInt64 {
-        return UInt64.fromLittleEndian(readFixedArray(6))
-    }
+    // public func readFix6Integer(): UInt64 {
+    //     return UInt64.fromLittleEndian(readFixedArray(6))
+    // }
 
-    public func readFix8Integer(): UInt64 {
-        return UInt64.fromLittleEndian(readFixedArray(8))
-    }
+    // public func readFix8Integer(): UInt64 {
+    //     return UInt64.fromLittleEndian(readFixedArray(8))
+    // }
 
     public func readLengthEncodedInteger(): ?UInt64 {
         match (readLengthEncodedIntegerRaw()) {
@@ -92,23 +72,21 @@ extend ByteBuffer <: MySqlIntegerReader {
 
 }
 
-extend UInt64 <: ToLengthEncoded {
+extend ByteBuffer {
 
-    public func toLengthEncoded(): Array<Byte> {
-        let buf = ArrayList<Byte>()
-        if (this < 0xFB) {
-            buf.add(UInt8(this))
-        } else if (this < UInt64(1 << 16)) {
-            buf.add(0xFC)
-            buf.add(all: UInt16(this).toLittleEndian())
-        } else if (this < UInt64(1 << 24)) {
-            buf.add(0xFD)
-            buf.add(all: UInt32(this).toLittleEndian().slice(0, 3))
+    protected func writeLengthEncoded(value: UInt64): Unit {
+        if (value < 0xFB) {
+            write(UInt8(value))
+        } else if (value < UInt64(1 << 16)) {
+            write(0xFC)
+            write(UInt16(value).toLittleEndian())
+        } else if (value < UInt64(1 << 24)) {
+            write(0xFD)
+            write(UInt32(value).toLittleEndian().slice(0, 3))
         } else {
-            buf.add(0xFE)
-            buf.add(all: this.toLittleEndian())
+            write(0xFE)
+            write(value.toLittleEndian())
         }
-        return buf.toArray()
     }
 
 }

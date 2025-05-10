@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 protected package mysql.protocol
+import std.unicode.UnicodeStringExtension
 
-import std.collection.*
+// import std.collection.*
 /*
 * HandshakeResponse41
 * referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_connection_phase_packets_protocol_handshake_response.html
@@ -38,7 +39,7 @@ protected class HandshakeResponse <: Request {
 
     private var clientAuthPlugin: String = ""
 
-    private var attributes: HashMap<String, String> = HashMap<String, String>()
+    private var attributes: Array<(String, String)> = Array<(String, String)>()
 
     private var zstdCompressionLevel: Byte = 0x00
     
@@ -81,8 +82,8 @@ protected class HandshakeResponse <: Request {
         return this
     }
 
-    protected func addAttrbiture(name: String, value: String): HandshakeResponse {
-        this.attributes.add(name, value)
+    protected func setAttrbiture(attributes: Array<(String, String)>): HandshakeResponse {
+        this.attributes = attributes
         return this
     }
 
@@ -107,44 +108,45 @@ protected class HandshakeResponse <: Request {
 
     public override func pack(): Unit {
         //put client Capabilities
-        this.capabilities.toLittleEndian() |> pack
+        this.capabilities.toLittleEndian() |> buffer.write
         //put max packet
-        this.maxPacket.toLittleEndian() |> pack
+        this.maxPacket.toLittleEndian() |> buffer.write
         //put charset
-        this.charset.toLittleEndian() |> pack
+        this.charset.toLittleEndian() |> buffer.write
         //put unused
-        this.unused |> pack
+        this.unused |> buffer.write
         //put username
-        this.username.toNullTerminated() |> pack
+        this.username |> buffer.writeNullTerminated
         //put auth response
         if(hasCapability(PluginAuthLenencClientData)){
-            this.authResponse.toLengthEncoded() |> pack
+            this.authResponse |> buffer.writeLengthEncoded
         }else{
-            UInt8(this.authResponse.size).toLittleEndian() |> pack
-            this.authResponse.toLengthEncoded() |> pack
+            UInt8(this.authResponse.size).toLittleEndian() |> buffer.write
+            this.authResponse |> buffer.writeLengthEncoded
         }
         // put schema if 'Connect With DB' are set
         if(hasCapability(ConnectWithDB)){
-            this.schema.toNullTerminated() |> pack
+            this.schema |> buffer.writeNullTerminated
         }
         //put client auth plguin
         if(hasCapability(PluginAuth)){
-            this.clientAuthPlugin.toNullTerminated() |> pack
+            this.clientAuthPlugin |> buffer.writeNullTerminated
         }
         //put attributes
         if(hasCapability(ConnectAttrs)) {
-            let temp = ArrayList<Byte>()
+            var size = 0
             for((k,v) in this.attributes) {
-                let key = k.toNullTerminated()
-                temp.add(all: key)
-                let value = v.toNullTerminated()
-                temp.add(all: value)
+                size += k.toArray().size + 1
+                size += v.toArray().size + 1
             }
-            UInt64(temp.size).toLengthEncoded() |> pack
-            temp.toArray() |> pack
+            UInt64(size) |> buffer.writeLengthEncoded
+            for((k,v) in this.attributes) {
+                k |> buffer.writeNullTerminated
+                v |> buffer.writeNullTerminated
+            }
         }
         if(hasCapability(ZSTDCompressionAlgorithm)) {
-            this.zstdCompressionLevel.toLittleEndian() |> pack
+            this.zstdCompressionLevel.toLittleEndian() |> buffer.write
         }
         
     }
@@ -186,13 +188,13 @@ protected class SslRequeset <: Request {
 
     public override func pack(): Unit {
         //put client Capabilities
-        this.capabilities.toLittleEndian() |> pack
+        this.capabilities.toLittleEndian() |> buffer.write
         //put max packet
-        this.maxPacket.toLittleEndian() |> pack
+        this.maxPacket.toLittleEndian() |> buffer.write
         //put charset
-        this.charset.toLittleEndian() |> pack
+        this.charset.toLittleEndian() |> buffer.write
         //put unused
-        this.unused |> pack
+        this.unused |> buffer.write
     }
 
 }
@@ -211,7 +213,7 @@ protected class RequestPublicKey <: Request {
     }
 
     protected override func pack(): Unit {
-        this.code |> pack
+        this.code |> buffer.write
     }
 
 }
@@ -229,7 +231,7 @@ protected class SendPassword <: Request {
     }
 
     protected override func pack(): Unit {
-        this.authResponse |> pack
+        this.authResponse |> buffer.write
     }
 
 }

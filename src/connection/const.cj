@@ -79,3 +79,22 @@ protected func toArray(inputStream: InputStream): Array<Byte> {
     } while (len != 0)
     return readToEnd(bytes)
 }
+
+extend String {
+
+
+    public func toNullTerminated(): Array<Byte> {
+        return this.toArray().toNullTerminated()
+    }
+    
+}
+
+extend Array<Byte>  {
+
+    public func toNullTerminated(): Array<Byte> {
+        let buf = Array<Byte>(this.size + 1, repeat: 0)
+        this.copyTo(buf, 0, 0, this.size)
+        return buf
+    }
+
+}
