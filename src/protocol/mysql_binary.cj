@@ -410,7 +410,8 @@ extend String <: MySqlBinary<String> {
                         return DateTime.fromBinaryDateTime(v).toString()
                     case Time => 
                         return DateTime.fromBinaryTime(v).toString()
-                        case _ => throw UnsupportedException("Unsupport MySQL binary type")
+                    case _ => 
+                        throw IllegalArgumentException("MySql ${columnType} types cannot be converted to Cangjie String types")
                     }
         }
     }

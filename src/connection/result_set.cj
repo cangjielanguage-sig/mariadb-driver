@@ -28,8 +28,6 @@ protected interface ResultSet {
 
     func getBool(index: Int64): ?Bool
 
-    // func getRune(index: Int64): ?Rune
-
     func getInt8(index: Int64): ?Int8
 
     func getUInt8(index: Int64): ?UInt8
