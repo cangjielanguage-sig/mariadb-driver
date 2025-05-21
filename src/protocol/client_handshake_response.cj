@@ -108,28 +108,28 @@ protected class HandshakeResponse <: Request {
 
     public override func pack(): Unit {
         //put client Capabilities
-        this.capabilities.toLittleEndian() |> buffer.write
+        this.capabilities |> buffer.writeInt4
         //put max packet
-        this.maxPacket.toLittleEndian() |> buffer.write
+        this.maxPacket |> buffer.writeInt4
         //put charset
-        this.charset.toLittleEndian() |> buffer.write
+        this.charset |> buffer.writeInt1
         //put unused
-        this.unused |> buffer.write
+        this.unused |> buffer.writeArray
         //put username
         this.username |> buffer.writeNullTerminated
         //put auth response
-        if(hasCapability(PluginAuthLenencClientData)){
+        if(hasCapability(PluginAuthLenencClientData)) {
             this.authResponse |> buffer.writeLengthEncoded
-        }else{
-            UInt8(this.authResponse.size).toLittleEndian() |> buffer.write
+        } else {
+            UInt8(this.authResponse.size) |> buffer.writeInt1
             this.authResponse |> buffer.writeLengthEncoded
         }
         // put schema if 'Connect With DB' are set
-        if(hasCapability(ConnectWithDB)){
+        if(hasCapability(ConnectWithDB)) {
             this.schema |> buffer.writeNullTerminated
         }
         //put client auth plguin
-        if(hasCapability(PluginAuth)){
+        if(hasCapability(PluginAuth)) {
             this.clientAuthPlugin |> buffer.writeNullTerminated
         }
         //put attributes
@@ -146,7 +146,7 @@ protected class HandshakeResponse <: Request {
             }
         }
         if(hasCapability(ZSTDCompressionAlgorithm)) {
-            this.zstdCompressionLevel.toLittleEndian() |> buffer.write
+            this.zstdCompressionLevel |> buffer.writeInt1
         }
         
     }
@@ -188,11 +188,11 @@ protected class SslRequeset <: Request {
 
     public override func pack(): Unit {
         //put client Capabilities
-        this.capabilities.toLittleEndian() |> buffer.write
+        this.capabilities |> buffer.writeInt4
         //put max packet
-        this.maxPacket.toLittleEndian() |> buffer.write
+        this.maxPacket |> buffer.writeInt4
         //put charset
-        this.charset.toLittleEndian() |> buffer.write
+        this.charset |> buffer.write
         //put unused
         this.unused |> buffer.write
     }

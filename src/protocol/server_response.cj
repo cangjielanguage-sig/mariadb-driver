@@ -44,7 +44,7 @@ protected open class Response <: CommonResponse {
 
     protected init(length: UInt64, number: UInt8, buffer: ByteBuffer) {
         super(length, number)
-        code = ResponseCode.of(buffer.readFix1Integer())
+        code = ResponseCode.of(buffer.readInt1())
     }
 
 }
@@ -75,9 +75,9 @@ protected class OkResponse <: Response {
         //最后一个插入的ID: lenenc byte
         this.index = buffer.readLengthEncodedInteger().getOrThrow()
         //服务器状态: 2 byte
-        this.serverStatus = buffer.readFix2Integer()
+        this.serverStatus = buffer.readInt2()
         //警告数量: 2 byte
-        this.waringCount = buffer.readFix2Integer()
+        this.waringCount = buffer.readInt2()
         //this.message = ""
         //this.sessionInfo = ""
         // if(DefaultCapability.has(SessionTrack)) {
@@ -115,13 +115,13 @@ protected class ErrorResponse <: Response {
     protected init(length: UInt64, number: UInt8, buffer: ByteBuffer) {
         super(length, number, buffer)
         //错误代码: 2 byte
-        this.errorCode = buffer.readFix2Integer()
+        this.errorCode = buffer.readInt2()
         //SQL状态标记: 1 byte
-        this.serverStatusFlag = buffer.readFix1Integer()
+        this.serverStatusFlag = buffer.readInt1()
         //SQL状态: 5 byte
-        this.sqlStatus = buffer.readFixedArray(5)
+        this.sqlStatus = buffer.readArray(5)
         //错误信息: rest byte
-        this.message = buffer.readFixedString(Int64(length - 9))
+        this.message = buffer.readString(Int64(length - 9))
     }
 
 }
@@ -169,9 +169,9 @@ protected class EofResponse <: AbstractEOF {
     protected init(length: UInt64, number: UInt8, buffer: ByteBuffer) {
         super(length, number, buffer)
         //警告数量: 2 byte
-        this.waringCount = buffer.readFix2Integer()
+        this.waringCount = buffer.readInt2()
         //状态标志
-        this.status = buffer.readFix2Integer()
+        this.status = buffer.readInt2()
     }
 
 }
@@ -195,16 +195,16 @@ protected class PrepareResposne <: Response {
     protected init(length: UInt64, number: UInt8, buffer: ByteBuffer) {
         super(length, number, buffer)
         //语句id: 4 byte
-        this.statementId = buffer.readFix4Integer()
+        this.statementId = buffer.readInt4()
         //列的数量: 2 byte
-        this.numColumns = buffer.readFix2Integer()
+        this.numColumns = buffer.readInt2()
         //参数的数量: 2 byte
-        this.numParams = buffer.readFix2Integer()
+        this.numParams = buffer.readInt2()
         //保留位: 1 byte
         this.reserved = 0x00
         //警告数量
         if(length > 12) {
-            this.warningCount = buffer.readFix2Integer()
+            this.warningCount = buffer.readInt2()
         }else {
             this.warningCount = 0
         }

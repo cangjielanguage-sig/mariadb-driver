@@ -24,7 +24,7 @@ import std.io.*
 
 extend ByteBuffer {
 
-    public func readFixedArray(length: Int64): Array<Byte> {
+    public func readArray(length: Int64): Array<Byte> {
         if (length == 0) {
             return []
         }
@@ -34,8 +34,8 @@ extend ByteBuffer {
         return data
     }
 
-    public func readFixedString(size: Int64): String {
-        return String.fromUtf8(readFixedArray(size))
+    public func readString(size: Int64): String {
+        return String.fromUtf8(readArray(size))
     }
 
     public func readNullTerminatedString(): String {
@@ -44,7 +44,7 @@ extend ByteBuffer {
 
     public func readNullTerminatedStringRaw(): Array<Byte> {
         let offset = this.bytes().indexOf(0) ?? throw InvalidPacketException("read a null terminated string failed")
-        let data = readFixedArray(offset)
+        let data = readArray(offset)
         this.readByte()//skip \0
         return data
     }
@@ -59,13 +59,21 @@ extend ByteBuffer {
     public func readLengthEncodedStringRaw(): ?Array<Byte> {
         match (readLengthEncodedInteger()) {
             case None => return None
-            case Some(length) => return readFixedArray(Int64(length))
+            case Some(length) => return readArray(Int64(length))
         }
     }
 
 }
 
 extend ByteBuffer {
+
+    public func writeArray(value: Array<Byte>): Unit {
+        write(value)
+    }
+
+    public func writeString(value: String): Unit {
+        write(value.toArray())
+    }
 
     public func writeNullTerminated(value: String): Unit {
         return writeNullTerminated(value.toArray())

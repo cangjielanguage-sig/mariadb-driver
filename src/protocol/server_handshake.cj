@@ -75,23 +75,23 @@ protected class Handshake <: CommonResponse {
     protected init(length: UInt64, number: UInt8, buffer: ByteBuffer) {
         super(length, number)
         // 协议: 1 byte
-        this.protocol = buffer.readFix1Integer()
+        this.protocol = buffer.readInt1()
         // 服务器版本: null end
         this.version = buffer.readNullTerminatedString()
         // 线程id: 4 byte
-        this.threadId = buffer.readFix4Integer()
+        this.threadId = buffer.readInt4()
         // 随机盐: null end
         this.salt1 = buffer.readNullTerminatedStringRaw()
         // 服务器权能标志: 2 byte
-        this.serverCapabilities = buffer.readFix2Integer()
+        this.serverCapabilities = buffer.readInt2()
         // 服务字符编码集: 1 byte
-        this.serverLanguage = buffer.readFix1Integer()
+        this.serverLanguage = buffer.readInt1()
         // 服务器状态: 2 byte
-        this.serverStatus = buffer.readFix2Integer()
+        this.serverStatus = buffer.readInt2()
         // 服务器权能标志扩展: 2 byte
-        this.extendedServerCapabilities = buffer.readFix2Integer()
+        this.extendedServerCapabilities = buffer.readInt2()
         // 认证插件长度: 1 byte
-        this.authenticationDataLength = buffer.readFix1Integer()
+        this.authenticationDataLength = buffer.readInt1()
         // if(hasCapability(PluginAuth)){
         //     this.authenticationDataLength = buffer.readOneByte()
         // }else{

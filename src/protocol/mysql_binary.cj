@@ -496,26 +496,26 @@ extend DateTime {
         match (data.size) {
             case 0 => throw IllegalFormatException()
             case 4 =>
-                let year = buffer.readFix2Integer()
-                let month = buffer.readFix1Integer()
-                let day = buffer.readFix1Integer()
+                let year = buffer.readInt2()
+                let month = buffer.readInt1()
+                let day = buffer.readInt1()
                 return DateTime.of(year: Int64(year), month: Int64(month), dayOfMonth: Int64(day), timeZone: TimeZone.Local)
             case 7 =>
-                let year = buffer.readFix2Integer()
-                let month = buffer.readFix1Integer()
-                let day = buffer.readFix1Integer()
-                let hour = buffer.readFix1Integer()
-                let minute = buffer.readFix1Integer()
-                let second = buffer.readFix1Integer()
+                let year = buffer.readInt2()
+                let month = buffer.readInt1()
+                let day = buffer.readInt1()
+                let hour = buffer.readInt1()
+                let minute = buffer.readInt1()
+                let second = buffer.readInt1()
                 return DateTime.of(year: Int64(year), month: Int64(month), dayOfMonth: Int64(day), hour: Int64(hour), minute: Int64(minute), second: Int64(second), timeZone: TimeZone.Local)
             case 11 =>
-                let year = buffer.readFix2Integer()
-                let month = buffer.readFix1Integer()
-                let day = buffer.readFix1Integer()
-                let hour = buffer.readFix1Integer()
-                let minute = buffer.readFix1Integer()
-                let second = buffer.readFix1Integer()
-                let micorSecond = buffer.readFix4Integer()
+                let year = buffer.readInt2()
+                let month = buffer.readInt1()
+                let day = buffer.readInt1()
+                let hour = buffer.readInt1()
+                let minute = buffer.readInt1()
+                let second = buffer.readInt1()
+                let micorSecond = buffer.readInt4()
                 return DateTime.of(year: Int64(year),month: Int64(month),dayOfMonth: Int64(day),hour: Int64(hour), minute: Int64(minute),second: Int64(second),nanosecond: Int64(micorSecond),timeZone: TimeZone.Local)
             case _ => throw InvalidPacketException("")
         }
@@ -526,19 +526,19 @@ extend DateTime {
         match (data.size) {
             case 0 => throw IllegalFormatException()
             case 8 =>
-                let _ = buffer.readFix1Integer() //negative
-                let _ = buffer.readFix4Integer() //day
-                let hour = buffer.readFix1Integer()
-                let minute = buffer.readFix1Integer()
-                let second = buffer.readFix1Integer()
+                let _ = buffer.readInt1() //negative
+                let _ = buffer.readInt4() //day
+                let hour = buffer.readInt1()
+                let minute = buffer.readInt1()
+                let second = buffer.readInt1()
                 return DateTime.of(year: 1970, month: 1, dayOfMonth: 1, hour: Int64(hour), minute: Int64(minute),second: Int64(second), timeZone: TimeZone.Local)
             case 12 =>
-                let _ = buffer.readFix1Integer() //negative
-                let _ = buffer.readFix4Integer() //day
-                let hour = buffer.readFix1Integer()
-                let minute = buffer.readFix1Integer()
-                let second = buffer.readFix1Integer()
-                let micorSecond = buffer.readFix4Integer()
+                let _ = buffer.readInt1() //negative
+                let _ = buffer.readInt4()//day
+                let hour = buffer.readInt1()
+                let minute = buffer.readInt1()
+                let second = buffer.readInt1()
+                let micorSecond = buffer.readInt4()
                 return DateTime.of(year: 1970, month: 1, dayOfMonth: 1, hour: Int64(hour), minute: Int64(minute),second: Int64(second), nanosecond: Int64(micorSecond), timeZone: TimeZone.Local)
             case _ => throw InvalidPacketException("")
         }

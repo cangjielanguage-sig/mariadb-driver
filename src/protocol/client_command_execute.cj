@@ -59,11 +59,11 @@ protected class ExecuteCommand <: Command {
     public override func pack(): Unit {
         super.pack()
         // id
-        this.statementId.toLittleEndian() |> buffer.write
+        this.statementId |> buffer.writeInt4
         // flag
-        this.flags.value() |> buffer.write
+        this.flags.value() |> buffer.writeInt1
         // iteration_count
-        this.iterationCount.toLittleEndian() |> buffer.write
+        this.iterationCount |> buffer.writeInt4
         if (parameterCount > 0 || flags == ParameterCountAvailable) {
             if (HandshakeResponse.getDefault(0).hasCapability(QueryAttributes)) {
                 //parameter_count
@@ -80,22 +80,22 @@ protected class ExecuteCommand <: Command {
                         case _ => continue
                     }
                 }
-                this.nullBitMap |> buffer.write
+                this.nullBitMap |> buffer.writeArray
 
                 // new_params_bind_flag
-                this.newParamsBindFlag |> buffer.write
+                this.newParamsBindFlag |> buffer.writeInt1
                 if (newParamsBindFlag == 1) {
                     //parameter_type
                     for(i in 0..params.size) {
                         match (params[i]) {
                             case v: NativeType => v.writeType(buffer)
-                            case v: InputStream => [ColumnType.LongBlob.value(), 0x00] |> buffer.write
-                            case v: ?Any => [ColumnType.Null.value(), 0x00] |> buffer.write
+                            case v: InputStream => [ColumnType.LongBlob.value(), 0x00] |> buffer.writeArray
+                            case v: ?Any => [ColumnType.Null.value(), 0x00] |> buffer.writeArray
                             case _ => throw UnsupportedException("")
                         }
                     }
                     if (HandshakeResponse.getDefault(0).hasCapability(QueryAttributes)) {
-                        0x00 |> buffer.write //paramter name: default null
+                        0x00 |> buffer.writeInt1 //paramter name: default null
                     }
                 }
 

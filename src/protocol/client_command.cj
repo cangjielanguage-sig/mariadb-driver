@@ -29,7 +29,7 @@ protected abstract class Command <: Request {
     }
 
     protected open override func pack(): Unit {
-        this.commandType.value() |> buffer.write
+        this.commandType.value() |> buffer.writeInt1
     }
 
 }
@@ -49,7 +49,7 @@ protected class QueryCommand <: Command {
 
     protected override func pack(): Unit {
         super.pack()
-        this.query.toArray() |> buffer.write
+        this.query |> buffer.writeString
     }
 
 }
@@ -69,7 +69,7 @@ protected class PrepareCommand <: Command {
 
     public override func pack(): Unit{
         super.pack()
-        this.sql.toArray() |> buffer.write
+        this.sql |> buffer.writeString
     }
 
 }
@@ -93,8 +93,8 @@ protected class FetchCommand <: Command {
 
     protected override func pack(): Unit {
         super.pack()
-        this.statemetnId.toLittleEndian() |> buffer.write
-        this.numRows.toLittleEndian() |> buffer.write
+        this.statemetnId |> buffer.writeInt4
+        this.numRows |> buffer.writeInt4
     }
 
 }
@@ -114,7 +114,7 @@ protected class CloseCommand <: Command {
 
     protected override func pack(): Unit {
         super.pack()
-        this.statementId.toLittleEndian() |> buffer.write
+        this.statementId |> buffer.writeInt4
     }
 }
 
@@ -133,7 +133,7 @@ protected class ResetCommand <: Command {
 
     public override func pack(): Unit {
         super.pack()
-        this.statementId.toLittleEndian() |> buffer.write
+        this.statementId |> buffer.writeInt4
     }
 }
 
@@ -158,8 +158,8 @@ protected class SendLongDataCommand <: Command {
 
     public override func pack(): Unit {
         super.pack()
-        this.statemetnId.toLittleEndian() |> buffer.write
-        this.parameterId.toLittleEndian() |> buffer.write
+        this.statemetnId |> buffer.writeInt4
+        this.parameterId |> buffer.writeInt2
         this.data |> buffer.write
     }
 

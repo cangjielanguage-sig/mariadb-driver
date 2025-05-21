@@ -50,7 +50,7 @@ USE driver_test;
 #数字类型测试表
 CREATE TABLE numeric_types (
   `bool_col` tinyint(1) ,             -- bool_col (TINYINT(1), 0/1)
-  `bit_col` bit(64)                   -- -- bit_col (BIT类型，64位二进制存储，范围: b'0'~b'1111111111111111111111111111111111111111111111111111111111111111')
+  `bit_col` bit(64) ,                  -- -- bit_col (BIT类型，64位二进制存储，范围: b'0'~b'1111111111111111111111111111111111111111111111111111111111111111')
   `tinyint_col` tinyint ,             -- tinyint_col (有符号TINYINT, 范围: -128~127)
   `utinyint_col` tinyint UNSIGNED ,   -- utinyint_col (无符号TINYINT, 范围: 0~255)
   `smallint_col` smallint,            -- smallint_col (有符号SMALLINT, 范围: -32768~32767)

@@ -43,7 +43,7 @@ protected class InitDbCommand <: Command {
 
     protected override func pack(): Unit {
         super.pack()
-        database.toArray() |> buffer.write
+        database |> buffer.writeString
     }
 }
 
@@ -104,7 +104,7 @@ protected class SetOptionCommand <: Command {
 
     protected override func pack(): Unit {
         super.pack()
-        operation.value().toLittleEndian() |> buffer.write
+        operation.value() |> buffer.writeInt2
     }
 
 }

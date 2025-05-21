@@ -31,7 +31,7 @@ protected open class AuthMoreData <: Response {
 
     internal init(length: UInt64, number: UInt8, buffer: ByteBuffer) {
         super(length, number, buffer)
-        this.authRep = buffer.readFixedArray(Int64(length - 1))
+        this.authRep = buffer.readArray(Int64(length - 1))
     }
 
 }

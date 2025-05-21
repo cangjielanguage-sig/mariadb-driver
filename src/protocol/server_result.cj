@@ -76,17 +76,17 @@ protected class ColumnDefinition <: CommonResponse {
         //列名: lenenc
         this.originalName = buffer.readLengthEncodedString().getOrThrow()
         //保留位: 1 byte
-        this.padding = buffer.readFix1Integer()
+        this.padding = buffer.readInt1()
         //字符集: 2 byte
-        this.charset = Charset.of(buffer.readFix2Integer())
+        this.charset = Charset.of(buffer.readInt2())
         //字段最大长度: 4 byte
-        this.columnLength = buffer.readFix4Integer()
+        this.columnLength = buffer.readInt4()
         //列类型: 1 byte
-        this.columnType = ColumnType.of(buffer.readFix1Integer())
+        this.columnType = ColumnType.of(buffer.readInt1())
         //列标志: 2 byte
-        this.flags =buffer.readFix2Integer()
+        this.flags =buffer.readInt2()
         //精度: 1 byte
-        this.decimals = buffer.readFix1Integer()
+        this.decimals = buffer.readInt1()
     }
 
     protected func hasFlag(flag: ColumnFlag): Bool {
@@ -126,7 +126,7 @@ protected class BinaryResult <: Response {
         let columnCount = columnInfos.size
         //null数据位图
         let size = (columnCount + 7 + 2) / 8
-        this.nullMap = buffer.readFixedArray(size)
+        this.nullMap = buffer.readArray(size)
         //二进制数据
         this.row = Array<?Array<Byte>>(columnCount, repeat: [])
         for (i in 0..columnCount){
@@ -139,18 +139,18 @@ protected class BinaryResult <: Response {
                 match (columnType) {
                     case Null => continue
                     case Tiny =>
-                        row[i] = buffer.readFixedArray(1)
+                        row[i] = buffer.readArray(1)
                     case Short | Year =>
-                        row[i] = buffer.readFixedArray(2)
+                        row[i] = buffer.readArray(2)
                     case Long | Int24 | Float =>
-                        row[i] = buffer.readFixedArray(4)
+                        row[i] = buffer.readArray(4)
                     case LongLong | Double =>
-                        row[i] = buffer.readFixedArray(8)
+                        row[i] = buffer.readArray(8)
                     case String | NewDecimal | Json | Enum | Set | TinyBlob | MediumBlob | LongBlob | Blob | VarString | Bit =>
                          row[i] = buffer.readLengthEncodedStringRaw()
                     case Date | DateTime | Timestamp | Time =>
-                        let flag = buffer.readFix1Integer()
-                        row[i] = buffer.readFixedArray(Int64(flag))
+                        let flag = buffer.readInt1()
+                        row[i] = buffer.readArray(Int64(flag))
                     //case _ => throw Exception("Unsupport MySQL binary type")
                 }
             }

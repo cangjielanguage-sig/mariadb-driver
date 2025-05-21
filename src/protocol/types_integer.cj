@@ -24,29 +24,29 @@ import std.io.*
 
 extend ByteBuffer {
 
-    public func readFix1Integer(): UInt8 {
-        return UInt8.fromLittleEndian(readFixedArray(1))
+    public func readInt1(): UInt8 {
+        return UInt8.fromLittleEndian(readArray(1))
     }
 
-    public func readFix2Integer(): UInt16 {
-        return UInt16.fromLittleEndian(readFixedArray(2))
+    public func readInt2(): UInt16 {
+        return UInt16.fromLittleEndian(readArray(2))
     }
 
-    // public func readFix3Integer(): UInt32 {
-    //     return UInt32.fromLittleEndian(readFixedArray(3))
-    // }
-
-    public func readFix4Integer(): UInt32 {
-        return UInt32.fromLittleEndian(readFixedArray(4))
+    public func readInt3(): UInt32 {
+        return UInt32.fromLittleEndian(readArray(3))
     }
 
-    // public func readFix6Integer(): UInt64 {
-    //     return UInt64.fromLittleEndian(readFixedArray(6))
-    // }
+    public func readInt4(): UInt32 {
+        return UInt32.fromLittleEndian(readArray(4))
+    }
 
-    // public func readFix8Integer(): UInt64 {
-    //     return UInt64.fromLittleEndian(readFixedArray(8))
-    // }
+    public func readInt6(): UInt64 {
+        return UInt64.fromLittleEndian(readArray(6))
+    }
+
+    public func readInt8(): UInt64 {
+        return UInt64.fromLittleEndian(readArray(8))
+    }
 
     public func readLengthEncodedInteger(): ?UInt64 {
         match (readLengthEncodedIntegerRaw()) {
@@ -56,15 +56,15 @@ extend ByteBuffer {
     }
 
     public func readLengthEncodedIntegerRaw(): ?Array<Byte> {
-        let flag = readFix1Integer()
+        let flag = readInt1()
         match (flag) {
             case 0xFB => return None
             case 0xFC =>
-                return readFixedArray(2)
+                return readArray(2)
             case 0xFD =>
-                return readFixedArray(3)
+                return readArray(3)
             case 0xFE =>
-                return readFixedArray(8)
+                return readArray(8)
             case 0xFF => throw InvalidPacketException("This packet is Error packet")
             case _ => return [flag]
         }
@@ -74,18 +74,42 @@ extend ByteBuffer {
 
 extend ByteBuffer {
 
+    protected func writeInt1(value: UInt8): Unit {
+        write(value)
+    }
+
+    protected func writeInt2(value: UInt16): Unit {
+        write(value.toLittleEndian())
+    }
+
+    protected func writeInt3(value: UInt32): Unit {
+        write(value.toLittleEndian().slice(0, 3))
+    }
+
+    protected func writeInt4(value: UInt32): Unit {
+        write(value.toLittleEndian())
+    }
+
+    protected func writeInt6(value: UInt32): Unit {
+        write(value.toLittleEndian().slice(0, 6))
+    }
+
+    protected func writeInt8(value: UInt64): Unit {
+        write(value.toLittleEndian())
+    }
+
     protected func writeLengthEncoded(value: UInt64): Unit {
         if (value < 0xFB) {
-            write(UInt8(value))
+            writeInt1(UInt8(value))
         } else if (value < UInt64(1 << 16)) {
-            write(0xFC)
-            write(UInt16(value).toLittleEndian())
+            writeInt1(0xFC)
+            writeInt2(UInt16(value))
         } else if (value < UInt64(1 << 24)) {
-            write(0xFD)
-            write(UInt32(value).toLittleEndian().slice(0, 3))
+            writeInt1(0xFD)
+            writeInt3(UInt32(value))
         } else {
-            write(0xFE)
-            write(value.toLittleEndian())
+            writeInt1(0xFEu8)
+            writeInt8(value)
         }
     }
 
