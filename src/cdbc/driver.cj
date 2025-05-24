@@ -83,15 +83,15 @@ public class MySqlDriver <: Driver {
 
     private func setPooledDataSourceParam(datasource: PooledDatasource, k: String, v: String): Unit {
         if (k == Params.PoolConnectionTimout) {
-            let connnectionTimeout = Int64.tryParse(v) ?? throw IllegalArgumentException("Parse PoolConnectionTimout failed: ${v}")
+            let connnectionTimeout = Float64.tryParse(v) ?? throw IllegalArgumentException("Parse PoolConnectionTimout failed: ${v}")
             return datasource.connectionTimeout = Duration.second * connnectionTimeout
         }
         if (k == Params.PoolIdleTimout) {
-            let idleTimeout = Int64.tryParse(v) ?? throw IllegalArgumentException("Parse PoolIdleTimout failed: ${v}")
+            let idleTimeout = Float64.tryParse(v) ?? throw IllegalArgumentException("Parse PoolIdleTimout failed: ${v}")
             return datasource.idleTimeout = Duration.minute * idleTimeout
         }
         if (k == Params.PoolKeepaliveTime) {
-            let keepaliveTime = Int64.tryParse(v) ?? throw IllegalArgumentException("Parse PoolKeepaliveTime failed: ${v}")
+            let keepaliveTime = Float64.tryParse(v) ?? throw IllegalArgumentException("Parse PoolKeepaliveTime failed: ${v}")
             return datasource.keepaliveTime = Duration.minute * keepaliveTime
         }
         if (k == Params.PoolMaxIdleSize) {
@@ -99,7 +99,7 @@ public class MySqlDriver <: Driver {
             return datasource.maxIdleSize = maxIdleSize
         }
         if (k == Params.PoolMaxLifeTime) {
-            let maxLifeTime = Int64.tryParse(v) ?? throw IllegalArgumentException("Parse PoolMaxLifeTime failed: ${v}")
+            let maxLifeTime = Float64.tryParse(v) ?? throw IllegalArgumentException("Parse PoolMaxLifeTime failed: ${v}")
             return datasource.maxLifeTime = Duration.minute * maxLifeTime
         }
         if (k == Params.PoolMaxSize) {

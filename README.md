@@ -178,12 +178,12 @@ main(){
 | tls1.2.ciphersuites     | 此选项指定客户端允许使用 TLSv1.2 及以下的加密连接使用哪些密码套件。 |                                                            |           | No                                |
 | tls1.3.ciphersuites     | 此选项指定客户端允许使用 TLSv1.3 的加密连接使用哪些密码套件。 |                                                            |           | No                                |
 | tls.version             | 支持的 TLS 版本号，值为逗号分隔的字符串，比如 "TLSv1.2,TLSv1.3"。 |                                                            |           | No                                |
-| pool.connection_timeout | 从池中获取连接的超时时间。单位 s                             |                                                            | 30        | No                                |
-| pool.idle_timeout       | 允许连接在池中闲置的最长时间，超过这个时间的空闲连接可能会被回收。单位 m |                                                            | 10        | No                                |
-| pool.keepalive_time     | 检查空闲连接健康状况的间隔时间，防止它被数据库或网络基础设施超时。单位 m |                                                            | 1         | No                                |
-| pool.max_idle_size      | 最大空闲连接数量，超过这个数量的空闲连接会被关闭，负数或0表示无限制。 |                                                            | 0         | No                                |
-| pool.max_life_time      | 自连接创建以来的持续时间，在该持续时间之后，连接将自动关闭。单位 m |                                                            | 30        | No                                |
-| pool.max_size           | 连接池最大连接数量，负数或0表示无限制。                      |                                                            | 10        | No                                |
+| pool.connection.timeout | 从池中获取连接的超时时间。单位 s                             |                                                            | 30        | No                                |
+| pool.idle.timeout       | 允许连接在池中闲置的最长时间，超过这个时间的空闲连接可能会被回收。单位 m |                                                            | 10        | No                                |
+| pool.keepalive.time     | 检查空闲连接健康状况的间隔时间，防止它被数据库或网络基础设施超时。单位 m |                                                            | 1         | No                                |
+| pool.max.idle.size      | 最大空闲连接数量，超过这个数量的空闲连接会被关闭，负数或0表示无限制。 |                                                            | 0         | No                                |
+| pool.max.life.time      | 自连接创建以来的持续时间，在该持续时间之后，连接将自动关闭。单位 m |                                                            | 30        | No                                |
+| pool.max.size           | 连接池最大连接数量，负数或0表示无限制。                      |                                                            | 10        | No                                |
 
 ### 3.4目前已知的一些问题
 

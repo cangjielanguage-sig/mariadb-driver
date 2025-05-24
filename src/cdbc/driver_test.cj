@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2024 Yesokim
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,13 +16,14 @@
 package mysql.cdbc
 
 import std.time.*
+import std.collection.*
 import std.unittest.*
 import std.unittest.testmacro.*
 import std.math.numeric.*
 import std.database.sql.*
+
 @Test
 protected class DriverTest {
-
     @TestCase
     public func mysqlTest(): Unit {
         let driver = DriverManager.getDriver("mysql").getOrThrow()
@@ -60,6 +61,51 @@ protected class DriverTest {
         insetTest(connection)
     }
 
+    @TestCase
+    public func pooledDatasourceTest(): Unit {
+        let driver = DriverManager.getDriver("mysql").getOrThrow()
+
+        let username = ("username", "test_user")
+        let password = ("password", "test_user")
+        let database = ("database", "driver_test")
+        let sslMode = ("ssl.mode", "disabled")
+        let timeout = ("pool.connection.timeout", "10")
+        let idleTimeout = ("pool.idle.timeout", "1")
+        let keepaliveTime = ("pool.keepalive.time", "0.5")
+        let maxIdleSize = ("pool.max.idle.size", "30")
+        let maxLifeTime = ("pool.max.life..time", "10")
+        let maxSize = ("pool.max.size", "100")
+        let params = ArrayList<(String, String)>()
+        params.add(username)
+        params.add(password)
+        params.add(database)
+        params.add(sslMode)
+        params.add(timeout)
+        params.add(idleTimeout)
+        params.add(keepaliveTime)
+        params.add(maxIdleSize)
+        params.add(maxLifeTime)
+        params.add(maxSize)
+        let dataSource = driver.open("mysql://localhost:3306", params.toArray())
+
+        let pool = (dataSource as PooledDatasource) ?? throw Exception()
+        //允许连接在池中闲置的最长时间，超过这个时间的空闲连接可能会被回收。默认值10m
+        pool.idleTimeout |> println
+        //连接池最大连接数量，负数或0表示无限制。默认值10
+        pool.maxSize |> println
+        //最大空闲连接数量，超过这个数量的空闲连接会被关闭，负数或0表示无限制。默认值0
+        pool.maxIdleSize |> println
+        //自连接创建以来的持续时间，在该持续时间之后，连接将自动关闭。单位 m， 默认值30m
+        pool.maxLifeTime |> println
+        //从池中获取连接的超时时间。默认值30s
+        pool.connectionTimeout |> println
+        // 检查空闲连接健康状况的间隔时间，防止它被数据库或网络基础设施超时。单位 m，默认值1m
+        pool.keepaliveTime |> println
+        let conn = dataSource.connect()
+        conn.close()
+        dataSource.connect()
+
+    }
 }
 
 protected func insetTest(conn: Connection): Unit {
@@ -137,9 +183,15 @@ protected func characterInsertTest(conn: Connection): Unit {
     statement.set<String>(1, "我冒了严寒，回到相隔二千余里，别了二十余年的故乡去。")
     statement.set<String>(2, "时候既然是深冬；渐近故乡时，天气又阴晦了，冷风吹进船舱中")
     statement.set<String>(3, "于是我自己解释说：故乡本也如此，——虽然没有进步，也未必有如我所感的悲凉")
-    statement.set<String>(4, "我所记得的故乡全不如此。我的故乡好得多了。但要我记起他的美丽，说出他的佳处来，却又没有影像，没有言辞了。仿佛也就如此。")
-    statement.set<String>(5, "但我们终于谈到搬家的事。我说外间的寓所已经租定了，又买了几件家具，此外须将家里所有的木器卖去，再去增添。母亲也说好，而且行李也略已齐集，木器不便搬运的，也小半卖去了，只是收不起钱来。\r\n\r\n“你休息一两天，去拜望亲戚本家一回，我们便可以走了。”母亲说。\r\n\r\n“是的。”\r\n\r\n“还有闰土，他每到我家来时，总问起你，很想见你一回面。我已经将你到家的大约日期通知他，他也许就要来了。”\r\n\r\n这时候，我的脑里忽然闪出一幅神异的图画来：深蓝的天空中挂着一轮金黄的圆月，下面是海边的沙地，都种着一望无际的碧绿的西瓜，其间有一个十一二岁的少年，项带银圈，手捏一柄钢叉，向一匹猹⑵尽力的刺去，那猹却将身一扭，反从他的胯下逃走了。")
-    statement.set<String>(6, "这少年便是闰土。我认识他时，也不过十多岁，离现在将有三十年了；那时我的父亲还在世，家景也好，我正是一个少爷。那一年，我家是一件大祭祀的值年⑶。这祭祀，说是三十多年才能轮到一回，所以很郑重；正月里供祖像，供品很多，祭器很讲究，拜的人也很多，祭器也很要防偷去。我家只有一个忙月（我们这里给人做工的分三种：整年给一定人家做工的叫长工；按日给人做工的叫短工；自己也种地，只在过年过节以及收租时候来给一定人家做工的称忙月），忙不过来，他便对父亲说，可以叫他的儿子闰土来管祭器的。\r\n\r\n我的父亲允许了；我也很高兴，因为我早听到闰土这名字，而且知道他和我仿佛年纪，闰月生的，五行缺土⑷，所以他的父亲叫他闰土。他是能装〔弓京〕捉小鸟雀的。\r\n\r\n我于是日日盼望新年，新年到，闰土也就到了。好容易")
+    statement.set<String>(4,
+        "我所记得的故乡全不如此。我的故乡好得多了。但要我记起他的美丽，说出他的佳处来，却又没有影像，没有言辞了。仿佛也就如此。"
+    )
+    statement.set<String>(5,
+        "但我们终于谈到搬家的事。我说外间的寓所已经租定了，又买了几件家具，此外须将家里所有的木器卖去，再去增添。母亲也说好，而且行李也略已齐集，木器不便搬运的，也小半卖去了，只是收不起钱来。\r\n\r\n“你休息一两天，去拜望亲戚本家一回，我们便可以走了。”母亲说。\r\n\r\n“是的。”\r\n\r\n“还有闰土，他每到我家来时，总问起你，很想见你一回面。我已经将你到家的大约日期通知他，他也许就要来了。”\r\n\r\n这时候，我的脑里忽然闪出一幅神异的图画来：深蓝的天空中挂着一轮金黄的圆月，下面是海边的沙地，都种着一望无际的碧绿的西瓜，其间有一个十一二岁的少年，项带银圈，手捏一柄钢叉，向一匹猹⑵尽力的刺去，那猹却将身一扭，反从他的胯下逃走了。"
+    )
+    statement.set<String>(6,
+        "这少年便是闰土。我认识他时，也不过十多岁，离现在将有三十年了；那时我的父亲还在世，家景也好，我正是一个少爷。那一年，我家是一件大祭祀的值年⑶。这祭祀，说是三十多年才能轮到一回，所以很郑重；正月里供祖像，供品很多，祭器很讲究，拜的人也很多，祭器也很要防偷去。我家只有一个忙月（我们这里给人做工的分三种：整年给一定人家做工的叫长工；按日给人做工的叫短工；自己也种地，只在过年过节以及收租时候来给一定人家做工的称忙月），忙不过来，他便对父亲说，可以叫他的儿子闰土来管祭器的。\r\n\r\n我的父亲允许了；我也很高兴，因为我早听到闰土这名字，而且知道他和我仿佛年纪，闰月生的，五行缺土⑷，所以他的父亲叫他闰土。他是能装〔弓京〕捉小鸟雀的。\r\n\r\n我于是日日盼望新年，新年到，闰土也就到了。好容易"
+    )
     statement.set<Array<Byte>>(7, [])
     statement.set<Array<Byte>>(8, Array<Byte>(1024, repeat: 0))
     statement.set<Array<Byte>>(9, Array<Byte>(1024 * 1024, repeat: 0))
@@ -157,7 +209,7 @@ protected func characterInsertTest(conn: Connection): Unit {
 protected func numericQueryTest(conn: Connection): Unit {
     let statement = conn.prepareStatement("select * from numeric_types")
     let result = statement.query()
-    while(result.next()) {
+    while (result.next()) {
         result.getOrNull<Bool>(1) |> println
         result.getOrNull<Array<Byte>>(2) |> println
         result.getOrNull<Int8>(3) |> println
@@ -173,13 +225,13 @@ protected func numericQueryTest(conn: Connection): Unit {
         result.getOrNull<Float32>(13) |> println
         result.getOrNull<Float64>(14) |> println
         result.getOrNull<Decimal>(15) |> println
-    } 
+    }
 }
 
 protected func timeQueryTest(conn: Connection): Unit {
     let statement = conn.prepareStatement("select * from time_types")
     let result = statement.query()
-    while(result.next()) {
+    while (result.next()) {
         result.getOrNull<DateTime>(1) |> println
         result.getOrNull<DateTime>(2) |> println
         result.getOrNull<DateTime>(3) |> println
@@ -191,7 +243,7 @@ protected func timeQueryTest(conn: Connection): Unit {
 protected func characterQueryTest(conn: Connection): Unit {
     let statement = conn.prepareStatement("select * from character_types")
     let result = statement.query()
-    while(result.next()) {
+    while (result.next()) {
         result.getOrNull<String>(1) |> println
         result.getOrNull<String>(2) |> println
         result.getOrNull<String>(3) |> println
@@ -205,5 +257,5 @@ protected func characterQueryTest(conn: Connection): Unit {
         result.getOrNull<String>(11) |> println
         result.getOrNull<String>(12) |> println
         result.getOrNull<String>(13) |> println
-    } 
+    }
 }

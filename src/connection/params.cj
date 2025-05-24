@@ -45,7 +45,7 @@ protected class Params {
     /**
     * connect 操作的超时时间，单位 ms。
     */
-    protected static const ConnectionTimeout = "connection_timeout"
+    protected static const ConnectionTimeout = "connection.timeout"
 
     /**
     * 数据库字符集编码类型。当前仅支持UTF-8
@@ -55,12 +55,12 @@ protected class Params {
     /**
     * query 操作的超时时间，单位 ms。
     */
-    protected static const QueryTimeout = "query_timeout"
+    protected static const QueryTimeout = "query.timeout"
 
     /**
     * update 操作的超时时间，单位 ms。
     */
-    protected static const UpdateTimeout = "update_timeout"
+    protected static const UpdateTimeout = "update.timeout"
 
     /**
     * 传输层加密模式。
@@ -112,32 +112,32 @@ protected class Params {
     /**
     * 从池中获取连接的超时时间。默认30s
     */
-    protected static const PoolConnectionTimout = "pool.connection_timeout"
+    protected static const PoolConnectionTimout = "pool.connection.timeout"
 
     /**
     * 允许连接在池中闲置的最长时间，超过这个时间的空闲连接可能会被回收。默认10m
     */
-    protected static const PoolIdleTimout = "pool.idle_timeout"
+    protected static const PoolIdleTimout = "pool.idle.timeout"
 
     /**
     * 检查空闲连接健康状况的间隔时间，防止它被数据库或网络基础设施超时。默认1m
     */
-    protected static const PoolKeepaliveTime = "pool.keepalive_time"
+    protected static const PoolKeepaliveTime = "pool.keepalive.time"
 
     /**
     * 最大空闲连接数量，超过这个数量的空闲连接会被关闭，负数或0表示无限制。默认0
     */
-    protected static const PoolMaxIdleSize = "pool.max_idle_size"
+    protected static const PoolMaxIdleSize = "pool.max.idle.size"
 
     /**
     * 自连接创建以来的持续时间，在该持续时间之后，连接将自动关闭。默认30m
     */
-    protected static const PoolMaxLifeTime = "pool.max_life_time"
+    protected static const PoolMaxLifeTime = "pool.max.life.time"
 
     /**
     * 连接池最大连接数量，负数或0表示无限制。默认10
     */
-    protected static const PoolMaxSize = "pool.max_size"
+    protected static const PoolMaxSize = "pool.max.size"
 
     
 }

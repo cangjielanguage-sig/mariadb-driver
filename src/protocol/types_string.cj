@@ -76,7 +76,7 @@ extend ByteBuffer {
     }
 
     public func writeNullTerminated(value: String): Unit {
-        return writeNullTerminated(value.toArray())
+        writeNullTerminated(value.toArray())
     }
 
     public func writeNullTerminated(value: Array<Byte>): Unit {
@@ -85,7 +85,7 @@ extend ByteBuffer {
     }
 
     public func writeLengthEncoded(value: String): Unit {
-        return writeLengthEncoded(value.toArray())
+        writeLengthEncoded(value.toArray())
     }
 
     public func writeLengthEncoded(value: Array<Byte>): Unit {

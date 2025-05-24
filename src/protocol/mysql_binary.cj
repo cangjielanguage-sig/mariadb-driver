@@ -534,7 +534,7 @@ extend DateTime {
                 return DateTime.of(year: 1970, month: 1, dayOfMonth: 1, hour: Int64(hour), minute: Int64(minute),second: Int64(second), timeZone: TimeZone.Local)
             case 12 =>
                 let _ = buffer.readInt1() //negative
-                let _ = buffer.readInt4()//day
+                let _ = buffer.readInt4() //day
                 let hour = buffer.readInt1()
                 let minute = buffer.readInt1()
                 let second = buffer.readInt1()

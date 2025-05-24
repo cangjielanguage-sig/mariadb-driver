@@ -32,21 +32,21 @@ extend ByteBuffer {
         return UInt16.fromLittleEndian(readArray(2))
     }
 
-    public func readInt3(): UInt32 {
-        return UInt32.fromLittleEndian(readArray(3))
-    }
+    // public func readInt3(): UInt32 {
+    //     return UInt32.fromLittleEndian(readArray(3))
+    // }
 
     public func readInt4(): UInt32 {
         return UInt32.fromLittleEndian(readArray(4))
     }
 
-    public func readInt6(): UInt64 {
-        return UInt64.fromLittleEndian(readArray(6))
-    }
+    // public func readInt6(): UInt64 {
+    //     return UInt64.fromLittleEndian(readArray(6))
+    // }
 
-    public func readInt8(): UInt64 {
-        return UInt64.fromLittleEndian(readArray(8))
-    }
+    // public func readInt8(): UInt64 {
+    //     return UInt64.fromLittleEndian(readArray(8))
+    // }
 
     public func readLengthEncodedInteger(): ?UInt64 {
         match (readLengthEncodedIntegerRaw()) {
@@ -90,9 +90,9 @@ extend ByteBuffer {
         write(value.toLittleEndian())
     }
 
-    protected func writeInt6(value: UInt32): Unit {
-        write(value.toLittleEndian().slice(0, 6))
-    }
+    // protected func writeInt6(value: UInt64): Unit {
+    //     write(value.toLittleEndian().slice(0, 6))
+    // }
 
     protected func writeInt8(value: UInt64): Unit {
         write(value.toLittleEndian())
@@ -108,7 +108,7 @@ extend ByteBuffer {
             writeInt1(0xFD)
             writeInt3(UInt32(value))
         } else {
-            writeInt1(0xFEu8)
+            writeInt1(0xFE)
             writeInt8(value)
         }
     }
