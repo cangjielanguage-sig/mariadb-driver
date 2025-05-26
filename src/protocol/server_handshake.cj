@@ -76,6 +76,9 @@ protected class Handshake <: CommonResponse {
         super(length, number)
         // 协议: 1 byte
         this.protocol = buffer.readInt1()
+        if(this.protocol != 10) {
+            throw InvalidPacketException("Unsupported communication protocol version ${this.protocol}")
+        }
         // 服务器版本: null end
         this.version = buffer.readNullTerminatedString()
         // 线程id: 4 byte
