@@ -55,11 +55,19 @@ public class ClientPrepareStatement <: Statement {
     }
 
     public func set<T>(index: Int, value: T): Unit {
-        parameters[index] = value
+        checkResource()
+        if(index <= 0) {
+            throw IllegalArgumentException("The parameter index must be greater than 0")
+        }
+        parameters[index - 1] = value
     }
 
     public func setNull(index: Int): Unit {
-        parameters[index] = Option<Any>.None
+        checkResource()
+        if(index <= 0) {
+            throw IllegalArgumentException("The parameter index must be greater than 0")
+        }
+        parameters[index - 1] = Option<Any>.None
     }
 
     public func update(): UpdateResult {

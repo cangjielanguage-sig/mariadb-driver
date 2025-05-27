@@ -91,14 +91,14 @@ main(): Unit {
     var statemnt = connection.prepareStatement("select * from simple")
     var result = statemnt.query()
     while (result.next()) {
-        result.get<UInt64>(0) |> println
-        result.getOrNull<String>(1) |> println
-        result.getOrNull<Int32>(2) |> println
-        result.getOrNull<Float64>(3) |> println
-        result.getOrNull<Decimal>(4) |> println
-        result.getOrNull<DateTime>(5) |> println
+        result.get<UInt64>(1) |> println
+        result.getOrNull<String>(2) |> println
+        result.getOrNull<Int32>(3) |> println
+        result.getOrNull<Float64>(4) |> println
+        result.getOrNull<Decimal>(5) |> println
         result.getOrNull<DateTime>(6) |> println
         result.getOrNull<DateTime>(7) |> println
+        result.getOrNull<DateTime>(8) |> println
     }
     
 }
@@ -122,14 +122,14 @@ main(): Unit {
     var connection = dataSource.connect()
 
     var statemnt = connection.prepareStatement("insert into simple values (?, ?, ?, ?, ?, ?, ?, ?)")
-    statemnt.set(0, 1000)
-    statemnt.set(1, "MySQL")
-    statemnt.setNull(2)
-    statemnt.set(3, 123.456789)
-    statemnt.set(4, Decimal.parse("1.234567"))
-    statemnt.set(5, DateTime.now())
+    statemnt.set(1, 1000)
+    statemnt.set(2, "MySQL")
+    statemnt.setNull(3)
+    statemnt.set(4, 123.456789)
+    statemnt.set(5, Decimal.parse("1.234567"))
     statemnt.set(6, DateTime.now())
     statemnt.set(7, DateTime.now())
+    statemnt.set(8, DateTime.now())
     var result = statemnt.update()
 
     println("effect row: ${result.rowCount} lastInsertId: ${result.lastInsertId}")

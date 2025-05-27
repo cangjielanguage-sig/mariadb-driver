@@ -61,7 +61,7 @@ public class ConnectionImpl <: Connection {
         checkEmptySql(sql)
         let index = sql.indexOf(" ") ?? sql.size
         let first = sql[0..index].toAsciiLower()
-        let crud = ["select", "upate", "insert", "delete"]
+        let crud = ["select", "update", "insert", "delete"]
         for(i in crud) {
             if(first == i) {
                 return ServerPrepareStatement(sql, this)
