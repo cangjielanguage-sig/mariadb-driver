@@ -1,8 +1,6 @@
 <div align="center">
 <h1>mysql-driver</h1>
 </div>
-
-
 <p align="center">
 <img alt="" src="https://img.shields.io/badge/release-v0.7.1-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/cjc-v0.59.6-brightgreen" style="display: inline-block;" />
@@ -53,7 +51,7 @@ cjpm.toml文件添加以下配置后，再执行cjpm update，即可在项目中
 
 ```toml
 [dependencies]
-  mysql = {git = "https://gitcode.com/Yesokim/mysql-driver.git", branch="cj-0.60.5"}
+  mysql = {git = "https://gitcode.com/Yesokim/mysql-driver.git", branch="master"}
 ```
 
 ### 3.2 功能示例
