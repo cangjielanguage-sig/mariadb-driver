@@ -1,5 +1,5 @@
 [package]
-  cjc-version = "0.60.5"
+  cjc-version = "1.0.0"
   compile-option = "-O2 --diagnostic-format=noColor -Woff deprecated"
   description = ""
   link-option = ""
