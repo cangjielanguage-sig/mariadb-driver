@@ -15,9 +15,12 @@
  */
 package mysql.cdbc
 
+import std.io.*
+import std.time.*
 import std.convert.*
 import std.collection.*
 import std.database.sql.*
+import std.math.numeric.*
 import mysql.connection.*
 
 public class ServerPrepareStatement <: Statement {
@@ -75,7 +78,36 @@ public class ServerPrepareStatement <: Statement {
         if(index <= 0) {
             throw IllegalArgumentException("The parameter index must be greater than 0")
         }
-        parameters[index - 1] = value
+        func unwrap<T>(value: ?T) {
+            if(let Some(v) <- value) {
+                parameters[index - 1] = v
+            }else {
+                parameters[index - 1] = Option<Any>.None
+            }
+        }
+        match (value) {
+            case v: ?Bool => unwrap(v)
+            case v: ?Int8 => unwrap(v)
+            case v: ?UInt8 => unwrap(v)
+            case v: ?Int16 => unwrap(v)
+            case v: ?UInt16 => unwrap(v)
+            case v: ?Int32 => unwrap(v)
+            case v: ?UInt32 => unwrap(v)
+            case v: ?Int64 => unwrap(v)
+            case v: ?UInt64 => unwrap(v)
+            case v: ?Float16 => unwrap(v)
+            case v: ?Float32 => unwrap(v)
+            case v: ?Float64 => unwrap(v)
+            case v: ?Rune => unwrap(v)
+            case v: ?String => unwrap(v)
+            case v: ?DateTime => unwrap(v)
+            case v: ?BigInt => unwrap(v)
+            case v: ?Decimal => unwrap(v)
+            case v: ?Array<Byte> => unwrap(v)
+            case v: ?InputStream => unwrap(v)
+            case _ => parameters[index - 1] = value
+        }
+        
     }
 
     public func setNull(index: Int): Unit {
