@@ -23,7 +23,7 @@ import std.math.numeric.*
 import mysql.connection.*
 
 public class QueryResultImpl <: QueryResult {
-
+    
     private var infos: Array<ColumnInfo>
 
     private var result: ResultSet
@@ -52,61 +52,39 @@ public class QueryResultImpl <: QueryResult {
     }
 
     public func get<T>(index: Int): T {
-        checkResource()
-        if(index <= 0) {
-            throw IllegalArgumentException("The index must be greater than 0")
-        }
-        let instance: Option<T> = None
-        match (instance) {
-            case v: Option<Bool> => (result.getBool(index) as Option<T> ?? throw Exception()) ?? throw Exception()
-            case v: Option<Int8> => (result.getInt8(index) as Option<T> ?? throw Exception()) ?? throw Exception()
-            case v: Option<Int16> => (result.getInt16(index) as Option<T> ?? throw Exception()) ?? throw Exception()
-            case v: Option<Int32> => (result.getInt32(index) as Option<T> ?? throw Exception()) ?? throw Exception()
-            case v: Option<Int64> => (result.getInt64(index) as Option<T> ?? throw Exception()) ?? throw Exception()
-            case v: Option<UInt8> => (result.getUInt8(index) as Option<T> ?? throw Exception()) ?? throw Exception()
-            case v: Option<UInt16> => (result.getUInt16(index) as Option<T> ?? throw Exception()) ?? throw Exception()
-            case v: Option<UInt32> => (result.getUInt32(index) as Option<T> ?? throw Exception()) ?? throw Exception()
-            case v: Option<UInt64> => (result.getUInt64(index) as Option<T> ?? throw Exception()) ?? throw Exception()
-            case v: Option<Float16> => (result.getFloat16(index) as Option<T> ?? throw Exception()) ?? throw Exception()
-            case v: Option<Float32> => (result.getFloat32(index) as Option<T> ?? throw Exception()) ?? throw Exception()
-            case v: Option<Float64> => (result.getFloat64(index) as Option<T> ?? throw Exception()) ?? throw Exception()
-            case v: Option<String> => (result.getString(index) as Option<T> ?? throw Exception()) ?? throw Exception()
-            case v: Option<Array<Byte>> => (result.getArray(index) as Option<T> ?? throw Exception()) ?? throw Exception()
-            case v: Option<InputStream> => (result.getInputStream(index) as Option<T> ?? throw Exception()) ?? throw Exception()
-            case v: Option<DateTime> => (result.getDateTime(index) as Option<T> ?? throw Exception()) ?? throw Exception()
-            case v: Option<BigInt> => (result.getBigInt(index) as Option<T> ?? throw Exception()) ?? throw Exception()
-            case v: Option<Decimal> => (result.getDecimal(index) as Option<T> ?? throw Exception()) ?? throw Exception()
-            case _ => throw UnsupportedException("unsupport type")
-        }
+        return getOrNull<T>(index) ?? throw NoneValueException()
     }
 
     public func getOrNull<T>(index: Int): ?T {
         checkResource()
-        if(index <= 0) {
+        if (index <= 0) {
             throw IllegalArgumentException("The index must be greater than 0")
         }
-        let instance: Option<T> = None
+        let instance: ?T = None
+        //var value: Any
+        let value = 
         match (instance) {
-            case v: Option<Bool> => result.getBool(index) as Option<T> ?? throw Exception()
-            case v: Option<Int8> => result.getInt8(index) as Option<T> ?? throw Exception()
-            case v: Option<Int16> => result.getInt16(index) as Option<T> ?? throw Exception()
-            case v: Option<Int32> => result.getInt32(index) as Option<T> ?? throw Exception()
-            case v: Option<Int64> => result.getInt64(index) as Option<T> ?? throw Exception()
-            case v: Option<UInt8> => result.getUInt8(index) as Option<T> ?? throw Exception()
-            case v: Option<UInt16> => result.getUInt16(index) as Option<T> ?? throw Exception()
-            case v: Option<UInt32> => result.getUInt32(index) as Option<T> ?? throw Exception()
-            case v: Option<UInt64> => result.getUInt64(index) as Option<T> ?? throw Exception()
-            case v: Option<Float16> => result.getFloat16(index) as Option<T> ?? throw Exception()
-            case v: Option<Float32> => result.getFloat32(index) as Option<T> ?? throw Exception()
-            case v: Option<Float64> => result.getFloat64(index) as Option<T> ?? throw Exception()
-            case v: Option<String> => result.getString(index) as Option<T> ?? throw Exception()
-            case v: Option<Array<Byte>> => result.getArray(index) as Option<T> ?? throw Exception()
-            case v: Option<InputStream> => result.getInputStream(index) as Option<T> ?? throw Exception()
-            case v: Option<DateTime> => result.getDateTime(index) as Option<T> ?? throw Exception()
-            case v: Option<BigInt> => result.getBigInt(index) as Option<T> ?? throw Exception()
-            case v: Option<Decimal> => result.getDecimal(index) as Option<T> ?? throw Exception()
+            case v: ?Bool => result.getBool(index)
+            case v: ?Int8 => result.getInt8(index)
+            case v: ?Int16 => result.getInt16(index)
+            case v: ?Int32 => result.getInt32(index)
+            case v: ?Int64 => result.getInt64(index)
+            case v: ?UInt8 => result.getUInt8(index)
+            case v: ?UInt16 => result.getUInt16(index)
+            case v: ?UInt32 => result.getUInt32(index)
+            case v: ?UInt64 => result.getUInt64(index)
+            case v: ?Float16 => result.getFloat16(index)
+            case v: ?Float32 => result.getFloat32(index)
+            case v: ?Float64 => result.getFloat64(index)
+            case v: ?String => result.getString(index)
+            case v: ?Array<Byte> => result.getArray(index)
+            case v: ?InputStream => result.getInputStream(index)
+            case v: ?DateTime => result.getDateTime(index)
+            case v: ?BigInt => result.getBigInt(index)
+            case v: ?Decimal => result.getDecimal(index)
             case _ => throw UnsupportedException("unsupport type")
         }
+        return (value as ?T) ?? throw IllegalStateException()
     }
 
     @Deprecated
