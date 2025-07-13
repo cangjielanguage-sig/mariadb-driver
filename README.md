@@ -13,6 +13,8 @@
 
 mysql-driver是使用Cangjie编写的mysql原生驱动程序，适配TIDB、OceanBase等国产数据库。
 
+**ORM框架**：[CORM](https://gitcode.com/Yesokim/corm)
+
 ## <img alt="" src="./doc/readme-image/readme-icon-framework.png" style="display: inline-block;" width=3%/> 2 架构
 
 ### 2.1 项目结构
