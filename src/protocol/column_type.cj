@@ -162,9 +162,9 @@ protected enum ColumnType <: ToString {
                 }
             case LongLong =>
                 if (unsigned) {
-                    "UInt16"
+                    "UInt64"
                 } else {
-                    "Int16"
+                    "Int64"
                 }
             case Float => "Float32"
             case Double => "Float64"
