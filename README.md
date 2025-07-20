@@ -46,8 +46,6 @@ mysql-driver是使用Cangjie编写的mysql原生驱动程序，适配TIDB、Ocea
 >
 > windows openSSL预编译包下载 -> https://slproweb.com/products/Win32OpenSSL.html
 
-<img alt="" src="./doc/readme-image/env.png"/>
-
 ### 3.1 编译构建（Win/Linux/Mac）
 
 cjpm.toml文件添加以下配置后，再执行cjpm update，即可在项目中引入mysql-driver。（需要额外设置环境变量CANGJIE_STDX，值为stdx的路径）
@@ -166,10 +164,8 @@ main(){
 | host                    | 主机地址                                                     |                                                            |           | Yes                               |
 | port                    | 服务端口                                                     |                                                            | 3306      | No                                |
 | database                | 数据库                                                       |                                                            |           | No                                |
-| connection_timeout      | connect 操作的超时时间，单位 ms。                            |                                                            |           | No                                |
-| query_timeout           | query 操作的超时时间，单位 ms。                              |                                                            |           | No                                |
-| update_timeout          | update 操作的超时时间，单位 ms。                             |                                                            |           | No                                |
-| encoding                | 数据库字符集编码类型。当前仅支持UTF-8                        |                                                            | utf-8     | No                                |
+| connection_timeout      | connect 操作的超时时间，单位 ms。                            |                                                            |           | Nop                               |
+| prepare.mode            | 预编译模式                                                   | server或client                                             | client    | No                                |
 | ssl.mode                | 传输层加密模式。                                             | disabled,preferred(default),required,verify_ca,verify_full | preferred | No                                |
 | ssl.ca                  | 证书颁发机构（ CA ）证书文件的路径名                         |                                                            |           | No                                |
 | ssl.cert                | 客户端 SSL 公钥证书文件的路径名。                            |                                                            |           | No                                |

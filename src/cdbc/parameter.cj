@@ -27,6 +27,18 @@ public interface SqlParameter {
 
 }
 
+extend ?Any <: SqlParameter {
+
+    public func asParameter(): String {
+        if (this.isNone()) {
+            return "NULL"
+        } else {
+            return ""
+        }
+    }
+
+}
+
 extend Bool <: SqlParameter {
 
     public func asParameter(): String {

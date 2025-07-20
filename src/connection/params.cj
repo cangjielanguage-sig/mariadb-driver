@@ -139,5 +139,9 @@ protected class Params {
     */
     protected static const PoolMaxSize = "pool.max.size"
 
-    
+    /**
+    * 使用的预编译模式，可取值为server或client，默认值为client
+    */
+    protected static const PrepareMode = "prepare.mode"
+
 }
