@@ -165,7 +165,7 @@ main(){
 | port                    | 服务端口                                                     |                                                            | 3306      | No                                |
 | database                | 数据库                                                       |                                                            |           | No                                |
 | connection_timeout      | connect 操作的超时时间，单位 ms。                            |                                                            |           | Nop                               |
-| prepare.mode            | 预编译模式                                                   | server或client                                             | client    | No                                |
+| prepare.mode            | 预编译模式                                                   | server或client                                             | server    | No                                |
 | ssl.mode                | 传输层加密模式。                                             | disabled,preferred(default),required,verify_ca,verify_full | preferred | No                                |
 | ssl.ca                  | 证书颁发机构（ CA ）证书文件的路径名                         |                                                            |           | No                                |
 | ssl.cert                | 客户端 SSL 公钥证书文件的路径名。                            |                                                            |           | No                                |

@@ -65,7 +65,7 @@ public class ConnectionImpl <: Connection {
                 case other => throw ConnectFailedException("Unknow prepare.mode value: ${other}")
             }
         }
-        return ClientPrepareStatement(sql, this)
+        return ServerPrepareStatement(sql, this)
     }
 
     public override func createTransaction(): Transaction {
