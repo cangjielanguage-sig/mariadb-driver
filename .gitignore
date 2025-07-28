@@ -1,6 +1,7 @@
 target
 build
 .cache/
+.VSCodeCounter
 *.cj.macrocall
 *.zip
 *.pem
