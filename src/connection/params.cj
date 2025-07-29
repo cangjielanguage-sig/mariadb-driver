@@ -20,27 +20,32 @@ protected class Params {
     /**
     * 连接数据库的用户名。
     */
-    protected static const Username: String = "username"
+    protected static const Username = "username"
 
     /**
     * 连接数据库的密码。
     */
-    protected static const Password: String = "password"
+    protected static const Password = "password"
 
     /**
     * 数据库服务器主机名或者 IP 地址。
     */
-    protected static const Host: String = "host"
+    protected static const Host = "host"
 
     /**
     * 数据库服务器端口
     */
-    protected static const Port: String = "port"
+    protected static const Port = "port"
 
     /**
     * 数据库名
     */
-    protected static const Database: String = "database"
+    protected static const Database = "database"
+
+    /**
+    * 使用的预编译模式，可取值为server或client，默认值为client
+    */
+    protected static const PrepareMode = "prepare.mode"
 
     /**
     * connect 操作的超时时间，单位 ms。
@@ -50,27 +55,27 @@ protected class Params {
     /**
     * 数据库字符集编码类型。当前仅支持UTF-8
     */
-    protected static const Encoding: String = "encoding"
+    // protected static const Encoding: String = "encoding"
 
     /**
     * query 操作的超时时间，单位 ms。
     */
-    protected static const QueryTimeout = "query.timeout"
+    // protected static const QueryTimeout = "query.timeout"
 
     /**
     * update 操作的超时时间，单位 ms。
     */
-    protected static const UpdateTimeout = "update.timeout"
+    // protected static const UpdateTimeout = "update.timeout"
 
     /**
     * 传输层加密模式。
     */
-    protected static const SSLMode: String = "ssl.mode"
+    protected static const SSLMode = "ssl.mode"
 
     /**
     * 证书颁发机构（ CA ）证书文件的路径名。
     */
-    protected static const SSLCA: String = "ssl.ca"
+    protected static const SSLCA = "ssl.ca"
 
     /**
     * 客户端 SSL 公钥证书文件的路径名。
@@ -107,7 +112,7 @@ protected class Params {
     /**
     * 支持的 TLS 版本号，值为逗号分隔的字符串，比如 "TLSv1.2,TLSv1.3"。
     */
-    protected static const TlsVersion = "tls.version"
+    // protected static const TlsVersion = "tls.version"
 
     /**
     * 从池中获取连接的超时时间。默认30s
@@ -138,10 +143,5 @@ protected class Params {
     * 连接池最大连接数量，负数或0表示无限制。默认10
     */
     protected static const PoolMaxSize = "pool.max.size"
-
-    /**
-    * 使用的预编译模式，可取值为server或client，默认值为client
-    */
-    protected static const PrepareMode = "prepare.mode"
 
 }

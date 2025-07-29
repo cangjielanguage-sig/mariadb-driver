@@ -1,6 +1,6 @@
 [package]
   cjc-version = "1.0.0"
-  compile-option = "-O2 --diagnostic-format=noColor -Woff deprecated"
+  compile-option = "-O2 -Woff deprecated"
   description = ""
   link-option = ""
   name = "mysql"
@@ -8,8 +8,6 @@
   src-dir = ""
   target-dir = ""
   version = "0.8.0"
-  [package.package-configuration]
-
 [target.x86_64-w64-mingw32.bin-dependencies]
   path-option = [ "${CANGJIE_STDX}" ]
 [target.x86_64-unknown-linux-gnu.bin-dependencies]
