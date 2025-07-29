@@ -21,33 +21,21 @@ protected package mysql.protocol
 */
 protected enum Charset {
     
-    | Latin1SwedishCi
-    | Utf8mb3GeneralCi
-    | Utf8mb4GeneralCi
-    | Utf8mb4Bin
     | Binary
-    | Utf8mb3Bin
-
-    protected func value(): UInt16 {
-        match (this) {
-            case Latin1SwedishCi => 8
-            case Utf8mb3GeneralCi => 33
-            case Utf8mb4GeneralCi => 45
-            case Utf8mb4Bin => 46
-            case Binary => 63
-            case Utf8mb3Bin => 83
-        }
-    }
+    | Utf8mb3
+    | Utf8mb4
 
     protected static func of(value: UInt16): Charset {
         match (value) {
-            case 8 => Latin1SwedishCi
-            case 33 => Utf8mb3GeneralCi
-            case 45 => Utf8mb4GeneralCi
-            case 46 => Utf8mb4Bin
             case 63 => Binary
-            case 83 => Utf8mb3Bin
+            case 33 | 83 | 223 | 1057 | 1107 | 1216 | 1238  => Utf8mb3
+            case 45 | 46 | 1069 | 1070 | 1248 | 1270 => Utf8mb4
+            case range where range >= 192 && range <= 215 => Utf8mb3
+            case range where range >= 224 && range <= 309 => Utf8mb4
+            case range where range >= 576 && range <= 579 => Utf8mb3
+            case range where range >= 608 && range <= 611 => Utf8mb4
             case _=> throw UnsupportedException("Unsupported Charset: ${value}")
         }
     }
+    
 }
