@@ -31,12 +31,24 @@ protected class DriverTest {
         let password = ("password", "test_user")
         let database = ("database", "driver_test")
         let sslMode = ("ssl.mode", "disabled")
-        //let prepareMode = ("prepare.mode", "server")
-        // let dataSource = driver.open("mysql://localhost:3306", [username, password, database, sslMode, prepareMode])
         let dataSource = driver.open("mysql://localhost:3306", [username, password, database, sslMode])
         let connection = dataSource.connect()
         insetTest(connection)
         queryTest(connection)
+    }
+
+    @TestCase
+    public func mariadbTest(): Unit {
+        let driver = DriverManager.getDriver("mysql").getOrThrow()
+        let username = ("username", "root")
+        let password = ("password", "root")
+        let database = ("database", "driver_test")
+        let sslMode = ("ssl.mode", "disabled")
+        let dataSource = driver.open("mysql://localhost:3306", [username, password, database, sslMode])
+        let connection = dataSource.connect()
+        insetTest(connection)
+        queryTest(connection)
+
     }
 
     @TestCase
