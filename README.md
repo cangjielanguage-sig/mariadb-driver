@@ -11,7 +11,7 @@
 
 ### 1.1 项目特性
 
-mysql-driver是使用Cangjie编写的mysql原生驱动程序，适配TIDB、OceanBase等国产数据库。
+mysql-driver是使用Cangjie编写的mysql原生驱动程序，适配MariaDB、TIDB、OceanBase等数据库。
 
 **ORM框架**：[CORM](https://gitcode.com/Yesokim/corm)
 
