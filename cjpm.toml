@@ -1,6 +1,6 @@
 [package]
   cjc-version = "1.0.0"
-  compile-option = "-O2 -Woff deprecated --diagnostic-format=noColor"
+  compile-option = "-O2 -Woff deprecated --disable-reflection"
   description = ""
   link-option = ""
   name = "mysql"
