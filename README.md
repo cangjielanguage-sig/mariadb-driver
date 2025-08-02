@@ -48,7 +48,11 @@ mysql-driver是使用Cangjie编写的mysql原生驱动程序，适配MariaDB、T
 
 ### 3.1 编译构建（Win/Linux/Mac）
 
-cjpm.toml文件添加以下配置后，再执行cjpm update，即可在项目中引入mysql-driver。（需要额外设置环境变量CANGJIE_STDX，值为stdx的路径）
+cjpm.toml文件添加以下配置后，再执行cjpm update，即可在项目中引入mysql-driver。（需要额外设置环境变量CANGJIE_STDX_PATH，值为stdx的路径）
+```tex
+$ echo $CANGJIE_STDX_PATH
+C:\Users\30247\Desktop\Cangjie\Cangjie-1.0.0\cangjie-stdx-windows-x64-1.0.0.1\windows_x86_64_llvm\dynamic\stdx
+```
 
 ```toml
 [dependencies]
