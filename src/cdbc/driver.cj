@@ -66,9 +66,21 @@ public class MySqlDriver <: Driver {
         if (port.size > 0) {
             datasource.setOption(Params.Port, port)
         }
-        for ((k, v) in opts) {
-            setPooledDataSourceParam(datasource, k, v)
-            datasource.setOption(k, v)
+
+        let database = parsed.path.removePrefix("/")
+        if (database.size > 0) {
+            datasource.setOption(Params.Database, database)
+        }
+
+        if (let Some(value) <- parsed.query) {
+            let splited = value.split("&", removeEmpty: true)
+            for (item in splited) {
+                let tuple = item.split("=", removeEmpty: true)
+                if (tuple.size != 2) {
+                    throw IllegalArgumentException("Illegal agrument: ${item}")
+                }
+                datasource.setOption(tuple[0], tuple[1])
+            }
         }
         let username = parsed.userInfo.username()
         if (username.size > 0) {
@@ -77,6 +89,10 @@ public class MySqlDriver <: Driver {
         let password = parsed.userInfo.password()
         if (let Some(v) <- password && v.size > 0) {
             datasource.setOption(Params.Password, v)
+        }
+        for ((k, v) in opts) {
+            setPooledDataSourceParam(datasource, k, v)
+            datasource.setOption(k, v)
         }
         return datasource
     }
