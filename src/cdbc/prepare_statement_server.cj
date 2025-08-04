@@ -49,7 +49,7 @@ public class ServerPrepareStatement <: Statement {
         this.originSql = originSql
         this.closed = false
         let array = ArrayList<ColumnInfo>()
-        for(i in prepareResult.columns) {
+        for(i in prepareResult.params) {
             array.add(ColumnInfoImpl(i))
         }
         this.paramsInfo = array.toArray()
