@@ -2,7 +2,7 @@
 <h1>mysql-driver</h1>
 </div>
 <p align="center">
-<img alt="" src="https://img.shields.io/badge/release-v0.8.0-brightgreen" style="display: inline-block;" />
+<img alt="" src="https://img.shields.io/badge/release-v1.0.0-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/cjc-v1.0.0-brightgreen" style="display: inline-block;" />
 </p>
 

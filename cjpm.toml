@@ -7,7 +7,7 @@
   output-type = "static"
   src-dir = ""
   target-dir = ""
-  version = "0.8.0"
+  version = "1.0.0"
 
 [target]
   [target.x86_64-w64-mingw32]
