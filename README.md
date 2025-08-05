@@ -84,7 +84,6 @@ import std.database.sql.*
 import mysql.cdbc.*
 
 main(): Unit {
-  
     var driver = DriverManager.getDriver("mysql").getOrThrow()
     var property1 = ("username", "test_user")
     var property2 = ("password", "test_user")
@@ -116,7 +115,6 @@ import std.time.DateTime
 import std.math.numeric.Decimal
 
 main(): Unit {
-  
     var driver = DriverManager.getDriver("mysql").getOrThrow()
     var property1 = ("username", "test_user")
     var property2 = ("password", "test_user")
