@@ -56,7 +56,7 @@ C:\Users\30247\Desktop\Cangjie\Cangjie-1.0.0\cangjie-stdx-windows-x64-1.0.0.1\wi
 
 ```toml
 [dependencies]
-  mysql = {git = "https://gitcode.com/Yesokim/mysql-driver.git", branch="master"}
+  mysql = {git = "https://gitcode.com/Cangjie-SIG/mysql-driver.git", branch="master"}
 ```
 
 ### 3.2 功能示例
