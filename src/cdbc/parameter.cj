@@ -18,7 +18,6 @@ package mysql.cdbc
 import std.io.*
 import std.time.*
 import std.math.numeric.*
-import std.database.sql.*
 import mysql.connection.*
 
 public interface SqlParameter {

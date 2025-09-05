@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 protected package mysql.protocol
-import std.unicode.UnicodeStringExtension
 
-// import std.collection.*
 /*
 * HandshakeResponse41
 * referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_connection_phase_packets_protocol_handshake_response.html
