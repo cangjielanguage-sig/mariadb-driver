@@ -15,14 +15,10 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-protected package mysql.protocol
+protected package mariadb.protocol
 
 import std.io.*
 
-/*
-* MySQL Packet
-* referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_basic_packets.html
-*/
 protected open class CommonResponse {
 
     protected let length: UInt64
@@ -38,7 +34,7 @@ protected open class CommonResponse {
 
 /*
 * Generic Response Packets
-* referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_basic_response_packets.html
+* referenced document: https://dev.mariadb.com/doc/dev/mariadb-server/latest/page_protocol_basic_response_packets.html
 */
 protected open class Response <: CommonResponse {
 
@@ -54,7 +50,7 @@ protected open class Response <: CommonResponse {
 /*
 * OK packet
 * An OK packet is sent from the server to the client to signal successful completion of a command.
-* referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_basic_ok_packet.html
+* referenced document: https://dev.mariadb.com/doc/dev/mariadb-server/latest/page_protocol_basic_ok_packet.html
 */
 protected class OkResponse <: Response {
 
@@ -102,7 +98,7 @@ protected class OkResponse <: Response {
 /*
 * Error Packet
 * This packet signals that an error occurred.
-* referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_basic_err_packet.html
+* referenced document: https://dev.mariadb.com/doc/dev/mariadb-server/latest/page_protocol_basic_err_packet.html
 */
 protected class ErrorResponse <: Response {
 
@@ -130,7 +126,7 @@ protected class ErrorResponse <: Response {
 
 /*
 * EOF packet
-* referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_basic_eof_packet.html
+* referenced document: https://dev.mariadb.com/doc/dev/mariadb-server/latest/page_protocol_basic_eof_packet.html
 */
 protected open class AbstractEOF <: Response {
 
@@ -180,7 +176,7 @@ protected class EofResponse <: AbstractEOF {
 
 /*
 * COM_STMT_PREPARE_OK
-* referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_com_stmt_prepare.html#sect_protocol_com_stmt_prepare_response
+* referenced document: https://dev.mariadb.com/doc/dev/mariadb-server/latest/page_protocol_com_stmt_prepare.html#sect_protocol_com_stmt_prepare_response
 */
 protected class PrepareResposne <: Response {
 

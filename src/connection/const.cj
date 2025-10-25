@@ -15,21 +15,21 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-protected package mysql.connection
+protected package mariadb.connection
 
 import std.io.*
 import stdx.encoding.hex.*
 
-//mysql datetime类型的默认格式
+//mariadb datetime类型的默认格式
 protected const DB_DATE_TIME_FORMAT: String = "yyyy-MM-dd HH:mm:ss"
 
-// //mysql date类型的默认格式
+// //mariadb date类型的默认格式
 // protected const DB_DATE_FORMAT: String = "yyyy-MM-dd"
 
-// //mysql time类型的默认格式
+// //mariadb time类型的默认格式
 // protected const DB_TIME_FORMAT: String = "HH:mm:ss"
 
-//mysql time类型转DateTime的前缀
+//mariadb time类型转DateTime的前缀
 protected const DB_TIME_PREFIX: String = "1970-01-01 "
 
 protected const DB_DATE_SUFFIX: String = " 00:00:00"

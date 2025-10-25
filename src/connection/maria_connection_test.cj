@@ -15,7 +15,7 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-protected package mysql.connection
+protected package mariadb.connection
 
 import std.collection.*
 import std.unittest.*
@@ -25,28 +25,28 @@ import std.unittest.testmacro.*
 /*
 * 测试认证插件的兼容情况
 * default: caching_sha2_password -> use: caching_sha2_password ssl:close √
-* default: caching_sha2_password -> use: mysql_native_password ssl:close √
+* default: caching_sha2_password -> use: mariadb_native_password ssl:close √
 * default: caching_sha2_password -> use: sha256_password ssl:close √
 * default: caching_sha2_password -> use: caching_sha2_password ssl: open √
-* default: caching_sha2_password -> use: mysql_native_password ssl: open √
+* default: caching_sha2_password -> use: mariadb_native_password ssl: open √
 * default: caching_sha2_password -> use: sha256_password ssl: open √
 
 * default: sha256_password -> use: caching_sha2_password ssl:close √
-* default: sha256_password -> use: mysql_native_password ssl:close √
+* default: sha256_password -> use: mariadb_native_password ssl:close √
 * default: sha256_password -> use: sha256_password ssl:close √
 * default: sha256_password -> use: caching_sha2_password ssl: open √
-* default: sha256_password -> use: mysql_native_password ssl: open √
+* default: sha256_password -> use: mariadb_native_password ssl: open √
 * default: sha256_password -> use: sha256_password ssl: open √
 
-* default: mysql_native_password -> use: caching_sha2_password ssl:close √
-* default: mysql_native_password -> use: mysql_native_password ssl:close √
-* default: mysql_native_password -> use: sha256_password ssl:close √
-* default: mysql_native_password -> use: caching_sha2_password ssl: open √
-* default: mysql_native_password -> use: mysql_native_password ssl: open √
-* default: mysql_native_password -> use: sha256_password ssl: open √
+* default: mariadb_native_password -> use: caching_sha2_password ssl:close √
+* default: mariadb_native_password -> use: mariadb_native_password ssl:close √
+* default: mariadb_native_password -> use: sha256_password ssl:close √
+* default: mariadb_native_password -> use: caching_sha2_password ssl: open √
+* default: mariadb_native_password -> use: mariadb_native_password ssl: open √
+* default: mariadb_native_password -> use: sha256_password ssl: open √
 */
 @Test
-public class MySqlConnectionTest {
+public class MariaConnectionTest {
 
 
     @TestCase
@@ -57,7 +57,7 @@ public class MySqlConnectionTest {
         attr.add(Params.Host, "localhost")
         attr.add(Params.Port, "3306")
         attr.add(Params.SSLMode, "disabled")
-        var conn = MySqlConnectionFactory.createAuthedConnection(attr)
+        var conn = createAuthedConnection(attr)
         conn.close()
     }
 
@@ -69,7 +69,7 @@ public class MySqlConnectionTest {
         attr.add(Params.Host, "localhost")
         attr.add(Params.Port, "3306")
         attr.add(Params.SSLMode, "disabled")
-        var conn = MySqlConnectionFactory.createAuthedConnection(attr)
+        var conn = createAuthedConnection(attr)
         conn.close()
     }
 
@@ -81,7 +81,7 @@ public class MySqlConnectionTest {
         attr.add(Params.Host, "localhost")
         attr.add(Params.Port, "3306")
         attr.add(Params.SSLMode, "disabled")
-        var conn = MySqlConnectionFactory.createAuthedConnection(attr)
+        var conn = createAuthedConnection(attr)
         conn.close()
     }
 
@@ -92,7 +92,7 @@ public class MySqlConnectionTest {
         attr.add(Params.Password, "caching_user")
         attr.add(Params.Host, "localhost")
         attr.add(Params.Port, "3306")
-        var conn = MySqlConnectionFactory.createAuthedConnection(attr)
+        var conn = createAuthedConnection(attr)
         conn.close()
     }
 
@@ -103,7 +103,7 @@ public class MySqlConnectionTest {
         attr.add(Params.Password, "native_user")
         attr.add(Params.Host, "localhost")
         attr.add(Params.Port, "3306")
-        var conn = MySqlConnectionFactory.createAuthedConnection(attr)
+        var conn = createAuthedConnection(attr)
         conn.close()
     }
 
@@ -114,7 +114,7 @@ public class MySqlConnectionTest {
         attr.add(Params.Password, "sha256_user")
         attr.add(Params.Host, "localhost")
         attr.add(Params.Port, "3306")
-        var conn = MySqlConnectionFactory.createAuthedConnection(attr)
+        var conn = createAuthedConnection(attr)
         conn.close()
     }
 

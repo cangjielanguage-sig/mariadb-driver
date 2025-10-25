@@ -15,10 +15,10 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-protected package mysql.protocol
+protected package mariadb.protocol
 
 
-protected open class MySqlException <: Exception & ToString {
+protected open class MariaException <: Exception & ToString {
 
     protected init() {
        super()
@@ -29,7 +29,7 @@ protected open class MySqlException <: Exception & ToString {
     }
 
     public open func toString(): String {
-        return "MySqlException: ${message}"
+        return "MariaException: ${message}"
     }
 
 }
@@ -38,7 +38,7 @@ protected open class MySqlException <: Exception & ToString {
 /*
 * 无效数据包异常类,表示数据包解析异常
 */
-protected class InvalidPacketException <: MySqlException {
+protected class InvalidPacketException <: MariaException {
 
     init() {
        super()

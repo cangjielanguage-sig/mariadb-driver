@@ -15,12 +15,12 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package mysql.cdbc
+package mariadb.cdbc
 
 import std.io.*
 import std.time.*
 import std.math.numeric.*
-import mysql.connection.*
+import mariadb.connection.*
 
 public interface SqlParameter {
 

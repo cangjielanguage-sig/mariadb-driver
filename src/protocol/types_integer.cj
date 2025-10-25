@@ -15,14 +15,9 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-protected package mysql.protocol
+protected package mariadb.protocol
 
 import std.io.*
-
-/*
-* The MySQL Protocol has a set of possible encodings for integers.
-* referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_basic_dt_integers.html#sect_protocol_basic_dt_int_fixed
-*/
 
 extend ByteBuffer {
 

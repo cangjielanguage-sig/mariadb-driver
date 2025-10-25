@@ -15,14 +15,10 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-protected package mysql.protocol
+protected package mariadb.protocol
 
 import std.io.*
 
-/*
- * It sends the values for the placeholders of the prepared statement (if it contained any) in Binary Protocol Value form.
- * referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_com_stmt_execute.html
- */
 protected class ExecuteCommand <: Command {
 
     private let statementId: UInt32

@@ -15,9 +15,9 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-protected package mysql.connection
+protected package mariadb.connection
 
-protected class MySqlTransaction {
+protected class MariaTransaction {
 
     private static const CLOSE_AUTO_COMMIT = "SET SESSION autocommit = 0"
 
@@ -53,9 +53,9 @@ protected class MySqlTransaction {
 
     private static const CHANGE_TO_READ_ONLY_SQL = "SET SESSION transaction_read_only = ON"
 
-    protected let connection: MySqlConnection
+    protected let connection: MariaConnection
 
-    protected init(connection: MySqlConnection) {
+    protected init(connection: MariaConnection) {
         this.connection = connection
     }
 

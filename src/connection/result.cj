@@ -15,9 +15,9 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-protected package mysql.connection
+protected package mariadb.connection
 
-import mysql.protocol.*
+import mariadb.protocol.*
 
 protected class ChangeResult {
     

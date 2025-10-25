@@ -15,12 +15,8 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-protected package mysql.protocol
+protected package mariadb.protocol
 
-/*
- * Column types for MySQL
- * referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/field__types_8h.html
- */
 protected enum ColumnType <: ToString {
     //| Decimal
     | Tiny

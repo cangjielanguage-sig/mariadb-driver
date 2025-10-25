@@ -15,12 +15,8 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-protected package mysql.protocol
+protected package mariadb.protocol
 
-/*
- * Command Phase
- * referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_command_phase.html
- */
 protected abstract class Command <: Request {
 
     private let commandType: CommandType
@@ -38,7 +34,7 @@ protected abstract class Command <: Request {
 
 /*
  * Text Protocol based SQL query
- * referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_com_query.html
+ * referenced document: https://dev.mariadb.com/doc/dev/mariadb-server/latest/page_protocol_com_query.html
  */
 protected class QueryCommand <: Command {
 
@@ -58,7 +54,7 @@ protected class QueryCommand <: Command {
 
 /*
  * Creates a prepared statement for the passed query string.
- * referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_com_stmt_prepare.html#sect_protocol_com_stmt_prepare_response
+ * referenced document: https://dev.mariadb.com/doc/dev/mariadb-server/latest/page_protocol_com_stmt_prepare.html#sect_protocol_com_stmt_prepare_response
  */
 protected class PrepareCommand <: Command {
 
@@ -79,7 +75,7 @@ protected class PrepareCommand <: Command {
 
 /*
  * Fetches the requested amount of rows from a resultset produced by COM_STMT_EXECUTE
- * referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_com_stmt_fetch.html
+ * referenced document: https://dev.mariadb.com/doc/dev/mariadb-server/latest/page_protocol_com_stmt_fetch.html
  */
 protected class FetchCommand <: Command {
     
@@ -103,7 +99,7 @@ protected class FetchCommand <: Command {
 
 /*
 * COM_STMT_CLOSE deallocates a prepared statement.
-* referened document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_com_stmt_close.html
+* referened document: https://dev.mariadb.com/doc/dev/mariadb-server/latest/page_protocol_com_stmt_close.html
 */
 protected class CloseCommand <: Command {
 
@@ -122,7 +118,7 @@ protected class CloseCommand <: Command {
 
 /*
  * COM_STMT_RESET resets the data of a prepared statement which was accumulated with
- * referened document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_com_stmt_reset.html
+ * referened document: https://dev.mariadb.com/doc/dev/mariadb-server/latest/page_protocol_com_stmt_reset.html
  */
 protected class ResetCommand <: Command {
 
@@ -141,7 +137,7 @@ protected class ResetCommand <: Command {
 
 /*
  * Sends the data for a parameter.
- * referened document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_com_stmt_send_long_data.html
+ * referened document: https://dev.mariadb.com/doc/dev/mariadb-server/latest/page_protocol_com_stmt_send_long_data.html
  */
 protected class SendLongDataCommand <: Command {
 

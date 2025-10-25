@@ -1,5 +1,5 @@
 <div align="center">
-<h1>mysql-driver</h1>
+<h1>mariadb-driver</h1>
 </div>
 <p align="center">
 <img alt="" src="https://img.shields.io/badge/release-v1.0.0-brightgreen" style="display: inline-block;" />
@@ -7,11 +7,12 @@
 </p>
 
 
+
 ## <img alt="" src="./doc/readme-image/readme-icon-introduction.png" style="display: inline-block;" width=3%/> 1 介绍
 
 ### 1.1 项目特性
 
-mysql-driver是使用Cangjie编写的mysql原生驱动程序，适配MariaDB、TIDB、OceanBase等数据库。
+mariadb-driver是使用Cangjie编写的mariadb原生驱动程序，适配MySQL、TIDB、OceanBase等数据库。
 
 **ORM框架**：[CORM](https://gitcode.com/Yesokim/corm)
 
@@ -48,7 +49,7 @@ mysql-driver是使用Cangjie编写的mysql原生驱动程序，适配MariaDB、T
 
 ### 3.1 编译构建（Win/Linux/Mac）
 
-cjpm.toml文件添加以下配置后，再执行cjpm update，即可在项目中引入mysql-driver。（需要额外设置环境变量CANGJIE_STDX_PATH，值为stdx的路径）
+cjpm.toml文件添加以下配置后，再执行cjpm update，即可在项目中引入mariadb-driver。（需要额外设置环境变量CANGJIE_STDX_PATH，值为stdx的路径）
 ```tex
 $ echo $CANGJIE_STDX_PATH
 C:\Users\30247\Desktop\Cangjie\Cangjie-1.0.0\cangjie-stdx-windows-x64-1.0.0.1\windows_x86_64_llvm\static\stdx
@@ -56,7 +57,7 @@ C:\Users\30247\Desktop\Cangjie\Cangjie-1.0.0\cangjie-stdx-windows-x64-1.0.0.1\wi
 
 ```toml
 [dependencies]
-  mysql = {git = "https://gitcode.com/Cangjie-SIG/mysql-driver.git", branch="master"}
+  mariadb = {git = "https://gitcode.com/Cangjie-SIG/mariadb-driver.git", branch="master"}
 ```
 
 ### 3.2 功能示例
@@ -81,14 +82,14 @@ PRIMARY KEY (`id`)
 import std.time.*
 import std.math.numeric.*
 import std.database.sql.*
-import mysql.cdbc.*
+import mariadb.cdbc.*
 
 main(): Unit {
-    var driver = DriverManager.getDriver("mysql").getOrThrow()
+    var driver = DriverManager.getDriver("mariadb").getOrThrow()
     var property1 = ("username", "test_user")
     var property2 = ("password", "test_user")
     var property3 = ("database", "driver_test")
-    var dataSource = driver.open("mysql://localhost", [property1, property2, property3])
+    var dataSource = driver.open("mariadb://localhost", [property1, property2, property3])
     var connection = dataSource.connect()
     var statemnt = connection.prepareStatement("select * from simple")
     var result = statemnt.query()
@@ -110,21 +111,21 @@ main(): Unit {
 
 ```cangjie
 import std.database.sql.*
-import mysql.cdbc.*
+import mariadb.cdbc.*
 import std.time.DateTime
 import std.math.numeric.Decimal
 
 main(): Unit {
-    var driver = DriverManager.getDriver("mysql").getOrThrow()
+    var driver = DriverManager.getDriver("mariadb").getOrThrow()
     var property1 = ("username", "test_user")
     var property2 = ("password", "test_user")
     var property3 = ("database", "driver_test")
-    var dataSource = driver.open("mysql://localhost", [property1, property2, property3])
+    var dataSource = driver.open("mariadb://localhost", [property1, property2, property3])
     var connection = dataSource.connect()
 
     var statemnt = connection.prepareStatement("insert into simple values (?, ?, ?, ?, ?, ?, ?, ?)")
     statemnt.set(1, 1000)
-    statemnt.set(2, "MySQL")
+    statemnt.set(2, "mariadb")
     statemnt.setNull(3)
     statemnt.set(4, 123.456789)
     statemnt.set(5, Decimal.parse("1.234567"))
@@ -141,15 +142,15 @@ main(): Unit {
 #### 获取事务对象
 
 ```cangjie
-import mysql.cdbc.*
+import mariadb.cdbc.*
 import std.database.sql.*
 
 main(){
-    var driver = DriverManager.getDriver("mysql").getOrThrow()
+    var driver = DriverManager.getDriver("mariadb").getOrThrow()
     var property1 = ("username" "root")
-    var property2 = ("password", "MySql123!")
+    var property2 = ("password", "password")
     var property3 = ("database", "test")
-    var dataSource = driver.open("mysql://localhost:3306", [property1,property2,property3])
+    var dataSource = driver.open("mariadb://localhost:3306", [property1,property2,property3])
     var connection =  dataSource.connect()
     var transaction = connection.createTransaction()
     transaction.begin()
@@ -188,8 +189,6 @@ main(){
 
 ## <img alt="" src="./doc/readme-image/readme-icon-contribute.png" style="display: inline-block;" width=3%/> 4 参与贡献
 
-本项目由Yesokim实现并维护。技术支持和意见反馈请提Issue。
+本项目由[@Yesokim](https://gitcode.com/Yesokim)实现并维护。技术支持和意见反馈请提Issue。
 
-本项目基于 Apache License 2.0，欢迎给我们提交PR，欢迎参与任何形式的贡献。
-
-本项目commiter：[@Yesokim](https://gitcode.com/Yesokim)
+本项目基于 GPL2.0，欢迎给我们提交PR，欢迎参与任何形式的贡献。

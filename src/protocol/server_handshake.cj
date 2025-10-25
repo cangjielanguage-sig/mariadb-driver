@@ -15,14 +15,10 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-protected package mysql.protocol
+protected package mariadb.protocol
 
 import std.io.*
 
-/*
-* Initial handshake packet for protocol version 10.
-* referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_connection_phase_packets_protocol_handshake_v10.html
-*/
 protected class Handshake <: CommonResponse {
 
     protected let protocol: Byte

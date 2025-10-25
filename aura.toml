@@ -1,8 +1,0 @@
-[package]
-  name = "mysql"
-  version = "1.0.0"
-  cjc-version = "1.0.0"
-  output-type = "static"
-  compile-option = "-O2 -Woff deprecated --disable-reflection"
-[dependencies]
-  stdx = "1.0.1"

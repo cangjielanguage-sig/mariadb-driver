@@ -1,5 +1,5 @@
 [package]
-  name = "mysql"
+  name = "mariadb"
   version = "1.0.0"
   cjc-version = "1.0.0"
   output-type = "static"

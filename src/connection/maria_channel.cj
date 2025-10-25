@@ -15,16 +15,16 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-protected package mysql.connection
+protected package mariadb.connection
 
 import std.io.*
 import std.net.*
-import mysql.protocol.*
+import mariadb.protocol.*
 
 /*
-* mysql channl reads complete mysql packages from the socket
+* mariadb channl reads complete mariadb packages from the socket
 */
-protected class MySqlChannel <: Resource {
+protected class MariaChannel <: Resource {
 
     private static let MAX_PACKAEG_SIZE: Int64 = (1 << 24) - 1
 
@@ -104,7 +104,7 @@ protected class MySqlChannel <: Resource {
     }
 
     /*
-     * write a mysql package to socket
+     * write a mariadb package to socket
      */
     protected func write(data: Array<Byte>) {
         socket.write(data)

@@ -15,25 +15,21 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-protected package mysql.protocol
+protected package mariadb.protocol
 
 import std.io.*
 import std.time.*
 import std.convert.*
 import std.math.numeric.*
 
-/*
-* MySQL Binary Protocol Value
-* referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_binary_resultset.html#sect_protocol_binary_resultset_row_value
-*/
-protected interface MySqlBinary<T> {
+protected interface MariaBinary<T> {
 
     static func fromBinary(definition: ColumnDefinition, data: ?Array<Byte>): ?T
 
 }
 
 
-extend Bool <: MySqlBinary<Bool> {
+extend Bool <: MariaBinary<Bool> {
 
     public static func fromBinary(definition: ColumnDefinition, data: ?Array<Byte>): ?Bool {
         let value = UInt8.fromBinary(definition, data)
@@ -47,7 +43,7 @@ extend Bool <: MySqlBinary<Bool> {
 
 }
 
-extend Int8 <: MySqlBinary<Int8> {
+extend Int8 <: MariaBinary<Int8> {
 
     public static func fromBinary(definition: ColumnDefinition, data: ?Array<Byte>): ?Int8 {
         match (data) {
@@ -71,14 +67,14 @@ extend Int8 <: MySqlBinary<Int8> {
                         var str = String.fromUtf8(v)
                         return Int8.parse(str)
                     case _ => 
-                        throw IllegalArgumentException("MySql ${columnType} types cannot be converted to Cangjie Int8 types")
+                        throw IllegalArgumentException("${columnType} types cannot be converted to Cangjie Int8 types")
                 }
         }
     }
 
 }
 
-extend UInt8 <: MySqlBinary<UInt8> {
+extend UInt8 <: MariaBinary<UInt8> {
 
     public static func fromBinary(definition: ColumnDefinition, data: ?Array<Byte>): ?UInt8 {
         match (data) {
@@ -102,14 +98,14 @@ extend UInt8 <: MySqlBinary<UInt8> {
                         var str = String.fromUtf8(v)
                         return UInt8.parse(str)
                     case _ => 
-                        throw IllegalArgumentException("MySql ${columnType} types cannot be converted to Cangjie UInt8 types")
+                        throw IllegalArgumentException("${columnType} types cannot be converted to Cangjie UInt8 types")
                 }
         }
     }
 
 }
 
-extend Int16 <: MySqlBinary<Int16> {
+extend Int16 <: MariaBinary<Int16> {
 
     public static func fromBinary(definition: ColumnDefinition, data: ?Array<Byte>): ?Int16 {
         match (data) {
@@ -133,14 +129,14 @@ extend Int16 <: MySqlBinary<Int16> {
                         var str = String.fromUtf8(v)
                         return Int16.parse(str)
                     case _ => 
-                        throw IllegalArgumentException("MySql ${columnType} types cannot be converted to Cangjie Int16 types")
+                        throw IllegalArgumentException("${columnType} types cannot be converted to Cangjie Int16 types")
                 }
         }
     }
 
 }
 
-extend UInt16 <: MySqlBinary<UInt16> {
+extend UInt16 <: MariaBinary<UInt16> {
 
     public static func fromBinary(definition: ColumnDefinition, data: ?Array<Byte>):? UInt16 {
         match (data) {
@@ -164,14 +160,14 @@ extend UInt16 <: MySqlBinary<UInt16> {
                         var str = String.fromUtf8(v)
                         return UInt16.parse(str)
                     case _ => 
-                        throw IllegalArgumentException("MySql ${columnType} types cannot be converted to Cangjie UInt16 types")
+                        throw IllegalArgumentException("${columnType} types cannot be converted to Cangjie UInt16 types")
                 }
         }
     }
 
 }
 
-extend Int32 <: MySqlBinary<Int32> {
+extend Int32 <: MariaBinary<Int32> {
 
     public static func fromBinary(definition: ColumnDefinition, data: ?Array<Byte>): ?Int32 {
         match (data) {
@@ -195,13 +191,13 @@ extend Int32 <: MySqlBinary<Int32> {
                         var str = String.fromUtf8(v)
                         return Int32.parse(str)
                     case _ => 
-                        throw IllegalArgumentException("MySql ${columnType} types cannot be converted to Cangjie Int32 types")
+                        throw IllegalArgumentException("${columnType} types cannot be converted to Cangjie Int32 types")
                 }
         }
     }
 }
 
-extend UInt32 <: MySqlBinary<UInt32> {
+extend UInt32 <: MariaBinary<UInt32> {
 
     public static func fromBinary(definition: ColumnDefinition, data: ?Array<Byte>): ?UInt32 {
         match (data) {
@@ -225,13 +221,13 @@ extend UInt32 <: MySqlBinary<UInt32> {
                         var str = String.fromUtf8(v)
                         return UInt32.parse(str)
                     case _ => 
-                        throw IllegalArgumentException("MySql ${columnType} types cannot be converted to Cangjie UInt32 types")
+                        throw IllegalArgumentException("${columnType} types cannot be converted to Cangjie UInt32 types")
                 }
         }
     }
 }
 
-extend Int64 <: MySqlBinary<Int64> {
+extend Int64 <: MariaBinary<Int64> {
 
     public static func fromBinary(definition: ColumnDefinition, data: ?Array<Byte>): ?Int64 {
         match (data) {
@@ -255,14 +251,14 @@ extend Int64 <: MySqlBinary<Int64> {
                         var str = String.fromUtf8(v)
                         return Int64.parse(str)
                     case _ => 
-                        throw IllegalArgumentException("MySql ${columnType} types cannot be converted to Cangjie Int64 types")
+                        throw IllegalArgumentException("${columnType} types cannot be converted to Cangjie Int64 types")
                 }
         }
     }
 
 }
 
-extend UInt64 <: MySqlBinary<UInt64> {
+extend UInt64 <: MariaBinary<UInt64> {
 
     public static func fromBinary(definition: ColumnDefinition, data: ?Array<Byte>): ?UInt64 {
         match (data) {
@@ -286,14 +282,14 @@ extend UInt64 <: MySqlBinary<UInt64> {
                         var str = String.fromUtf8(v)
                         return UInt64.parse(str)
                     case _ => 
-                        throw IllegalArgumentException("MySql ${columnType} types cannot be converted to Cangjie UInt64 types")
+                        throw IllegalArgumentException("${columnType} types cannot be converted to Cangjie UInt64 types")
                 }
         }
     }
 
 }
 
-extend Float16 <: MySqlBinary<Float16> {
+extend Float16 <: MariaBinary<Float16> {
 
     public static func fromBinary(definition: ColumnDefinition, data: ?Array<Byte>): ?Float16 {
         match (data) {
@@ -308,14 +304,14 @@ extend Float16 <: MySqlBinary<Float16> {
                     case String | VarString => 
                         return Float16.parse(String.fromUtf8(v))
                     case _ => 
-                        throw IllegalArgumentException("MySql ${columnType} types cannot be converted to Cangjie Float16 types")
+                        throw IllegalArgumentException("${columnType} types cannot be converted to Cangjie Float16 types")
                 }   
         }
     }
 
 }
 
-extend Float32 <: MySqlBinary<Float32> {
+extend Float32 <: MariaBinary<Float32> {
 
     public static func fromBinary(definition: ColumnDefinition, data: ?Array<Byte>): ?Float32 {
         match(data) {
@@ -330,14 +326,14 @@ extend Float32 <: MySqlBinary<Float32> {
                     case String | VarString | NewDecimal => 
                         return Float32.parse(String.fromUtf8(v))
                     case _ => 
-                        throw IllegalArgumentException("MySql ${columnType} types cannot be converted to Cangjie Float32 types")
+                        throw IllegalArgumentException("${columnType} types cannot be converted to Cangjie Float32 types")
                 }
         }
     }
 
 }
 
-extend Float64 <: MySqlBinary<Float64> {
+extend Float64 <: MariaBinary<Float64> {
 
     public static func fromBinary(definition: ColumnDefinition, data: ?Array<Byte>): ?Float64 {
         match(data) {
@@ -352,14 +348,14 @@ extend Float64 <: MySqlBinary<Float64> {
                     case String | VarString | NewDecimal => 
                         return Float64.parse(String.fromUtf8(v))
                     case _ => 
-                        throw IllegalArgumentException("MySql ${columnType} types cannot be converted to Cangjie Float64 types")
+                        throw IllegalArgumentException("${columnType} types cannot be converted to Cangjie Float64 types")
                 }
         }
     }
 
 }
 
-extend String <: MySqlBinary<String> {
+extend String <: MariaBinary<String> {
 
     public static func fromBinary(definition: ColumnDefinition, data: ?Array<Byte>): ?String {
         match (data) {
@@ -413,14 +409,14 @@ extend String <: MySqlBinary<String> {
                     case Time => 
                         return DateTime.fromBinaryTime(v).toString()
                     case _ => 
-                        throw IllegalArgumentException("MySql ${columnType} types cannot be converted to Cangjie String types")
+                        throw IllegalArgumentException("${columnType} types cannot be converted to Cangjie String types")
                     }
         }
     }
 
 }
 
-extend BigInt <: MySqlBinary<BigInt> {
+extend BigInt <: MariaBinary<BigInt> {
 
     public static func fromBinary(definition: ColumnDefinition, data: ?Array<Byte>): ?BigInt {
         match (data) {
@@ -439,14 +435,14 @@ extend BigInt <: MySqlBinary<BigInt> {
                 case String | VarString | Enum | Set | TinyBlob | MediumBlob | LongBlob | Blob | NewDecimal => 
                     return BigInt.parse(String.fromUtf8(v))
                 case _ => 
-                    throw IllegalArgumentException("MySql ${columnType} types cannot be converted to Cangjie BigInt types")
+                    throw IllegalArgumentException("${columnType} types cannot be converted to Cangjie BigInt types")
                 }
         }
     }
 
 }
 
-extend Decimal <: MySqlBinary<Decimal> {
+extend Decimal <: MariaBinary<Decimal> {
 
     public static func fromBinary(definition: ColumnDefinition, data: ?Array<Byte>): ?Decimal {
         match (data) {
@@ -461,7 +457,7 @@ extend Decimal <: MySqlBinary<Decimal> {
                     case String | VarString | NewDecimal | TinyBlob | MediumBlob | LongBlob | Blob => 
                         Decimal.parse(String.fromUtf8(v))
                     case _ => 
-                        throw IllegalArgumentException("MySql ${columnType} types cannot be converted to Cangjie Decimal types")
+                        throw IllegalArgumentException("${columnType} types cannot be converted to Cangjie Decimal types")
                 }
         }
     }
@@ -469,7 +465,7 @@ extend Decimal <: MySqlBinary<Decimal> {
 }
 
 
-extend DateTime <: MySqlBinary<DateTime> {
+extend DateTime <: MariaBinary<DateTime> {
 
     public static func fromBinary(definition: ColumnDefinition, data: ?Array<Byte>): ?DateTime {
         match(data) {
@@ -484,7 +480,7 @@ extend DateTime <: MySqlBinary<DateTime> {
                     case Time => 
                         return DateTime.fromBinaryTime(v)
                     case _ => 
-                        throw IllegalArgumentException("MySql ${columnType} types cannot be converted to Cangjie DateTime types")
+                        throw IllegalArgumentException("${columnType} types cannot be converted to Cangjie DateTime types")
                 }
         }
     }

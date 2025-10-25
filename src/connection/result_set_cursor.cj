@@ -15,12 +15,12 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-protected package mysql.connection
+protected package mariadb.connection
 
 import std.io.*
 import std.time.*
 import std.math.numeric.*
-import mysql.protocol.*
+import mariadb.protocol.*
 
 protected class CursorResultSet <: ResultSet {
 
@@ -28,13 +28,13 @@ protected class CursorResultSet <: ResultSet {
 
     private let columns: Array<ColumnDefinition>
 
-    private let connection: MySqlConnection
+    private let connection: MariaConnection
 
     private let fetchSize: UInt32
 
     private var resultSet: ResultSet
 
-    protected CursorResultSet(prepareId: UInt32, columns: Array<ColumnDefinition>, fetchSize: UInt32, connection: MySqlConnection) {
+    protected CursorResultSet(prepareId: UInt32, columns: Array<ColumnDefinition>, fetchSize: UInt32, connection: MariaConnection) {
         this.prepareId = prepareId
         this.columns = columns
         this.connection = connection

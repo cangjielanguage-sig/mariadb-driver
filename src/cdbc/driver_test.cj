@@ -15,7 +15,7 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package mysql.cdbc
+package mariadb.cdbc
 
 import std.time.*
 import std.collection.*
@@ -27,26 +27,26 @@ import std.database.sql.*
 @Test
 protected class DriverTest {
     @TestCase
-    public func mysqlTest(): Unit {
-        let driver = DriverManager.getDriver("mysql").getOrThrow()
+    public func mariadbTest(): Unit {
+        let driver = DriverManager.getDriver("mariadb").getOrThrow()
         let username = ("username", "test_user")
         let password = ("password", "test_user")
         let database = ("database", "driver_test")
         let sslMode = ("ssl.mode", "disabled")
-        let dataSource = driver.open("mysql://localhost:3306", [username, password, database, sslMode])
+        let dataSource = driver.open("mariadb://localhost:3306", [username, password, database, sslMode])
         let connection = dataSource.connect()
         insetTest(connection)
         queryTest(connection)
     }
 
     @TestCase
-    public func mariadbTest(): Unit {
-        let driver = DriverManager.getDriver("mysql").getOrThrow()
+    public func mysqlTest(): Unit {
+        let driver = DriverManager.getDriver("mariadb").getOrThrow()
         let username = ("username", "root")
         let password = ("password", "root")
         let database = ("database", "driver_test")
         let sslMode = ("ssl.mode", "disabled")
-        let dataSource = driver.open("mysql://localhost:3306", [username, password, database, sslMode])
+        let dataSource = driver.open("mariadb://localhost:3306", [username, password, database, sslMode])
         let connection = dataSource.connect()
         insetTest(connection)
         queryTest(connection)
@@ -55,31 +55,31 @@ protected class DriverTest {
 
     @TestCase
     public func tidbTest(): Unit {
-        let driver = DriverManager.getDriver("mysql").getOrThrow()
+        let driver = DriverManager.getDriver("mariadb").getOrThrow()
         let username = ("username", "root")
         let password = ("password", "")
         let database = ("database", "driver_test")
         let sslMode = ("ssl.mode", "disabled")
-        let dataSource = driver.open("mysql://localhost:3306", [username, password, database, sslMode])
+        let dataSource = driver.open("mariadb://localhost:3306", [username, password, database, sslMode])
         let connection = dataSource.connect()
         insetTest(connection)
     }
 
     @TestCase
     public func ocaseBaseTest(): Unit {
-        let driver = DriverManager.getDriver("mysql").getOrThrow()
+        let driver = DriverManager.getDriver("mariadb").getOrThrow()
         let username = ("username", "root")
         let password = ("password", "")
         let database = ("database", "driver_test")
         let sslMode = ("ssl.mode", "disabled")
-        let dataSource = driver.open("mysql://localhost:3306", [username, password, database, sslMode])
+        let dataSource = driver.open("mariadb://localhost:3306", [username, password, database, sslMode])
         let connection = dataSource.connect()
         insetTest(connection)
     }
 
     @TestCase
     public func pooledDatasourceTest(): Unit {
-        let driver = DriverManager.getDriver("mysql").getOrThrow()
+        let driver = DriverManager.getDriver("mariadb").getOrThrow()
         let username = ("username", "test_user")
         let password = ("password", "test_user")
         let database = ("database", "driver_test")
@@ -101,7 +101,7 @@ protected class DriverTest {
         params.add(maxIdleSize)
         params.add(maxLifeTime)
         params.add(maxSize)
-        let dataSource = driver.open("mysql://localhost:3306", params.toArray())
+        let dataSource = driver.open("mariadb://localhost:3306", params.toArray())
 
         let pool = (dataSource as PooledDatasource) ?? throw Exception()
         //允许连接在池中闲置的最长时间，超过这个时间的空闲连接可能会被回收。默认值10m

@@ -15,24 +15,24 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package mysql.cdbc
+package mariadb.cdbc
 
 import std.convert.*
 import std.database.sql.*
 import stdx.encoding.url.*
-import mysql.connection.*
+import mariadb.connection.*
 
-let _ = DriverManager.register("mysql", MySqlDriver())
+let _ = DriverManager.register("mariadb", MariaDBDriver())
 
-public class MySqlDriver <: Driver {
+public class MariaDBDriver <: Driver {
 
-    private let driverName: String = "MySqlDriver"
+    private let driverName: String = "MariaDBDriver"
 
     private let driverVersion: String = "1.0.0"
 
     private let supportPooling: Bool = true
 
-    protected MySqlDriver() {
+    protected init() {
     }
 
     public override prop name: String {
@@ -55,7 +55,7 @@ public class MySqlDriver <: Driver {
 
     public override func open(url: String, opts: Array<(String, String)>): Datasource {
         let parsed = URL.parse(url)
-        if (parsed.scheme != "mysql") {
+        if (parsed.scheme != "mariadb") {
             throw IllegalArgumentException("Bad connection url")
         }
         let host = parsed.hostName

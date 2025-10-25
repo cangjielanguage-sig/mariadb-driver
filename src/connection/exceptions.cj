@@ -15,16 +15,16 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-protected package mysql.connection
+protected package mariadb.connection
 
-import mysql.protocol.*
+import mariadb.protocol.*
 
 
 
 /*
 * 服务器响应Error异常,表示执行命令后服务器响应Error
 */
-protected class ResponseErrorException <: MySqlException {
+protected class ResponseErrorException <: MariaException {
 
     init() {
         super()
@@ -43,7 +43,7 @@ protected class ResponseErrorException <: MySqlException {
 /*
 *  连接失败异常
 */
-protected class ConnectFailedException <: MySqlException {
+protected class ConnectFailedException <: MariaException {
 
     init() {
         super()

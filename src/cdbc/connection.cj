@@ -15,18 +15,18 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package mysql.cdbc
+package mariadb.cdbc
 
 import std.sync.*
 import std.collection.*
 import std.database.sql.*
-import mysql.connection.*
+import mariadb.connection.*
 
 public class ConnectionImpl <: Connection {
 
     private var currentState: ConnectionState
 
-    private var connection: MySqlConnection
+    private var connection: MariaConnection
 
     private var transaction: Transaction
 
@@ -42,7 +42,7 @@ public class ConnectionImpl <: Connection {
         this.currentState = ConnectionState.Connecting
         this.options = options
         try {
-            this.connection = MySqlConnectionFactory.createAuthedConnection(options)
+            this.connection = createAuthedConnection(options)
         } catch (e: ConnectFailedException) {
             currentState = ConnectionState.Broken
             throw e

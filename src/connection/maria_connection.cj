@@ -15,25 +15,25 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-protected package mysql.connection
+protected package mariadb.connection
 
 import std.io.*
 import std.net.*
 import std.sync.*
 import std.collection.*
-import mysql.protocol.*
+import mariadb.protocol.*
 
 /**
-* The mysql connection object facilitates the upper-layer driver to interact with the database
+* The mariadb connection object facilitates the upper-layer driver to interact with the database
 */
-protected class MySqlConnection <: Resource {
+protected class MariaConnection <: Resource {
     
     private let mutex: Mutex = Mutex()
 
-    private var channel: MySqlChannel
+    private var channel: MariaChannel
 
     internal init(socket: TcpSocket) {
-        this.channel = MySqlChannel(socket)
+        this.channel = MariaChannel(socket)
     }
 
     protected prop connectionMutex: Mutex {
@@ -76,7 +76,7 @@ protected class MySqlConnection <: Resource {
     }
 
     /**
-    * send a command to mysql server, like BEGIN or COMMIT statemnt without returned value
+    * send a command to mariadb server, like BEGIN or COMMIT statemnt without returned value
     * @throws ResponseErrorException
     */
     protected func sendCommand(sql: String): Unit {
@@ -87,7 +87,7 @@ protected class MySqlConnection <: Resource {
     }
 
     /**
-    * send a query statment to mysql server
+    * send a query statment to mariadb server
     * @return ResultSet
     * @throw ResponseErrorException
     */
@@ -99,7 +99,7 @@ protected class MySqlConnection <: Resource {
     }
 
     /**
-    * send a update statemnt to mysql server
+    * send a update statemnt to mariadb server
     * @return ChangeResult
     * @throw ResponseErrorException
     */
@@ -118,7 +118,7 @@ protected class MySqlConnection <: Resource {
     }
 
     /**
-    * send a prepare statement to mysql server
+    * send a prepare statement to mariadb server
     * @return PrepareResult
     * @throw ResponseErrorException
     */
@@ -201,8 +201,8 @@ protected class MySqlConnection <: Resource {
         }
     } 
 
-    protected func createTransaction(): MySqlTransaction {
-        return MySqlTransaction(this)
+    protected func createTransaction(): MariaTransaction {
+        return MariaTransaction(this)
     }
 
     private func handleLongData(statementId: UInt32, params: Array<Any>){
@@ -353,7 +353,7 @@ protected class MySqlConnection <: Resource {
         match (readResponse()) {
             case error: ErrorResponse => throw ResponseErrorException(error.message)
             case ok: OkResponse => ok
-            case other => throw MySqlException("Inexpect response: ${other.code}")
+            case other => throw MariaException("Inexpect response: ${other.code}")
         }
     }
 
@@ -393,7 +393,7 @@ protected class MySqlConnection <: Resource {
 
     private func checkInexpectantOkResponse(payload: ByteBuffer) {
         if(payload.bytes()[0] == ResponseCode.Ok.value()) {
-            throw MySqlException("Execute non-select statements using the query method.")
+            throw MariaException("Execute non-select statements using the query method.")
         }
     }
 

@@ -15,13 +15,8 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-protected package mysql.protocol
+protected package mariadb.protocol
 
-
-/*
- * Tells the server that the client wants it to close the connection.
- * referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_com_quit.html
- */
 protected class QuitCommand <: Command {
 
     protected init() {
@@ -32,7 +27,7 @@ protected class QuitCommand <: Command {
 
 /*
  * Change the default schema of the connection
- * referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_com_init_db.html
+ * referenced document: https://dev.mariadb.com/doc/dev/mariadb-server/latest/page_protocol_com_init_db.html
  */
 protected class InitDbCommand <: Command {
 
@@ -51,7 +46,7 @@ protected class InitDbCommand <: Command {
 
 /*
  * Get a human readable string of some internal status vars.
- * referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_com_statistics.html
+ * referenced document: https://dev.mariadb.com/doc/dev/mariadb-server/latest/page_protocol_com_statistics.html
  */
 protected class StatisticsCommand <: Command {
 
@@ -63,7 +58,7 @@ protected class StatisticsCommand <: Command {
 
 /*
  * Dump debug info to server's stdout
- * referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_com_debug.html
+ * referenced document: https://dev.mariadb.com/doc/dev/mariadb-server/latest/page_protocol_com_debug.html
  */
 protected class DebugCommand <: Command {
     protected init() {
@@ -73,7 +68,7 @@ protected class DebugCommand <: Command {
 
 /*
  * Check if the server is alive
- * referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_com_ping.html
+ * referenced document: https://dev.mariadb.com/doc/dev/mariadb-server/latest/page_protocol_com_ping.html
  */
 protected class PingCommand <: Command {
     protected init() {
@@ -83,7 +78,7 @@ protected class PingCommand <: Command {
 
 /*
  * Resets the session state
- * referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_com_reset_connection.html
+ * referenced document: https://dev.mariadb.com/doc/dev/mariadb-server/latest/page_protocol_com_reset_connection.html
  */
 protected class ResetConnectionCommand <: Command {
     protected init() {
@@ -93,7 +88,7 @@ protected class ResetConnectionCommand <: Command {
 
 /*
  * Sets options for the current connection
- * referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_com_set_option.html
+ * referenced document: https://dev.mariadb.com/doc/dev/mariadb-server/latest/page_protocol_com_set_option.html
  */
 protected class SetOptionCommand <: Command {
 

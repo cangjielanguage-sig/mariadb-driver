@@ -15,7 +15,7 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-protected package mysql.connection
+protected package mariadb.connection
 
 import std.io.*
 import stdx.crypto.keys.*
@@ -67,7 +67,7 @@ internal func performFullAuthentication(pubPem: String, password: Array<Byte>, s
     return outStream.bytes()
 }
 
-internal func mysqlNativePassword(password: Array<Byte>, salt: Array<Byte>): Array<Byte> {
+internal func mariadbNativePassword(password: Array<Byte>, salt: Array<Byte>): Array<Byte> {
     if(password.size == 0) {
         return []
     }

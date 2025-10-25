@@ -15,12 +15,8 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-protected package mysql.protocol
+protected package mariadb.protocol
 
-/*
-* HandshakeResponse41
-* referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_connection_phase_packets_protocol_handshake_response.html
-*/
 protected class HandshakeResponse <: Request {
 
     private var capabilities: UInt32 = 0x00
@@ -170,7 +166,7 @@ protected class HandshakeResponse <: Request {
 
 /*
 * SSL Connection Request Packet.
-* referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_connection_phase_packets_protocol_ssl_request.html
+* referenced document: https://dev.mariadb.com/doc/dev/mariadb-server/latest/page_protocol_connection_phase_packets_protocol_ssl_request.html
 */
 protected class SslRequeset <: Request {
 

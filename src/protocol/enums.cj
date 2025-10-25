@@ -15,7 +15,7 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-protected package mysql.protocol
+protected package mariadb.protocol
 
 
 /*
@@ -71,7 +71,7 @@ protected enum ResponseCode <: ToString {
             case 0xFF => Error
             case 0xFE => Eof
             case 0x01 => AuthMoreData
-            case _ => throw MySqlException("Inexpect response code: ${value}")
+            case _ => throw MariaException("Inexpect response code: ${value}")
         }
     }
 
@@ -91,7 +91,7 @@ protected enum ResponseCode <: ToString {
 
 /*
  * The flags used in COM_STMT_EXECUTE.
- * referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/mysql__com_8h.html#a3e5e9e744ff6f7b989a604fd669977da
+ * referenced document: https://dev.mariadb.com/doc/dev/mariadb-server/latest/mariadb__com_8h.html#a3e5e9e744ff6f7b989a604fd669977da
  */
 protected enum CursorType {
 

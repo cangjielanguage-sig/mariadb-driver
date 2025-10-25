@@ -15,20 +15,20 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package mysql.cdbc
+package mariadb.cdbc
 
 import std.database.sql.*
-import mysql.connection.*
+import mariadb.connection.*
 
 class TransactionImpl <: Transaction {
     
-    private var transaction: MySqlTransaction
+    private var transaction: MariaTransaction
 
     private var isolationLevel: TransactionIsoLevel
 
     private var accessPower: TransactionAccessMode = ReadWrite
 
-    public init(transaction: MySqlTransaction) {
+    public init(transaction: MariaTransaction) {
         this.transaction = transaction
         this.accessPower = ReadWrite
         this.isolationLevel = RepeatableRead

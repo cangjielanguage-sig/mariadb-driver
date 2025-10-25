@@ -15,13 +15,10 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-protected package mysql.protocol
+protected package mariadb.protocol
 
 import std.io.*
-/*
- * Field Count packet
- * referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_com_query_response.html
- */
+
 protected class ColumnCount <: CommonResponse {
 
     protected let count: UInt64
@@ -33,10 +30,6 @@ protected class ColumnCount <: CommonResponse {
     }
 }
 
-/*
- * Column Definition
- * referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_com_query_response_text_resultset_column_definition.html
- */
 protected class ColumnDefinition <: CommonResponse {
     /*目录名*/
     protected let catalog: String
@@ -98,7 +91,7 @@ protected class ColumnDefinition <: CommonResponse {
 
 /*
  * Text Resultset Row Packet
- * referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_com_query_response_text_resultset_row.html
+ * referenced document: https://dev.mariadb.com/doc/dev/mariadb-server/latest/page_protocol_com_query_response_text_resultset_row.html
  */
 protected class TextResult <: CommonResponse {
 
@@ -115,7 +108,7 @@ protected class TextResult <: CommonResponse {
 
 /*
  * Binary Protocol Resultset
- * referenced document: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_binary_resultset.html
+ * referenced document: https://dev.mariadb.com/doc/dev/mariadb-server/latest/page_protocol_binary_resultset.html
  */
 protected class BinaryResult <: Response {
     
@@ -153,7 +146,6 @@ protected class BinaryResult <: Response {
                     case Date | DateTime | Timestamp | Time =>
                         let flag = buffer.readInt1()
                         row[i] = buffer.readArray(Int64(flag))
-                    //case _ => throw Exception("Unsupport MySQL binary type")
                 }
             }
         }
