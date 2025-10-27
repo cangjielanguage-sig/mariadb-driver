@@ -6,7 +6,7 @@ CREATE USER 'test_user'@'%' IDENTIFIED BY 'test_user';
 GRANT ALL PRIVILEGES ON driver_test.* TO 'test_user'@'%';
 
 #创建测试数据库
-CREATE DATABASE driver_test;
+CREATE DATABASE driver_test CHARSET utf8mb4;
 USE driver_test;
 
 #数字类型测试表

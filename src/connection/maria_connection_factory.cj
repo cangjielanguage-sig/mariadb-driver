@@ -123,7 +123,7 @@ private func prepareAuthRequest(handshake: Handshake, params: Map<String, String
             } else {
                 encryptedPassword = [1]
             }
-        case "mariadb_native_password" => encryptedPassword = mariadbNativePassword(originPassword.toArray(),handshake.salt)
+        case "mysql_native_password" => encryptedPassword = mariadbNativePassword(originPassword.toArray(),handshake.salt)
         case _ => throw ConnectFailedException("Unknow authentication plugin")
     }
     authReq.setUsername(username).setAuthResponse(encryptedPassword).setClientAuthPlugin(handshake.authPlugin)

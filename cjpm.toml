@@ -3,8 +3,8 @@
   version = "1.0.0"
   cjc-version = "1.0.0"
   output-type = "static"
-  compile-option = "-O2 -Woff deprecated -Woff unused  --disable-reflection"
-  
+  compile-option = "-O2 -Woff deprecated -Woff unused  --disable-reflection --diagnostic-format=noColor"
+
 [target]
   [target.x86_64-w64-mingw32]
     [target.x86_64-w64-mingw32.bin-dependencies]

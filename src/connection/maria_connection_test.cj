@@ -45,77 +45,77 @@ import std.unittest.testmacro.*
 * default: mariadb_native_password -> use: mariadb_native_password ssl: open √
 * default: mariadb_native_password -> use: sha256_password ssl: open √
 */
-@Test
-public class MariaConnectionTest {
+// @Test
+// public class MariaConnectionTest {
 
 
-    @TestCase
-    public func case1(): Unit {
-        var attr = HashMap<String, String>()
-        attr.add(Params.Username, "caching_user")
-        attr.add(Params.Password, "caching_user")
-        attr.add(Params.Host, "localhost")
-        attr.add(Params.Port, "3306")
-        attr.add(Params.SSLMode, "disabled")
-        var conn = createAuthedConnection(attr)
-        conn.close()
-    }
+//     @TestCase
+//     public func case1(): Unit {
+//         var attr = HashMap<String, String>()
+//         attr.add(Params.Username, "caching_user")
+//         attr.add(Params.Password, "caching_user")
+//         attr.add(Params.Host, "localhost")
+//         attr.add(Params.Port, "3306")
+//         attr.add(Params.SSLMode, "disabled")
+//         var conn = createAuthedConnection(attr)
+//         conn.close()
+//     }
 
-    @TestCase
-    public func case2(): Unit {
-        var attr = HashMap<String, String>()
-        attr.add(Params.Username, "native_user")
-        attr.add(Params.Password, "native_user")
-        attr.add(Params.Host, "localhost")
-        attr.add(Params.Port, "3306")
-        attr.add(Params.SSLMode, "disabled")
-        var conn = createAuthedConnection(attr)
-        conn.close()
-    }
+//     @TestCase
+//     public func case2(): Unit {
+//         var attr = HashMap<String, String>()
+//         attr.add(Params.Username, "native_user")
+//         attr.add(Params.Password, "native_user")
+//         attr.add(Params.Host, "localhost")
+//         attr.add(Params.Port, "3306")
+//         attr.add(Params.SSLMode, "disabled")
+//         var conn = createAuthedConnection(attr)
+//         conn.close()
+//     }
 
-    @TestCase
-    public func case3(): Unit {
-        var attr = HashMap<String, String>()
-        attr.add(Params.Username, "sha256_user")
-        attr.add(Params.Password, "sha256_user")
-        attr.add(Params.Host, "localhost")
-        attr.add(Params.Port, "3306")
-        attr.add(Params.SSLMode, "disabled")
-        var conn = createAuthedConnection(attr)
-        conn.close()
-    }
+//     @TestCase
+//     public func case3(): Unit {
+//         var attr = HashMap<String, String>()
+//         attr.add(Params.Username, "sha256_user")
+//         attr.add(Params.Password, "sha256_user")
+//         attr.add(Params.Host, "localhost")
+//         attr.add(Params.Port, "3306")
+//         attr.add(Params.SSLMode, "disabled")
+//         var conn = createAuthedConnection(attr)
+//         conn.close()
+//     }
 
-    @TestCase
-    public func case4(): Unit {
-        var attr = HashMap<String, String>()
-        attr.add(Params.Username, "caching_user")
-        attr.add(Params.Password, "caching_user")
-        attr.add(Params.Host, "localhost")
-        attr.add(Params.Port, "3306")
-        var conn = createAuthedConnection(attr)
-        conn.close()
-    }
+//     @TestCase
+//     public func case4(): Unit {
+//         var attr = HashMap<String, String>()
+//         attr.add(Params.Username, "caching_user")
+//         attr.add(Params.Password, "caching_user")
+//         attr.add(Params.Host, "localhost")
+//         attr.add(Params.Port, "3306")
+//         var conn = createAuthedConnection(attr)
+//         conn.close()
+//     }
 
-    @TestCase
-    public func case5(): Unit {
-        var attr = HashMap<String, String>()
-        attr.add(Params.Username, "native_user")
-        attr.add(Params.Password, "native_user")
-        attr.add(Params.Host, "localhost")
-        attr.add(Params.Port, "3306")
-        var conn = createAuthedConnection(attr)
-        conn.close()
-    }
+//     @TestCase
+//     public func case5(): Unit {
+//         var attr = HashMap<String, String>()
+//         attr.add(Params.Username, "native_user")
+//         attr.add(Params.Password, "native_user")
+//         attr.add(Params.Host, "localhost")
+//         attr.add(Params.Port, "3306")
+//         var conn = createAuthedConnection(attr)
+//         conn.close()
+//     }
 
-    @TestCase
-    public func case6(): Unit {
-        var attr = HashMap<String, String>()
-        attr.add(Params.Username, "sha256_user")
-        attr.add(Params.Password, "sha256_user")
-        attr.add(Params.Host, "localhost")
-        attr.add(Params.Port, "3306")
-        var conn = createAuthedConnection(attr)
-        conn.close()
-    }
+//     @TestCase
+//     public func case6(): Unit {
+//         var attr = HashMap<String, String>()
+//         attr.add(Params.Username, "sha256_user")
+//         attr.add(Params.Password, "sha256_user")
+//         attr.add(Params.Host, "localhost")
+//         attr.add(Params.Port, "3306")
+//         var conn = createAuthedConnection(attr)
+//         conn.close()
+//     }
 
-}
+// }

@@ -42,8 +42,8 @@ protected class DriverTest {
     @TestCase
     public func mysqlTest(): Unit {
         let driver = DriverManager.getDriver("mariadb").getOrThrow()
-        let username = ("username", "root")
-        let password = ("password", "root")
+        let username = ("username", "test_user")
+        let password = ("password", "test_user")
         let database = ("database", "driver_test")
         let sslMode = ("ssl.mode", "disabled")
         let dataSource = driver.open("mariadb://localhost:3306", [username, password, database, sslMode])
