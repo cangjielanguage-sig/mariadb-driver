@@ -25,10 +25,6 @@ protected class QuitCommand <: Command {
 
 }
 
-/*
- * Change the default schema of the connection
- * referenced document: https://dev.mariadb.com/doc/dev/mariadb-server/latest/page_protocol_com_init_db.html
- */
 protected class InitDbCommand <: Command {
 
     private let database: String
@@ -44,10 +40,6 @@ protected class InitDbCommand <: Command {
     }
 }
 
-/*
- * Get a human readable string of some internal status vars.
- * referenced document: https://dev.mariadb.com/doc/dev/mariadb-server/latest/page_protocol_com_statistics.html
- */
 protected class StatisticsCommand <: Command {
 
     protected init() {
@@ -56,40 +48,24 @@ protected class StatisticsCommand <: Command {
 
 }
 
-/*
- * Dump debug info to server's stdout
- * referenced document: https://dev.mariadb.com/doc/dev/mariadb-server/latest/page_protocol_com_debug.html
- */
 protected class DebugCommand <: Command {
     protected init() {
         super(Debug)
     }
 }
 
-/*
- * Check if the server is alive
- * referenced document: https://dev.mariadb.com/doc/dev/mariadb-server/latest/page_protocol_com_ping.html
- */
 protected class PingCommand <: Command {
     protected init() {
         super(Ping)
     }
 }
 
-/*
- * Resets the session state
- * referenced document: https://dev.mariadb.com/doc/dev/mariadb-server/latest/page_protocol_com_reset_connection.html
- */
 protected class ResetConnectionCommand <: Command {
     protected init() {
         super(ResetConnection)
     }
 }
 
-/*
- * Sets options for the current connection
- * referenced document: https://dev.mariadb.com/doc/dev/mariadb-server/latest/page_protocol_com_set_option.html
- */
 protected class SetOptionCommand <: Command {
 
     private let operation: StatementOption

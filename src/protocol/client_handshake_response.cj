@@ -164,10 +164,6 @@ protected class HandshakeResponse <: Request {
 
 }
 
-/*
-* SSL Connection Request Packet.
-* referenced document: https://dev.mariadb.com/doc/dev/mariadb-server/latest/page_protocol_connection_phase_packets_protocol_ssl_request.html
-*/
 protected class SslRequeset <: Request {
 
     protected var capabilities: UInt32 = 0x00

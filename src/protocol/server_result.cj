@@ -89,10 +89,6 @@ protected class ColumnDefinition <: CommonResponse {
     }
 }
 
-/*
- * Text Resultset Row Packet
- * referenced document: https://dev.mariadb.com/doc/dev/mariadb-server/latest/page_protocol_com_query_response_text_resultset_row.html
- */
 protected class TextResult <: CommonResponse {
 
     protected let row: Array<?Array<Byte>>
@@ -106,10 +102,6 @@ protected class TextResult <: CommonResponse {
     }
 }
 
-/*
- * Binary Protocol Resultset
- * referenced document: https://dev.mariadb.com/doc/dev/mariadb-server/latest/page_protocol_binary_resultset.html
- */
 protected class BinaryResult <: Response {
     
     protected let nullMap: Array<Byte>

@@ -32,10 +32,6 @@ protected open class CommonResponse {
 
 }
 
-/*
-* Generic Response Packets
-* referenced document: https://dev.mariadb.com/doc/dev/mariadb-server/latest/page_protocol_basic_response_packets.html
-*/
 protected open class Response <: CommonResponse {
 
     protected let code: ResponseCode
@@ -47,11 +43,6 @@ protected open class Response <: CommonResponse {
 
 }
 
-/*
-* OK packet
-* An OK packet is sent from the server to the client to signal successful completion of a command.
-* referenced document: https://dev.mariadb.com/doc/dev/mariadb-server/latest/page_protocol_basic_ok_packet.html
-*/
 protected class OkResponse <: Response {
 
     protected let effectRows: UInt64
@@ -95,11 +86,6 @@ protected class OkResponse <: Response {
 }
 
 
-/*
-* Error Packet
-* This packet signals that an error occurred.
-* referenced document: https://dev.mariadb.com/doc/dev/mariadb-server/latest/page_protocol_basic_err_packet.html
-*/
 protected class ErrorResponse <: Response {
 
     protected let errorCode: UInt16
@@ -124,10 +110,6 @@ protected class ErrorResponse <: Response {
 
 }
 
-/*
-* EOF packet
-* referenced document: https://dev.mariadb.com/doc/dev/mariadb-server/latest/page_protocol_basic_eof_packet.html
-*/
 protected open class AbstractEOF <: Response {
 
     protected init(length: UInt64, number: UInt8, buffer: ByteBuffer) {
@@ -174,10 +156,6 @@ protected class EofResponse <: AbstractEOF {
 
 }
 
-/*
-* COM_STMT_PREPARE_OK
-* referenced document: https://dev.mariadb.com/doc/dev/mariadb-server/latest/page_protocol_com_stmt_prepare.html#sect_protocol_com_stmt_prepare_response
-*/
 protected class PrepareResposne <: Response {
 
     protected let statementId: UInt32
