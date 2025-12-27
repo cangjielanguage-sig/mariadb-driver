@@ -80,7 +80,7 @@ protected func createAuthedConnection(params: Map<String, String>): MariaConnect
                         let encryptedPwd = performFullAuthentication(response.publicKey, originPassword.toNullTerminated(), authSwitch.salt)
                         return sendPassword(connection, encryptedPwd, response.number)
                     }
-                case "mariadb_native_password" =>
+                case "mysql_native_password" =>
                     let encryptedPwd = mariadbNativePassword(originPassword.toArray(), authSwitch.salt)
                     return sendPassword(connection, encryptedPwd, authSwitch.number);
                 case _ => throw ConnectFailedException("Unsupported auth plugin")
