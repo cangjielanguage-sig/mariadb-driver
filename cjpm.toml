@@ -1,6 +1,6 @@
 [package]
   name = "mariadb"
-  version = "1.0.0"
+  version = "2.0.2"
   cjc-version = "1.0.0"
   output-type = "static"
   compile-option = "-O2 -Woff deprecated -Woff unused  --disable-reflection --diagnostic-format=noColor"
