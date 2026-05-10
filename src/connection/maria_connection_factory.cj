@@ -22,6 +22,7 @@ import std.net.*
 import std.collection.*
 import std.convert.*
 import stdx.net.tls.*
+import stdx.net.tls.common.*
 import stdx.crypto.x509.*
 import stdx.crypto.keys.*
 import mariadb.protocol.*
@@ -135,27 +136,15 @@ private func prepareAuthRequest(handshake: Handshake, params: Map<String, String
 
 private func sslHandshake(connection: MariaConnection, sslMode: String, params: Map<String, String>) {
     var config = TlsClientConfig()
-    if (sslMode == "preferred" || sslMode == "required") {
+    if (sslMode == "preferred" || sslMode == "required" || sslMode == "verify_ca") {
         config.verifyMode = CertificateVerifyMode.TrustAll
-    } else if (sslMode == "verify_ca") {
-        match (params.get(Params.SSLCA)) {
-            case None => throw ConnectFailedException("ssl.mode=verify_ca must set ssl.ca")
-            case Some(v) => 
-                let certificates = X509Certificate.decodeFromPem(String.fromUtf8(File.readFrom(v)))
-                config.verifyMode = CertificateVerifyMode.CustomCA(certificates)
-        }
     }
-    config.clientCertificate = getClientCertificate(params)
-    config.domain = params.get(Params.SSLSni)
-    config.cipherSuitesV1_2 = (params.get(Params.Tls12Ciphersuites) ?? "").split(":", removeEmpty: true)
-    config.cipherSuitesV1_3 = (params.get(Params.Tls13Ciphersuites) ?? "").split(":", removeEmpty: true)
     //(config.minVersion, config.maxVersion) = getMinAndMaxTlsVersion(option.get(Params.TlsVersion))
-    let lastSession: ?TlsSession = None
     try {
-        let tls: TlsSocket = TlsSocket.client(connection.socket, session: lastSession, clientConfig: config)
+        let tls: TlsSocket = TlsSocket.client(connection.socket, clientConfig: config)
         tls.handshake()
         connection.socket = tls
-    } catch (e: TlsException) {
+    } catch (e: Exception) {
         throw ConnectFailedException(e.message)
     }
 }
@@ -226,15 +215,15 @@ private func requestPublicKey(connection: MariaConnection, requestKeyCode: Byte,
 //     }
 // }
 
-private func getClientCertificate(params: Map<String, String>): ?(Array<X509Certificate>, PrivateKey) {
+private func getClientCertificate(params: Map<String, String>): ?(Array<X509Certificate>, Object) {
     match (params.get(Params.SSLCert)) {
         case None => None
-        case Some(publicKeyPath) => 
+        case Some(publicKeyPath) =>
             match (params.get(Params.SSLKey)) {
                 case None => throw ConnectFailedException()
-                case Some(privateKeyPath) => 
+                case Some(privateKeyPath) =>
                     let certificates = X509Certificate.decodeFromPem(String.fromUtf8(File.readFrom(publicKeyPath)))
-                    let privateKey: PrivateKey = match (certificates[0].publicKeyAlgorithm) {
+                    let privateKey: Object = match (certificates[0].publicKeyAlgorithm) {
                         case PublicKeyAlgorithm.RSA => RSAPrivateKey.decodeFromPem(privateKeyPath, password: params.get(Params.SSLKeyPassword))
                         case PublicKeyAlgorithm.ECDSA => ECDSAPrivateKey.decodeFromPem(privateKeyPath, password: params.get(Params.SSLKeyPassword))
                         case _ => throw ConnectFailedException("Unsupported protected key algorithm")
