@@ -88,7 +88,7 @@ protected class DriverTest {
         let idleTimeout = ("pool.idle.timeout", "1")
         let keepaliveTime = ("pool.keepalive.time", "0.5")
         let maxIdleSize = ("pool.max.idle.size", "30")
-        let maxLifeTime = ("pool.max.life..time", "10")
+        let maxLifeTime = ("pool.max.life.time", "10")
         let maxSize = ("pool.max.size", "100")
         let params = ArrayList<(String, String)>()
         params.add(username)
