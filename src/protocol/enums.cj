@@ -37,7 +37,7 @@ protected enum AuthState {
     public func value(): Byte {
         match (this) {
             case FastAuthSuccess => 0x03
-            case performFullAuthentication => 0x04
+            case PerformFullAuthentication => 0x04
         }
     }
 
