@@ -23,23 +23,23 @@ import std.database.sql.*
 
 public class DatasourceImpl <: Datasource {
 
-    private var optinos: HashMap<String, String>
+    private var options: HashMap<String, String>
 
     private var closed: AtomicBool
 
     public DatasourceImpl() {
-        optinos = HashMap<String, String>()
+        options = HashMap<String, String>()
         closed = AtomicBool(false)
     }
     
     public override func setOption(key: String, value: String): Unit {
         checkResource()
-        optinos.add(key, value)
+        options.add(key, value)
     }
 
     public override func connect(): Connection {
         checkResource()
-        return ConnectionImpl(optinos)
+        return ConnectionImpl(options)
     }
 
     public override func close() {

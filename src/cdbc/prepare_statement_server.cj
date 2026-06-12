@@ -138,7 +138,7 @@ public class ServerPrepareStatement <: Statement {
                 connection.executeQueryPrepare(prepareResult, parameters)
             case Some(v) => 
                 let fetchSize = UInt32.parse(v)
-                connection.executeQueryPrepareWithCurosr(prepareResult, parameters, fetchSize)
+                connection.executeQueryPrepareWithCursor(prepareResult, parameters, fetchSize)
         }
         return QueryResultImpl(result)
     }

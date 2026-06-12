@@ -68,19 +68,19 @@ protected class PrepareCommand <: Command {
 
 protected class FetchCommand <: Command {
     
-    private let statemetnId: UInt32
+    private let statementId: UInt32
 
     private let numRows: UInt32
 
-    protected init(statemetnId: UInt32, numRows: UInt32){
+    protected init(statementId: UInt32, numRows: UInt32){
         super(StmtFetch)
-        this.statemetnId = statemetnId
+        this.statementId = statementId
         this.numRows = numRows
     }
 
     protected override func pack(): Unit {
         super.pack()
-        this.statemetnId |> buffer.writeInt4
+        this.statementId |> buffer.writeInt4
         this.numRows |> buffer.writeInt4
     }
 
@@ -119,22 +119,22 @@ protected class ResetCommand <: Command {
 
 protected class SendLongDataCommand <: Command {
 
-    private let statemetnId: UInt32
+    private let statementId: UInt32
 
     private let parameterId: UInt16
 
     private let data: Array<Byte>
 
-    protected init(statemetnId: UInt32, parameterId: UInt16, data: Array<Byte>) {
+    protected init(statementId: UInt32, parameterId: UInt16, data: Array<Byte>) {
         super(StmtSendLongData)
-        this.statemetnId = statemetnId
+        this.statementId = statementId
         this.parameterId = parameterId
         this.data = data
     }
 
     public override func pack(): Unit {
         super.pack()
-        this.statemetnId |> buffer.writeInt4
+        this.statementId |> buffer.writeInt4
         this.parameterId |> buffer.writeInt2
         this.data |> buffer.write
     }

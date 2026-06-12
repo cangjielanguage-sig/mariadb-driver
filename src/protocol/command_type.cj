@@ -30,7 +30,7 @@ protected enum CommandType {
     | Statistics
     | ProcessInfo
     | Connect
-    | PreocessKill
+    | ProcessKill
     | Debug
     | Ping
     | Time
@@ -48,7 +48,7 @@ protected enum CommandType {
     | SetOption
     | StmtFetch
     | Daemon
-    | BingLongDumpGTID
+    | BinLogDumpGTID
     | ResetConnection
     | Clone 
     | SubscribeGroupReplicationStream
@@ -67,9 +67,9 @@ protected enum CommandType {
             case Statistics => 0x09
             case ProcessInfo => 0x0A
             case Connect => 0x0B
-            case PreocessKill => 0x0C
+            case ProcessKill => 0x0C
             case Debug => 0x0D
-            case Ping => 0xE
+            case Ping => 0x0E
             case Time => 0x0F
             case DelayedInsert => 0x10
             case ChangeUser => 0x11
@@ -86,7 +86,7 @@ protected enum CommandType {
             case StmtFetch => 0x1C
             //uncheck
             case Daemon => 0x1D
-            case BingLongDumpGTID => 0x1E
+            case BinLogDumpGTID => 0x1E
             case ResetConnection => 0x1F
             case Clone => 0x20
             case SubscribeGroupReplicationStream => 0x21
@@ -107,7 +107,7 @@ protected enum CommandType {
             case 0x09 => Statistics
             case 0x0A => ProcessInfo
             case 0x0B => Connect
-            case 0x0C => PreocessKill
+            case 0x0C => ProcessKill
             case 0x0D => Debug
             case 0x0E => Ping
             case 0x0F => Time
@@ -125,7 +125,7 @@ protected enum CommandType {
             case 0x1B => SetOption
             case 0x1C => StmtFetch
             case 0x1D => Daemon
-            case 0x1E => BingLongDumpGTID
+            case 0x1E => BinLogDumpGTID
             case 0x1F => ResetConnection
             case 0x20 => Clone
             case 0x21 => SubscribeGroupReplicationStream

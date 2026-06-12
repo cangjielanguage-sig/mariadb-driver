@@ -151,7 +151,7 @@ protected class MariaConnection <: Resource {
     * @result ResultSet 
     * @throws ResponseErrorException
     */
-    protected func executeQueryPrepareWithCurosr(statementId: UInt32, params: Array<Any>, fetchSize: UInt32): ResultSet {
+    protected func executeQueryPrepareWithCursor(statementId: UInt32, params: Array<Any>, fetchSize: UInt32): ResultSet {
         synchronized(connectionMutex) {
             handleLongData(statementId, params)
             writeRequest(ExecuteCommand.withReadOnly(statementId, params))

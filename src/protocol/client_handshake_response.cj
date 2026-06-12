@@ -78,7 +78,7 @@ protected class HandshakeResponse <: Request {
         return this
     }
 
-    protected func setAttrbiture(attributes: Array<(String, String)>): HandshakeResponse {
+    protected func setAttribute(attributes: Array<(String, String)>): HandshakeResponse {
         this.attributes = attributes
         return this
     }
@@ -88,7 +88,7 @@ protected class HandshakeResponse <: Request {
         return this
     }
 
-    protected func setCapabilitys(capabilities: UInt32): HandshakeResponse {
+    protected func setCapabilities(capabilities: UInt32): HandshakeResponse {
         this.capabilities = capabilities
         return this
     }
@@ -124,7 +124,7 @@ protected class HandshakeResponse <: Request {
         if(hasCapability(ConnectWithDB)) {
             this.schema |> buffer.writeNullTerminated
         }
-        //put client auth plguin
+        //put client auth plugin
         if(hasCapability(PluginAuth)) {
             this.clientAuthPlugin |> buffer.writeNullTerminated
         }
@@ -148,7 +148,7 @@ protected class HandshakeResponse <: Request {
     }
 
     protected func sslRequest(): Request {
-        let ssl = SslRequeset(number)
+        let ssl = SslRequest(number)
         ssl.capabilities = capabilities
         ssl.maxPacket = maxPacket
         ssl.charset = charset
@@ -157,14 +157,14 @@ protected class HandshakeResponse <: Request {
 
     protected static func getDefault(number: UInt8): HandshakeResponse{
         return HandshakeResponse(number)
-                            .setCapabilitys(DefaultCapability.default)
+                            .setCapabilities(DefaultCapability.default)
                             .setCharset(33)
                             .setMaxPacket(1073741824)
     }
 
 }
 
-protected class SslRequeset <: Request {
+protected class SslRequest <: Request {
 
     protected var capabilities: UInt32 = 0x00
 

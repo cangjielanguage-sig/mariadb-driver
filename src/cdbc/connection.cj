@@ -126,9 +126,9 @@ public class ConnectionImpl <: Connection {
         }
     }
 
-    protected func executeQueryPrepareWithCurosr(prepare: PrepareResult, params: Array<Any>, fetchSize: UInt32): ResultSet {
+    protected func executeQueryPrepareWithCursor(prepare: PrepareResult, params: Array<Any>, fetchSize: UInt32): ResultSet {
         try {
-            return connection.executeQueryPrepareWithCurosr(prepare.id, params, fetchSize)
+            return connection.executeQueryPrepareWithCursor(prepare.id, params, fetchSize)
         } catch (e: ResponseErrorException) {
             throw SqlException(e.message)
         }

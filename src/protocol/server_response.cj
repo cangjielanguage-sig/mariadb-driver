@@ -51,7 +51,7 @@ protected class OkResponse <: Response {
 
     protected let serverStatus: UInt16
 
-    protected let waringCount: UInt16
+    protected let warningCount: UInt16
 
     //protected let message: String
 
@@ -66,7 +66,7 @@ protected class OkResponse <: Response {
         //服务器状态: 2 byte
         this.serverStatus = buffer.readInt2()
         //警告数量: 2 byte
-        this.waringCount = buffer.readInt2()
+        this.warningCount = buffer.readInt2()
         //this.message = ""
         //this.sessionInfo = ""
         // if(DefaultCapability.has(SessionTrack)) {
@@ -142,14 +142,14 @@ protected class AuthSwitch <: AbstractEOF {
 */
 protected class EofResponse <: AbstractEOF {
 
-    protected let waringCount: UInt16
+    protected let warningCount: UInt16
 
     protected let status: UInt16
 
     protected init(length: UInt64, number: UInt8, buffer: ByteBuffer) {
         super(length, number, buffer)
         //警告数量: 2 byte
-        this.waringCount = buffer.readInt2()
+        this.warningCount = buffer.readInt2()
         //状态标志
         this.status = buffer.readInt2()
     }
