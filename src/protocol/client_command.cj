@@ -106,7 +106,7 @@ protected class ResetCommand <: Command {
     private let statementId: UInt32
 
     internal init(statementId: UInt32){
-        super(StmtClose)
+        super(StmtReset)
         this.statementId = statementId
     }
 
