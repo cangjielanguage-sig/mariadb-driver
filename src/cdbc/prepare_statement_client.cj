@@ -33,7 +33,11 @@ public class ClientPrepareStatement <: Statement {
 
     private let options: HashMap<String, String>
 
+    private let parts: Array<String>
+
     private var closed: Bool
+
+    private var cachedSql: ?String
 
     public ClientPrepareStatement(originSql: String, connection: ConnectionImpl) {
         this.connection = connection
@@ -41,6 +45,8 @@ public class ClientPrepareStatement <: Statement {
         this.closed = false
         this.options = HashMap<String, String>()
         this.parameters = Array<Any>(originSql.count("?"), repeat: Option<Any>.None)
+        this.parts = originSql.split("?", removeEmpty: true)
+        this.cachedSql = None
     }
 
     public override prop parameterColumnInfos: Array<ColumnInfo> {
@@ -93,6 +99,7 @@ public class ClientPrepareStatement <: Statement {
             case v: ?InputStream => unwrap(v)
             case _ => parameters[index - 1] = value
         }
+        cachedSql = None
     }
 
     public func setNull(index: Int): Unit {
@@ -101,11 +108,12 @@ public class ClientPrepareStatement <: Statement {
             throw IllegalArgumentException("The parameter index must be greater than 0")
         }
         parameters[index - 1] = Option<Any>.None
+        cachedSql = None
     }
 
     public func update(): UpdateResult {
         checkResource()
-        let executeableSql = getExecuteableSql()
+        let executeableSql = getOrBuildSql()
         let result = connection.sendUpdate(executeableSql)
         var lastInsertId: Int64 = 0
         if (result.lastInsertId > 0) {
@@ -116,7 +124,7 @@ public class ClientPrepareStatement <: Statement {
 
     public func query(): QueryResult {
         checkResource()
-        let executeableSql = getExecuteableSql()
+        let executeableSql = getOrBuildSql()
         return QueryResultImpl(connection.sendQuery(executeableSql))
     }
 
@@ -125,14 +133,23 @@ public class ClientPrepareStatement <: Statement {
         options.add(key, value)
     }
 
-    private func getExecuteableSql(): String {
+    private func getOrBuildSql(): String {
+        match (cachedSql) {
+            case Some(s) => s
+            case None =>
+                let built = buildSql()
+                cachedSql = built
+                built
+        }
+    }
+
+    private func buildSql(): String {
         let sqlBuilder = StringBuilder()
-        let parts = originSql.split("?", removeEmpty: true)
         for(i in 0..parts.size) {
             sqlBuilder.append(parts[i])
             if(i < parameters.size) {
                 match (parameters[i]) {
-                    case param: SqlParameter =>sqlBuilder.append(param.asParameter())
+                    case param: SqlParameter => sqlBuilder.append(param.asParameter())
                     case _ =>  throw UnsupportedException("an unsupported sql type")
                 }
             }
@@ -149,6 +166,7 @@ public class ClientPrepareStatement <: Statement {
     public override func close() {
         checkResource()
         closed = true
+        cachedSql = None
     }
 
     public override func isClosed(): Bool {
