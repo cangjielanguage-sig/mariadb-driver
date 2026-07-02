@@ -191,4 +191,4 @@ main(){
 
 本项目由[@Yesokim](https://gitcode.com/Yesokim)实现并维护。技术支持和意见反馈请提Issue。
 
-本项目基于 GPL2.0，欢迎给我们提交PR，欢迎参与任何形式的贡献。
+本项目基于 Apache License 2.0，欢迎给我们提交PR，欢迎参与任何形式的贡献。
